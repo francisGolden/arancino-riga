@@ -1,6 +1,17 @@
-Welcome to your new TanStack Start app! 
-
 # Getting Started
+
+# Arancino Riga
+Restaurant entrepreneur simulator set in Riga, Latvia.
+
+Main features
+Business types: street food truck, ice cream truck, pizzeria.
+Ingredients: buy from the market, store, use for recipes or throw away (expired).
+Finished products: buy from the market, create, store, sell or throw away (expired).
+Business: open, buy, sell, upgrade, expand, close (bankruptcy).
+Employees: kitchen staff (cook, dishwasher), backend staff (book keeper, ...), shop assistant, waiter.
+Employee actions: hire, fire, promote, change location.
+Locations: old town, Agenskalns, ...
+Kitchen equipment: buy, change location, sell, upgrade.
 
 To run this application:
 
