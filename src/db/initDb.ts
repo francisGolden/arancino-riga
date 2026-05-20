@@ -1,5 +1,6 @@
 import {get, set} from "idb-keyval"
-import { Low, type Adapter } from "lowdb"
+import { Low } from "lowdb"
+import type { Adapter } from "lowdb"
 import type { GameDb } from "#/types"
 
 class IndexedDBAdapter<T> implements Adapter<T> {
