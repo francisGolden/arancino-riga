@@ -1,5 +1,7 @@
 import { db } from "#/db/initDb"
 
+db.read()
+
 export const currentTime = Date.now()
 
 export const initializeGameTime = async () => {
@@ -14,3 +16,8 @@ export const initializeGameTime = async () => {
     console.log('game already initialized. ', 'gameStartedAt: ', db.data.gameStartedAt)
   }
 }
+
+const gameStartedAt = JSON.parse(db.data.gameStartedAt)
+export const elapsedTime = Date.now() - gameStartedAt
+export const elapsedSeconds = Math.floor(elapsedTime/1000)
+export const elapsedMinutes = elapsedSeconds / 60

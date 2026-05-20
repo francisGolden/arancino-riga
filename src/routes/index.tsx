@@ -1,16 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { initializeGameTime } from '#/engine/world/time'
-import { db } from '#/db/initDb'
+import { initializeGameTime, elapsedMinutes } from '#/engine/world/time'
 
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
   initializeGameTime()
-  db.read()
-  const gameStartedAt = JSON.parse(db.data.gameStartedAt)
-  const elapsedTime = Date.now() - gameStartedAt
-  const elapsedSeconds = Math.floor(elapsedTime/1000)
-  const elapsedMinutes = elapsedSeconds / 60
 
   return (
     <div className="p-8">
