@@ -1,4 +1,4 @@
 export interface GameDb {
-  gameStartedAt: number;
-  lastSavedAt: number;
+  gameStartedAt: number | null;
+  lastSavedAt: number | null;
 }

@@ -4,8 +4,6 @@ import { getElapsedGameTime } from '#/engine/world/time'
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
-  
-
   const {elapsedSeconds} = getElapsedGameTime()
 
   return (
