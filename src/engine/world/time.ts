@@ -12,6 +12,5 @@ export const initializeGameTime = async () => {
     })
   } else {
     console.log('game already initialized. ', 'gameStartedAt: ', db.data.gameStartedAt)
-    return db.data.gameStartedAt
   }
 }
