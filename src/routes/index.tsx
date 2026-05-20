@@ -1,15 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { initializeGameTime, elapsedMinutes } from '#/engine/world/time'
+import { getElapsedGameTime } from '#/engine/world/time'
 
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
-  initializeGameTime()
+  
+
+  const {elapsedSeconds} = getElapsedGameTime()
 
   return (
     <div className="p-8">
       <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <span>gameStartedAt: {elapsedMinutes}</span>
+      <span>gameStartedAt: {elapsedSeconds/60}</span>
       <p className="mt-4 text-lg">
         Edit <code>src/routes/index.tsx</code> to get started.
       </p>

@@ -5,19 +5,27 @@ db.read()
 export const currentTime = Date.now()
 
 export const initializeGameTime = async () => {
-  db.read()
+  await db.read()
 
   if (!db.data.gameStartedAt) {
     console.log('game not initialized yet')
-    db.update(data => {
-      data.gameStartedAt = JSON.stringify(Date.now())
+    await db.update(data => {
+      data.gameStartedAt = Date.now()
     })
   } else {
     console.log('game already initialized. ', 'gameStartedAt: ', db.data.gameStartedAt)
   }
 }
 
-const gameStartedAt = JSON.parse(db.data.gameStartedAt)
-export const elapsedTime = Date.now() - gameStartedAt
-export const elapsedSeconds = Math.floor(elapsedTime/1000)
-export const elapsedMinutes = elapsedSeconds / 60
+export const getElapsedGameTime = () => {
+  if (!db.data.gameStartedAt) {
+    console.warn("Attempted to get elapsed time before DB was initialized.");
+    return { elapsedTime: 0, elapsedSeconds: 0 };
+  }
+
+  const gameStartedAt = db.data.gameStartedAt;
+  const elapsedTime = Date.now() - gameStartedAt;
+  const elapsedSeconds = Math.floor(elapsedTime / 1000);
+
+  return { elapsedTime, elapsedSeconds };
+}

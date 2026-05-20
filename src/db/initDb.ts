@@ -3,8 +3,8 @@ import { LowSync } from "lowdb"
 import type { GameDb } from "#/types"
 
 const defaultData: GameDb = {
-    gameStartedAt: "",
-    lastSavedAt: ""
+    gameStartedAt: 0,
+    lastSavedAt: 0
 }
 
 const adapter = new LocalStorage<GameDb>("game-db")
