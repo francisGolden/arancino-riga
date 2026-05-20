@@ -1,18 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getElapsedGameTime } from '#/engine/world/time'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
   const [elapsed, setElapsed] = useState(0)
 
-  setInterval(() => {
-    const { elapsedTime } = getElapsedGameTime()
-    setElapsed(elapsedTime)
-  }, 2000)
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const { elapsedTime } = getElapsedGameTime()
+      setElapsed(elapsedTime)
+    }, 2000)
 
-  const elapsedMinutes = (Math.floor(elapsed / 1000))/60
+    return () => clearInterval(intervalId)
+  }, [])
+
+  const elapsedMinutes = Math.floor(elapsed / 1000) / 60
 
   return (
     <div className="p-8">
