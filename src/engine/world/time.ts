@@ -3,11 +3,11 @@ import { db } from "#/db/initDb"
 export const currentTime = Date.now()
 
 export const initializeGameTime = async () => {
-  db.read()
+  await db.read()
 
   if (!db.data.gameStartedAt) {
     console.log('game not initialized yet')
-    db.update(data => {
+    await db.update(data => {
       data.gameStartedAt = Date.now()
     })
   } else {
