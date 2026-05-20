@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom/client'
+import React from 'react'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import { initializeGameTime } from './engine/world/time'
@@ -15,11 +16,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
-initializeGameTime()
+await initializeGameTime()
 
 const rootElement = document.getElementById('app')!
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
-  root.render(<RouterProvider router={router} />)
+  root.render(<React.StrictMode><RouterProvider router={router} /></React.StrictMode>)
 }
