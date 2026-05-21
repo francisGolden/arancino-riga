@@ -22,6 +22,8 @@ export interface MoneyState {
 export interface BusinessConfig {
   id: string;
   baseCost: number;
+  baseIncome: number;
   name: string;
   description: string;
+  location: string;
 }
