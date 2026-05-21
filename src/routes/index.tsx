@@ -11,18 +11,6 @@ function Home() {
   const [elapsed, setElapsed] = useState(0)
   const increaseMoney = useMoney((state) => state.increaseMoney)
   const money = useMoney((state) => state.money)
-  const hydrateMoney = useMoney((state) => state.hydrateMoney)
-
-  useEffect(() => {
-    (async () => {
-      try {
-        await db.read()
-        hydrateMoney(db.data.money)
-      } catch (error) {
-        console.error('error in hydrating money', error)
-      }
-    })()
-  }, [])
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime

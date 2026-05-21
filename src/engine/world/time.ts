@@ -1,5 +1,6 @@
 import { db } from '#/db/initDb'
 import type { ElapsedTimeResult } from '#/types'
+import { useMoney } from '#/store/currency'
 
 export const currentTime = Date.now()
 
@@ -15,6 +16,7 @@ export const initializeGameTime = async (): Promise<void> => {
     try {
       await db.update((data) => {
         data.gameStartedAt = Date.now()
+        data.money = 100
       })
     } catch (error) {
       console.error(error)
@@ -25,7 +27,7 @@ export const initializeGameTime = async (): Promise<void> => {
       'gameStartedAt: ',
       db.data.gameStartedAt,
     )
-
+    useMoney.getState().hydrateMoney(db.data.money)
   }
 }
 
