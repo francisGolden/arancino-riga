@@ -2,6 +2,8 @@ export interface GameDb {
   gameStartedAt: number;
   lastSavedAt: number;
   money: number;
+  ownedBusinesses: [];
+  businessList: BusinessConfig[];
 }
 
 export interface ElapsedTimeResult {
@@ -15,4 +17,11 @@ export interface MoneyState {
   decreaseMoney: (amount: number) => void;
   setMoney: (amount: number) => void;
   hydrateMoney: (savedAmount: number) => void;
+}
+
+export interface BusinessConfig {
+  id: string;
+  baseCost: number;
+  name: string;
+  description: string;
 }
