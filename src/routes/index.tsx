@@ -3,11 +3,14 @@ import { getElapsedGameTime } from '#/engine/world/time'
 import { useState, useEffect } from 'react'
 import { db } from '#/db/initDb'
 import type { ElapsedTimeResult } from '#/types'
+import { useMoney } from '#/store/currency'
 
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
   const [elapsed, setElapsed] = useState(0)
+  const increaseMoney = useMoney((state) => state.increaseMoney)
+  const money = useMoney((state) => state.money)
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
@@ -56,6 +59,8 @@ function Home() {
       <p className="mt-4 text-lg">
         Edit <code>src/routes/index.tsx</code> to get started.
       </p>
+      <button onClick={() => increaseMoney(1)}>Click me</button>
+      <span>Money: {money}</span>
     </div>
   )
 }
