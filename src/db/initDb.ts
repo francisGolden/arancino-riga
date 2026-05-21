@@ -24,7 +24,8 @@ class IndexedDBAdapter<T> implements Adapter<T> {
 
 const defaultData: GameDb = {
     gameStartedAt: 0,
-    lastSavedAt: 0
+    lastSavedAt: 0,
+    money: 0
 }
 
 const adapter = new IndexedDBAdapter<GameDb>("game-db")
