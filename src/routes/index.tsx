@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useState, useEffect } from 'react'
+import { db } from '#/db/initDb'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -11,8 +12,28 @@ function Home() {
     const intervalId = setInterval(() => {
       const { elapsedTime } = getElapsedGameTime()
       setElapsed(elapsedTime)
-    }, 2000)
+      db.read()
+      console.log(db.data)
+    }, 3000)
 
+    return () => clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    const AUTOSAVE_INTERVAL_MS = 10000 // Save every 10 seconds
+
+    const intervalId = setInterval(async () => {
+      try {
+        await db.update((data) => {
+          data.lastSavedAt = Date.now()
+        })
+        console.log('Game auto-saved.')
+      } catch (error) {
+        console.error('Auto-save failed', error)
+      }
+    }, AUTOSAVE_INTERVAL_MS)
+
+    // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId)
   }, [])
 
