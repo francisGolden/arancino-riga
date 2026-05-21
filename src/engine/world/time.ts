@@ -25,6 +25,7 @@ export const initializeGameTime = async (): Promise<void> => {
       'gameStartedAt: ',
       db.data.gameStartedAt,
     )
+
   }
 }
 

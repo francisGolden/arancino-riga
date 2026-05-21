@@ -11,6 +11,18 @@ function Home() {
   const [elapsed, setElapsed] = useState(0)
   const increaseMoney = useMoney((state) => state.increaseMoney)
   const money = useMoney((state) => state.money)
+  const hydrateMoney = useMoney((state) => state.hydrateMoney)
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await db.read()
+        hydrateMoney(db.data.money)
+      } catch (error) {
+        console.error('error in hydrating money', error)
+      }
+    })()
+  }, [])
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
@@ -18,9 +30,10 @@ function Home() {
 
     const UPDATE_ELAPSED_TIME_MS = 3000
 
-    const getElapsedGameTimeWrapper: (() => ElapsedTimeResult) = getElapsedGameTime()
+    const getElapsedGameTimeWrapper: () => ElapsedTimeResult =
+      getElapsedGameTime()
 
-    // using window.setInterval to avoid the type ambiguity 
+    // using window.setInterval to avoid the type ambiguity
     // between browser's setInterval and NodeJS.Timeout
     const intervalId: number = window.setInterval((): void => {
       const { elapsedTime } = getElapsedGameTimeWrapper()

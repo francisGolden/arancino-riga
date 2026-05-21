@@ -1,8 +1,30 @@
-import { create } from "zustand"
-import type { MoneyState } from "#/types"
+import { create } from 'zustand'
+import type { MoneyState } from '#/types'
+import { db } from '#/db/initDb'
 
-export const useMoney = create<MoneyState>((set) => ({
-    money: 0,
-    increaseMoney: (amount: number) => set((state) => ({ money: state.money + amount })),
-    decreaseMoney: (amount: number) => set((state) => ({ money: state.money - amount }))
+const updateDbMoney = async (currentMoney: number) => {
+  try {
+    await db.update((data) => (data.money = currentMoney))
+    console.log('money updated')
+  } catch (error) {
+    console.error('could not update money', error)
+  }
+}
+
+export const useMoney = create<MoneyState>((set, get) => ({
+  money: 0,
+  increaseMoney: async (amount: number) => {
+    set((state) => ({ money: state.money + amount }))
+
+    const currentMoney = get().money
+    await updateDbMoney(currentMoney)
+  },
+  decreaseMoney: async (amount: number) => {
+    set((state) => ({ money: state.money - amount }))
+
+    const currentMoney = get().money
+    await updateDbMoney(currentMoney)
+
+  },
+  hydrateMoney: (savedAmount: number): void => set({ money: savedAmount }),
 }))
