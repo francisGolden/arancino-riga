@@ -36,6 +36,8 @@ export const getElapsedGameTime = (): (() => ElapsedTimeResult) => {
     }
   }
 
+  // this function uses the Closure feature of JS to avoid unnecessary db reads,
+  // using its private memory whenever the value is not 0
   let gameStartedAtCached = 0
 
   return function (): ElapsedTimeResult {
