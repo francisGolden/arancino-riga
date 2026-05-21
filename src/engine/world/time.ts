@@ -1,8 +1,9 @@
 import { db } from '#/db/initDb'
+import type { ElapsedTimeResult } from '#/types'
 
 export const currentTime = Date.now()
 
-export const initializeGameTime = async () => {
+export const initializeGameTime = async (): Promise<void> => {
   try {
     await db.read()
   } catch (error) {
@@ -27,17 +28,17 @@ export const initializeGameTime = async () => {
   }
 }
 
-export const getElapsedGameTime = () => {
+export const getElapsedGameTime = (): (() => ElapsedTimeResult) => {
   if (!db.data.gameStartedAt) {
     console.warn('Attempted to get elapsed time before DB was initialized.')
-    return function () {
+    return function (): ElapsedTimeResult {
       return { elapsedTime: 0, elapsedSeconds: 0 }
     }
   }
 
   let gameStartedAtCached = 0
 
-  return function () {
+  return function (): ElapsedTimeResult {
     let gameStartedAt = 0
     if (gameStartedAtCached !== 0) {
       gameStartedAt = gameStartedAtCached
