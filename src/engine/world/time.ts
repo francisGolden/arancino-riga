@@ -30,12 +30,26 @@ export const initializeGameTime = async () => {
 export const getElapsedGameTime = () => {
   if (!db.data.gameStartedAt) {
     console.warn('Attempted to get elapsed time before DB was initialized.')
-    return { elapsedTime: 0, elapsedSeconds: 0 }
+    return function () {
+      return { elapsedTime: 0, elapsedSeconds: 0 }
+    }
   }
 
-  const gameStartedAt = db.data.gameStartedAt
-  const elapsedTime = Date.now() - gameStartedAt
-  const elapsedSeconds = Math.floor(elapsedTime / 1000)
+  let gameStartedAtCached = 0
 
-  return { elapsedTime, elapsedSeconds }
+  return function () {
+    let gameStartedAt = 0
+    if (gameStartedAtCached !== 0) {
+      gameStartedAt = gameStartedAtCached
+      console.log('reading value from function private memory')
+    } else {
+      gameStartedAt = db.data.gameStartedAt
+      gameStartedAtCached = gameStartedAt
+      console.log('reading value from db')
+    }
+    const elapsedTime = Date.now() - gameStartedAt
+    const elapsedSeconds = Math.floor(elapsedTime / 1000)
+
+    return { elapsedTime, elapsedSeconds }
+  }
 }

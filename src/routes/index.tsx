@@ -9,18 +9,26 @@ function Home() {
   const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
+    // This useEffect gathers the elapsedGameTime
+    // every 3 seconds and updates the elapsed state.
+
+    const UPDATE_ELAPSED_TIME_MS = 3000
+
+    const getElapsedGameTimeWrapper = getElapsedGameTime()
+
     const intervalId = setInterval(() => {
-      const { elapsedTime } = getElapsedGameTime()
+      const { elapsedTime } = getElapsedGameTimeWrapper()
       setElapsed(elapsedTime)
-      db.read()
-      console.log(db.data)
-    }, 3000)
+    }, UPDATE_ELAPSED_TIME_MS)
 
     return () => clearInterval(intervalId)
   }, [])
 
   useEffect(() => {
-    const AUTOSAVE_INTERVAL_MS = 10000 // Save every 10 seconds
+    // This useEffect auto-saves the lastSavedAt property of the db
+    // every 10 seconds.
+
+    const AUTOSAVE_INTERVAL_MS = 10000
 
     const intervalId = setInterval(async () => {
       try {
@@ -33,7 +41,6 @@ function Home() {
       }
     }, AUTOSAVE_INTERVAL_MS)
 
-    // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId)
   }, [])
 
