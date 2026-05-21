@@ -5,6 +5,10 @@ import { useMoney } from '#/store/currency'
 export const currentTime = Date.now()
 
 export const initializeGameTime = async (): Promise<void> => {
+  // this async function is ran every time the game starts and checks if the
+  // game has been initialized yet or not.
+  // Importantly, it also hydrates global state properties like money,
+  // so that at start-up this value in the state is gathered from the db.
   try {
     await db.read()
   } catch (error) {
