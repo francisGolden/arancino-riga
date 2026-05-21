@@ -20,7 +20,7 @@ export const initializeGameTime = async (): Promise<void> => {
     try {
       await db.update((data) => {
         data.gameStartedAt = Date.now()
-        data.money = 100
+        useMoney.getState().setMoney(1000)
       })
     } catch (error) {
       console.error(error)

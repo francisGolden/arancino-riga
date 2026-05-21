@@ -10,6 +10,7 @@ export const Route = createFileRoute('/')({ component: Home })
 function Home() {
   const [elapsed, setElapsed] = useState(0)
   const increaseMoney = useMoney((state) => state.increaseMoney)
+  const setMoney = useMoney((state) => state.setMoney)
   const money = useMoney((state) => state.money)
 
   useEffect(() => {
@@ -54,13 +55,11 @@ function Home() {
   const elapsedMinutes = Math.floor(elapsed / 1000) / 60
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
+    <div className="">
+      <h1 className="">Welcome to TanStack Start</h1>
       <span>elapsed minutes: {elapsedMinutes}</span>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-      <button onClick={() => increaseMoney(1)}>Click me</button>
+      <button onClick={() => increaseMoney(1)}>Money + 1</button>
+      <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
     </div>
   )

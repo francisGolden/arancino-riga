@@ -26,5 +26,9 @@ export const useMoney = create<MoneyState>((set, get) => ({
     await updateDbMoney(currentMoney)
 
   },
+  setMoney: async(amount: number) => {
+    set(() => ({ money: amount}))
+    await updateDbMoney(amount)
+  },
   hydrateMoney: (savedAmount: number): void => set({ money: savedAmount }),
 }))
