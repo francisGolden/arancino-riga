@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { db } from '#/db/initDb'
 import type { ElapsedTimeResult } from '#/types'
 import { useMoney } from '#/store/currency'
+import { buyBusiness } from '#/engine/economy/business'
+import { businessListData } from '#/db/businessList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -61,6 +63,9 @@ function Home() {
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
+      {businessListData.map(({id, name}) => {
+        return (<button onClick={() => buyBusiness(id)}>{name}</button>)
+      })}
     </div>
   )
 }

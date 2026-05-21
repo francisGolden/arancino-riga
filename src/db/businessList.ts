@@ -14,7 +14,7 @@ export const businessListData: BusinessConfig[] = [
     baseCost: 2500,
     baseIncome: 15,
     name: 'Arančino Rīga',
-    description: 'Artisan arancini food truck located inside the beautiful, renovated Āgenskalns indoor market (Āgenskalna tirgus). Blends Sicilian street food with the Latvian spirit.',
+    description: 'Artisan arancini shop located inside the beautiful, renovated Āgenskalns indoor market (Āgenskalna tirgus). Blends Sicilian street food with the Latvian spirit.',
     location: 'Āgenskalns',
   },
   {
@@ -26,11 +26,11 @@ export const businessListData: BusinessConfig[] = [
     location: 'Vērmanes dārzs',
   },
   {
-    id: 'bakery_tallinas_kvartals',
+    id: 'pizza_tallinas_kvartals',
     baseCost: 14000,
     baseIncome: 70,
     name: 'Tallinas Kvartāls Maiznīca',
-    description: 'Artisan bakery and pastry shop in the heart of the Tallinas creative district. Attracts hipsters, artists, and lovers of organic baked goods.',
+    description: 'Artisan pizza shop in the heart of the Tallinas creative district. Attracts hipsters, artists, and lovers of organic baked goods.',
     location: 'Tallinas Kvartāls',
   },
   {

@@ -2,7 +2,7 @@ export interface GameDb {
   gameStartedAt: number;
   lastSavedAt: number;
   money: number;
-  ownedBusinesses: [];
+  ownedBusinesses: string[];
   businessList: BusinessConfig[];
 }
 
