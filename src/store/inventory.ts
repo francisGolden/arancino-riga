@@ -22,52 +22,48 @@ export const useInventory = create<InventoryState>((set, get) => ({
     console.log('inventario', currentInventory)
     const iterableRecipe = Object.entries(recipeIngredients)
 
-    let checkIngredients = true
+    let canCraft = true
 
     for (const [ingredientId, amount] of iterableRecipe) {
       const isInInventory = currentInventory[ingredientId]
-      const isEnough = currentInventory[ingredientId] > amount
-      if (!isInInventory && !isEnough) {
-        checkIngredients = false
+      const isEnough = currentInventory[ingredientId] >= amount
+      if (!isInInventory || !isEnough) {
+        canCraft = false
       }
     }
 
-    if (!checkIngredients) return
+    if (!canCraft) {
+      console.log('cannot craft because I do not have enough ingredients')
+      return
+    }
 
     console.log('ingredients are present')
 
     // remove ingredients from the inventory
-    let newInventory = { ...currentInventory }
+    const newInventory = { ...currentInventory }
     for (const [ingredientId, amount] of iterableRecipe) {
-        console.log(ingredientId, currentInventory[ingredientId])
-        newInventory = { ...newInventory, [ingredientId]: newInventory[ingredientId] - amount}
+      console.log(ingredientId, currentInventory[ingredientId])
+      newInventory[ingredientId] -= amount
+      if (newInventory[ingredientId] <= 0) {
+        delete newInventory[ingredientId]
+      }
     }
 
-    const iterableNewInventory = Object.entries(newInventory)
-    for (const [itemId, amount] of iterableNewInventory) {
-        if (amount <= 0) {
-            const {[itemId]: itemToRemove, ...restOfInventory } = newInventory
-            newInventory = restOfInventory
-        }
-    }
-    
     console.log(newInventory)
+    console.log(RECIPE_CATALOG[id])
 
-    // for (const [ingredientId, amount] of iterableRecipe) {
-    //   const inventoryAmount = currentInventory[ingredientId]
-    //   currentInventory[ingredientId] -= amount
-    // }
-    
-    // currentInventory[RECIPE_CATALOG[id].productId] = currentInventory[
-    //   RECIPE_CATALOG[id].productId
-    // ]
-    //   ? ++currentInventory[RECIPE_CATALOG[id].productId]
-    //   : 1
+    console.log(RECIPE_CATALOG[id].productId, RECIPE_CATALOG[id].yieldAmount)
 
-    // set(() => ({ inventory: currentInventory }))
+    const productId = RECIPE_CATALOG[id].productId
+    const yieldAmount = RECIPE_CATALOG[id].yieldAmount
+    const amountAlreadyPresent = newInventory[RECIPE_CATALOG[id].productId] || 0
 
-    // const updatedInventory = get().inventory
-    // await updateDbInventory(updatedInventory)
+    newInventory[productId] = amountAlreadyPresent + yieldAmount
+
+    set(() => ({ inventory: newInventory }))
+
+    const updatedInventory = get().inventory
+    await updateDbInventory(updatedInventory)
   },
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
