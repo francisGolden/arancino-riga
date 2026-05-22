@@ -55,11 +55,9 @@ export const getElapsedGameTime = (): (() => ElapsedTimeResult) => {
     let gameStartedAt = 0
     if (gameStartedAtCached !== 0) {
       gameStartedAt = gameStartedAtCached
-      console.log('reading value from function private memory')
     } else {
       gameStartedAt = db.data.gameStartedAt
       gameStartedAtCached = gameStartedAt
-      console.log('reading value from db')
     }
     const elapsedTime = Date.now() - gameStartedAt
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
