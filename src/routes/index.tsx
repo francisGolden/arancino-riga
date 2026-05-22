@@ -6,6 +6,7 @@ import { useBusiness } from '#/store/business'
 import { businessListData } from '#/db/businessList'
 import { inventoryListData } from '#/db/inventoryList'
 import { GameClock } from '#/components/gameClock'
+import { useInventory } from '#/store/inventory'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -75,7 +76,11 @@ function Home() {
         <span>ingredients</span>
         {Object.keys(inventoryListData).map((item) => {
           return (
-            <div key={item}>{item}</div>
+            <div key={item}>
+              <span>{item}</span>
+              <button onClick={() => useInventory.getState().buyItem(item, inventoryListData[item].baseCost)}>Buy item</button>
+              <span>{useInventory.getState().inventory[item] ? 'owned' : 'not owned'}</span>
+            </div>
           )
         })}
       </div>
