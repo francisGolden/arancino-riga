@@ -20,13 +20,18 @@ export const useInventory = create<InventoryState>((set, get) => ({
     const currentInventory = get().inventory
     console.log('ricetta', recipeIngredients)
     console.log('inventario', currentInventory)
-    const iterableCatalog = Object.entries(recipeIngredients)
-    console.log(iterableCatalog)
+    const iterableRecipe = Object.entries(recipeIngredients)
+
 
     // work in progress.
-    for (const [ingredientId, availableQuantity] of iterableCatalog) {
-        console.log(currentInventory[ingredientId])
+    for (const [ingredientId, amount] of iterableRecipe) {
+        const isInInventory = currentInventory[ingredientId]
+        if (!isInInventory) {
+            return
+        }
     }
+    console.log('all ingredients are in the inventory')
+    
   },
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
