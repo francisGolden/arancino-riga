@@ -69,7 +69,7 @@ function Home() {
         return (
           <div key={id}>
             <button onClick={() => buyBusiness(id, baseCost)}>buy {name}</button>
-            <button onClick={() => sellBusiness(id)}>sell {name}</button>
+            <button onClick={() => sellBusiness(id, baseCost)}>sell {name}</button>
           </div>
         )
       })}

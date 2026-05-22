@@ -30,8 +30,8 @@ export interface BusinessConfig {
 
 export interface BusinessListState {
   ownedBusinesses: string[];
-  buyBusiness: (id: string, money: number) => void;
-  sellBusiness: (id: string) => void;
+  buyBusiness: (id: string, cost: number) => void;
+  sellBusiness: (id: string, cost: number) => void;
   setBusinessList: (list: string[]) => void;
   hydrateBusinessList: (savedBusinesses: string[]) => void;
 }

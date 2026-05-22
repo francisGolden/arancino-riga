@@ -1,5 +1,3 @@
-import { businessListData } from '#/db/businessList'
-import type { BusinessConfig } from '#/types'
 import { db } from '#/db/initDb'
 
 export const checkPurchase = async (amount: number) => {
