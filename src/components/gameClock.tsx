@@ -3,6 +3,9 @@ import type { ElapsedTimeResult } from "#/types"
 import { getElapsedGameTime } from "#/engine/world/time"
 
 export const GameClock = () => {
+  // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds
+  // aka re-render hell.
+  
   const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
