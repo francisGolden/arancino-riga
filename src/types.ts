@@ -34,3 +34,13 @@ export interface BusinessListState {
   setBusinessList: (list: string[]) => void;
   hydrateBusinessList: (savedBusinesses: string[]) => void;
 }
+
+export type ItemType = 'ingredient' | 'product';
+
+export interface ItemConfig {
+  id: string;
+  name: string;
+  type: ItemType;
+  baseCost: number;
+  description?: string;
+}
