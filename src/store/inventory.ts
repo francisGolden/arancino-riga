@@ -18,8 +18,6 @@ export const useInventory = create<InventoryState>((set, get) => ({
   craftProduct: async (id: string) => {
     const recipeIngredients = RECIPE_CATALOG[id].ingredients
     const currentInventory = get().inventory
-    console.log('ricetta', recipeIngredients)
-    console.log('inventario', currentInventory)
     const iterableRecipe = Object.entries(recipeIngredients)
 
     let canCraft = true
@@ -37,8 +35,6 @@ export const useInventory = create<InventoryState>((set, get) => ({
       return
     }
 
-    console.log('ingredients are present')
-
     // remove ingredients from the inventory
     const newInventory = { ...currentInventory }
     for (const [ingredientId, amount] of iterableRecipe) {
@@ -48,11 +44,6 @@ export const useInventory = create<InventoryState>((set, get) => ({
         delete newInventory[ingredientId]
       }
     }
-
-    console.log(newInventory)
-    console.log(RECIPE_CATALOG[id])
-
-    console.log(RECIPE_CATALOG[id].productId, RECIPE_CATALOG[id].yieldAmount)
 
     const productId = RECIPE_CATALOG[id].productId
     const yieldAmount = RECIPE_CATALOG[id].yieldAmount
