@@ -3,7 +3,6 @@ export interface GameDb {
   lastSavedAt: number;
   money: number;
   ownedBusinesses: string[];
-  businessList: BusinessConfig[];
 }
 
 export interface ElapsedTimeResult {
