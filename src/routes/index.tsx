@@ -3,8 +3,8 @@ import { useEffect } from 'react'
 import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
-import { businessListData } from '#/db/businessList'
-import { inventoryListData } from '#/db/inventoryList'
+import { BUSINESS_CATALOG } from '#/db/businessList'
+import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { GameClock } from '#/components/gameClock'
 import { useInventory } from '#/store/inventory'
 
@@ -40,7 +40,7 @@ function Home() {
     return () => window.clearInterval(intervalId)
   }, [])
 
-  console.log(inventoryListData.rice_kg)
+  console.log(INVENTORY_CATALOG.rice_kg)
 
   return (
     <div className="">
@@ -51,7 +51,7 @@ function Home() {
       <br />
       <br />
       <span>business</span>
-      {businessListData.map(({ id, name, baseCost }) => {
+      {BUSINESS_CATALOG.map(({ id, name, baseCost }) => {
         return (
           <div key={id}>
             <button onClick={() => buyBusiness(id, baseCost)}>
@@ -74,12 +74,12 @@ function Home() {
       <br />
       <div>
         <span>ingredients</span>
-        {Object.keys(inventoryListData).map((item) => {
+        {Object.keys(INVENTORY_CATALOG).map((item) => {
           return (
             <div key={item}>
               <span>{item}</span>
-              <button onClick={() => useInventory.getState().buyItem(item, inventoryListData[item].baseCost)}>Buy item</button>
-              <button onClick={() => useInventory.getState().sellItem(item, inventoryListData[item].baseCost)}>Sell item</button>
+              <button onClick={() => useInventory.getState().buyItem(item, INVENTORY_CATALOG[item].baseCost)}>Buy item</button>
+              <button onClick={() => useInventory.getState().sellItem(item, INVENTORY_CATALOG[item].baseCost)}>Sell item</button>
               <span>{useInventory.getState().inventory[item] ? 'owned' : 'not owned'}</span>
             </div>
           )

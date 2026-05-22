@@ -53,3 +53,9 @@ export interface ItemConfig {
   baseCost: number;
   description?: string;
 }
+
+export interface RecipeConfig {
+  productId: string; // ID of finished product (must exist in inventoryList)
+  ingredients: Record<string, number>; // Which ingredients are needed and how many
+  yieldAmount: number; // How many products does this recipe yield?
+}
