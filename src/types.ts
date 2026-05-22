@@ -3,7 +3,7 @@ export interface GameDb {
   lastSavedAt: number;
   money: number;
   ownedBusinesses: string[];
-  businessList: BusinessConfig[];
+  inventory: Record<string, number>;
 }
 
 export interface ElapsedTimeResult {
@@ -34,4 +34,22 @@ export interface BusinessListState {
   sellBusiness: (id: string, cost: number) => void;
   setBusinessList: (list: string[]) => void;
   hydrateBusinessList: (savedBusinesses: string[]) => void;
+}
+
+export interface InventoryState {
+  inventory: Record<string, number>;
+  buyItem: (id: string, cost: number) => void;
+  sellItem: (id: string, cost: number) => void;
+  setInventory: (inventory: Record<string, number>) => void;
+  hydrateInventory: (savedInventory: Record<string, number>) => void;
+}
+
+export type ItemType = 'ingredient' | 'product';
+
+export interface ItemConfig {
+  id: string;
+  name: string;
+  type: ItemType;
+  baseCost: number;
+  description?: string;
 }
