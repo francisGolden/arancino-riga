@@ -39,7 +39,7 @@ function Home() {
     return () => window.clearInterval(intervalId)
   }, [])
 
-  console.log(inventoryListData)
+  console.log(inventoryListData.rice_kg)
 
   return (
     <div className="">
@@ -73,11 +73,11 @@ function Home() {
       <br />
       <div>
         <span>ingredients</span>
-        {/* {Object.keys(inventoryListData).map((item) => {
+        {Object.keys(inventoryListData).map((item) => {
           return (
-            <div key={item}></div>
+            <div key={item}>{item}</div>
           )
-        })} */}
+        })}
       </div>
     </div>
   )
