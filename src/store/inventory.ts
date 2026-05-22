@@ -22,16 +22,30 @@ export const useInventory = create<InventoryState>((set, get) => ({
     console.log('inventario', currentInventory)
     const iterableRecipe = Object.entries(recipeIngredients)
 
-
-    // work in progress.
     for (const [ingredientId, amount] of iterableRecipe) {
-        const isInInventory = currentInventory[ingredientId]
-        if (!isInInventory) {
-            return
-        }
+      const isInInventory = currentInventory[ingredientId]
+      if (!isInInventory) {
+        return
+      }
+
+      const difference = isInInventory - amount
+      if (difference <= 0) {
+        delete currentInventory[ingredientId]
+      } else {
+        currentInventory[ingredientId]--
+      }
     }
-    console.log('all ingredients are in the inventory')
-    
+
+    if (currentInventory[RECIPE_CATALOG[id].productId]) {
+      currentInventory[RECIPE_CATALOG[id].productId]++
+    } else {
+      currentInventory[RECIPE_CATALOG[id].productId] = 1
+    }
+
+    set(() => ({ inventory: currentInventory }))
+
+    const updatedInventory = get().inventory
+    await updateDbInventory(updatedInventory)
   },
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
