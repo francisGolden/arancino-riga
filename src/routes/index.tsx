@@ -64,7 +64,7 @@ function Home() {
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
       {businessListData.map(({id, name}) => {
-        return (<button onClick={() => buyBusiness(id)}>{name}</button>)
+        return (<button key={id} onClick={() => buyBusiness(id)}>{name}</button>)
       })}
     </div>
   )
