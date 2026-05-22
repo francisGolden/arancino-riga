@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { db } from '#/db/initDb'
 import type { ElapsedTimeResult } from '#/types'
 import { useMoney } from '#/store/currency'
+import { useBusiness } from '#/store/business'
+import { businessListData } from '#/db/businessList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -12,6 +14,8 @@ function Home() {
   const increaseMoney = useMoney((state) => state.increaseMoney)
   const setMoney = useMoney((state) => state.setMoney)
   const money = useMoney((state) => state.money)
+  const buyBusiness = useBusiness((state) => state.buyBusiness)
+  const sellBusiness = useBusiness((state) => state.sellBusiness)
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
@@ -61,6 +65,14 @@ function Home() {
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
+      {businessListData.map(({ id, name, baseCost }) => {
+        return (
+          <div key={id}>
+            <button onClick={() => buyBusiness(id, baseCost)}>buy {name}</button>
+            <button onClick={() => sellBusiness(id, baseCost)}>sell {name}</button>
+          </div>
+        )
+      })}
     </div>
   )
 }

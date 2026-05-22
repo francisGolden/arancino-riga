@@ -1,6 +1,7 @@
 import { db } from '#/db/initDb'
 import type { ElapsedTimeResult } from '#/types'
 import { useMoney } from '#/store/currency'
+import { useBusiness } from '#/store/business'
 
 export const currentTime = Date.now()
 
@@ -21,6 +22,7 @@ export const initializeGameTime = async (): Promise<void> => {
       await db.update((data) => {
         data.gameStartedAt = Date.now()
         useMoney.getState().setMoney(1000)
+        useBusiness.getState().setBusinessList([])
       })
     } catch (error) {
       console.error(error)
@@ -33,6 +35,7 @@ export const initializeGameTime = async (): Promise<void> => {
     )
     
     useMoney.getState().hydrateMoney(db.data.money)
+    useBusiness.getState().hydrateBusinessList(db.data.ownedBusinesses)
   }
 }
 
@@ -52,11 +55,9 @@ export const getElapsedGameTime = (): (() => ElapsedTimeResult) => {
     let gameStartedAt = 0
     if (gameStartedAtCached !== 0) {
       gameStartedAt = gameStartedAtCached
-      console.log('reading value from function private memory')
     } else {
       gameStartedAt = db.data.gameStartedAt
       gameStartedAtCached = gameStartedAt
-      console.log('reading value from db')
     }
     const elapsedTime = Date.now() - gameStartedAt
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
