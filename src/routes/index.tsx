@@ -80,7 +80,7 @@ function Home() {
           return (
             <div key={recipe}>
               <span>{recipe}</span>
-              <button onClick={() => useInventory.getState().createProduct(recipe, 1)}>Create product</button>
+              <button onClick={() => useInventory.getState().craftProduct(recipe, 1)}>Create product</button>
               <span>owned: {useInventory.getState().inventory[recipe] ? 'true' : 'false'}</span>
             </div>
           )

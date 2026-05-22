@@ -15,7 +15,7 @@ const updateDbInventory = async (newInventory: Record<string, number>) => {
 
 export const useInventory = create<InventoryState>((set, get) => ({
   inventory: {},
-  createProduct: async (id: string) => {
+  craftProduct: async (id: string) => {
     const recipeIngredients = RECIPE_CATALOG[id].ingredients
     const currentInventory = get().inventory
     console.log('ricetta', recipeIngredients)
