@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { InventoryState } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
+import { RECIPE_CATALOG } from '#/db/recipeList'
 
 const updateDbInventory = async (newInventory: Record<string, number>) => {
   try {
@@ -14,6 +15,11 @@ const updateDbInventory = async (newInventory: Record<string, number>) => {
 
 export const useInventory = create<InventoryState>((set, get) => ({
   inventory: {},
+  createProduct: async (id: string) => {
+    const key = JSON.stringify(RECIPE_CATALOG[id].ingredients)
+    console.log(key)
+    console.log(get().inventory)
+  },
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
 

@@ -7,6 +7,7 @@ import { BUSINESS_CATALOG } from '#/db/businessList'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { GameClock } from '#/components/gameClock'
 import { useInventory } from '#/store/inventory'
+import { RECIPE_CATALOG } from '#/db/recipeList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -72,6 +73,20 @@ function Home() {
         )
       })}
       <br />
+      
+      <div>
+        <span>products</span>
+        {Object.keys(RECIPE_CATALOG).map((recipe) => {
+          return (
+            <div key={recipe}>
+              <span>{recipe}</span>
+              <button onClick={() => useInventory.getState().createProduct(recipe, 1)}>Create product</button>
+              <span>owned: {useInventory.getState().inventory[recipe] ? 'true' : 'false'}</span>
+            </div>
+          )
+        })}
+      </div>
+      <br />
       <div>
         <span>ingredients</span>
         {Object.keys(INVENTORY_CATALOG).map((item) => {
@@ -80,7 +95,7 @@ function Home() {
               <span>{item}</span>
               <button onClick={() => useInventory.getState().buyItem(item, INVENTORY_CATALOG[item].baseCost)}>Buy item</button>
               <button onClick={() => useInventory.getState().sellItem(item, INVENTORY_CATALOG[item].baseCost)}>Sell item</button>
-              <span>{useInventory.getState().inventory[item] ? 'owned' : 'not owned'}</span>
+              <span>qt: {useInventory.getState().inventory[item] ? useInventory.getState().inventory[item] : 0}</span>
             </div>
           )
         })}

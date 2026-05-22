@@ -38,6 +38,7 @@ export interface BusinessListState {
 
 export interface InventoryState {
   inventory: Record<string, number>;
+  createProduct: (id: string, amount: number) => void;
   buyItem: (id: string, cost: number) => void;
   sellItem: (id: string, cost: number) => void;
   setInventory: (inventory: Record<string, number>) => void;
