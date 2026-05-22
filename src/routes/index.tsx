@@ -60,19 +60,26 @@ function Home() {
 
   return (
     <div className="">
-      <h1 className="">Welcome to TanStack Start</h1>
       <span>elapsed minutes: {elapsedMinutes}</span>
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
+      <br />
+      <br />
+      <span>business</span>
       {businessListData.map(({ id, name, baseCost }) => {
         return (
           <div key={id}>
             <button onClick={() => buyBusiness(id, baseCost)}>buy {name}</button>
             <button onClick={() => sellBusiness(id, baseCost)}>sell {name}</button>
+            <span>owned: {useBusiness.getState().ownedBusinesses.some((businessId: string) => businessId === id) ? 'true' : 'false'}</span>
           </div>
         )
       })}
+      <br />
+      <div>
+        <span>ingredients</span>
+      </div>
     </div>
   )
 }
