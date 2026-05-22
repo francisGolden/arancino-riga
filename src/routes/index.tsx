@@ -76,12 +76,12 @@ function Home() {
       
       <div>
         <span>products</span>
-        {Object.keys(RECIPE_CATALOG).map((recipe) => {
+        {Object.entries(RECIPE_CATALOG).map(([recipe]) => {
           return (
-            <div key={recipe}>
+            <div key={recipe} id={recipe}>
               <span>{recipe}</span>
               <button onClick={() => useInventory.getState().craftProduct(recipe, 1)}>Create product</button>
-              <span>owned: {useInventory.getState().inventory[recipe] ? 'true' : 'false'}</span>
+              <span>owned: {useInventory.getState().inventory[RECIPE_CATALOG[recipe].productId] ? 'true' : 'false'}</span>
             </div>
           )
         })}
