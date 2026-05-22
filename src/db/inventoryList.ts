@@ -1,6 +1,6 @@
 import type { ItemConfig } from "#/types";
 
-export const ITEMS_CATALOG: Record<string, ItemConfig> = {
+export const inventoryListData: Record<string, ItemConfig> = {
   // --- INGREDIENTI: ARANCINI & STREET FOOD ---
   rice_kg: { id: 'rice_kg', name: 'Arborio Rice (Kg)', type: 'ingredient', baseCost: 2, description: 'The perfect base for every arancino.' },
   saffron_g: { id: 'saffron_g', name: 'Saffron (g)', type: 'ingredient', baseCost: 15, description: 'Red gold. It gives arancini their iconic color.' },
