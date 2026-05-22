@@ -16,15 +16,16 @@ const updateDbInventory = async (newInventory: Record<string, number>) => {
 export const useInventory = create<InventoryState>((set, get) => ({
   inventory: {},
   createProduct: async (id: string) => {
-    const catalogIngredients = RECIPE_CATALOG[id].ingredients
-    console.log(get().inventory)
-    const iterableInventory = Object.entries(get().inventory)
+    const recipeIngredients = RECIPE_CATALOG[id].ingredients
+    const currentInventory = get().inventory
+    console.log('ricetta', recipeIngredients)
+    console.log('inventario', currentInventory)
+    const iterableCatalog = Object.entries(recipeIngredients)
+    console.log(iterableCatalog)
 
     // work in progress.
-    for (const [ingredientId, availableQuantity] of iterableInventory) {
-        console.log(ingredientId)
-        const quantityNeeded = catalogIngredients[ingredientId]
-        console.log(quantityNeeded, availableQuantity)
+    for (const [ingredientId, availableQuantity] of iterableCatalog) {
+        console.log(currentInventory[ingredientId])
     }
   },
   buyItem: async (id: string, cost: number) => {
