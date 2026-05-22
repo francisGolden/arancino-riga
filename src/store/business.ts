@@ -43,7 +43,7 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     
     useMoney.getState().increaseMoney(cost)
     const newOwnedBusinesses = currentOwnedBusinesses.filter((currentOwnedBusinessId: string) => currentOwnedBusinessId !== id)
-    set((state) => ({ ownedBusinesses: newOwnedBusinesses }))
+    set(() => ({ ownedBusinesses: newOwnedBusinesses }))
 
     const updatesBusinesses = get().ownedBusinesses
     await updateDbBusiness(updatesBusinesses)
