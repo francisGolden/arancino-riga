@@ -79,6 +79,7 @@ function Home() {
             <div key={item}>
               <span>{item}</span>
               <button onClick={() => useInventory.getState().buyItem(item, inventoryListData[item].baseCost)}>Buy item</button>
+              <button onClick={() => useInventory.getState().sellItem(item, inventoryListData[item].baseCost)}>Sell item</button>
               <span>{useInventory.getState().inventory[item] ? 'owned' : 'not owned'}</span>
             </div>
           )
