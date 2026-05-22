@@ -27,3 +27,11 @@ export interface BusinessConfig {
   description: string;
   location: string;
 }
+
+export interface BusinessListState {
+  ownedBusinesses: string[];
+  buyBusiness: (id: string, money: number) => void;
+  sellBusiness: (id: string) => void;
+  setBusinessList: (list: string[]) => void;
+  hydrateBusinessList: (savedBusinesses: string[]) => void;
+}
