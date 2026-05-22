@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import type { InventoryState } from '#/types'
 import { db } from '#/db/initDb'
-import { checkPurchase } from '#/engine/economy/business'
 import { useMoney } from './currency'
 
 const updateDbInventory = async (newInventory: Record<string, number>) => {
@@ -18,7 +17,7 @@ export const useInventory = create<InventoryState>((set, get) => ({
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
 
-    if (!(await checkPurchase(cost))) {
+    if (useMoney.getState().money < cost) {
       console.log('not enough funds for this purchase')
       return
     }

@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import type { BusinessListState } from '#/types'
 import { db } from '#/db/initDb'
-import { checkPurchase } from '#/engine/economy/business'
 import { useMoney } from './currency'
 
 const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
@@ -22,7 +21,7 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
         return
     }
 
-    if (!await checkPurchase(cost)) {
+    if (useMoney.getState().money < cost) {
         console.log('not enough funds for this purchase')
         return
     }
