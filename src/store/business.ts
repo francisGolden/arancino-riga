@@ -17,7 +17,7 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
   ownedBusinesses: [],
   buyBusiness: async (id: string, cost: number) => {
     const currentOwnedBusinesses = get().ownedBusinesses
-    if (currentOwnedBusinesses.find((currentOwnedBusinessId: string) => currentOwnedBusinessId === id)) {
+    if (currentOwnedBusinesses.includes(id)) {
         console.log('business already owned')
         return
     }
@@ -35,7 +35,7 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
   },
   sellBusiness: async (id: string, cost: number) => {
     const currentOwnedBusinesses = get().ownedBusinesses
-    const match = currentOwnedBusinesses.find((currentOwnedBusinessId: string) => currentOwnedBusinessId === id)
+    const match = currentOwnedBusinesses.includes(id)
     if (!match) {
         console.log('cannot sell because I do not own this business')
         return
