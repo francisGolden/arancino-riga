@@ -33,6 +33,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     
     const currentAmount = newInventories[businessId][id] || 0
     newInventories[businessId][id] = currentAmount + 1
+    
     set(() => ({ inventories: newInventories }))
     const updatedInventories = get().inventories
 

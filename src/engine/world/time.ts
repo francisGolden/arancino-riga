@@ -3,6 +3,7 @@ import type { ElapsedTimeResult } from '#/types'
 import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
 import { useInventory } from '#/store/inventory'
+import { useInventories } from '#/store/inventories'
 
 export const currentTime = Date.now()
 
@@ -38,6 +39,7 @@ export const initializeGameTime = async (): Promise<void> => {
     useMoney.getState().hydrateMoney(db.data.money)
     useBusiness.getState().hydrateBusinessList(db.data.ownedBusinesses)
     useInventory.getState().hydrateInventory(db.data.inventory)
+    useInventories.getState().hydrateInventories(db.data.inventories)
   }
 }
 
