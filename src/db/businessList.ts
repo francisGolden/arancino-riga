@@ -1,6 +1,6 @@
 import type { BusinessConfig } from '#/types'
 
-export const businessListData: BusinessConfig[] = [
+export const BUSINESS_CATALOG: BusinessConfig[] = [
   {
     id: 'penguin_saldejums_uzvaras',
     baseCost: 750,

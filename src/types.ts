@@ -38,6 +38,7 @@ export interface BusinessListState {
 
 export interface InventoryState {
   inventory: Record<string, number>;
+  craftProduct: (id: string, amount: number) => void;
   buyItem: (id: string, cost: number) => void;
   sellItem: (id: string, cost: number) => void;
   setInventory: (inventory: Record<string, number>) => void;
@@ -52,4 +53,10 @@ export interface ItemConfig {
   type: ItemType;
   baseCost: number;
   description?: string;
+}
+
+export interface RecipeConfig {
+  productId: string; // ID of finished product (must exist in inventoryList)
+  ingredients: Record<string, number>; // Which ingredients are needed and how many
+  yieldAmount: number; // How many products does this recipe yield?
 }

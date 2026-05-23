@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { InventoryState } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
+import { RECIPE_CATALOG } from '#/db/recipeList'
 
 const updateDbInventory = async (newInventory: Record<string, number>) => {
   try {
@@ -14,6 +15,47 @@ const updateDbInventory = async (newInventory: Record<string, number>) => {
 
 export const useInventory = create<InventoryState>((set, get) => ({
   inventory: {},
+  craftProduct: async (id: string) => {
+    const recipeIngredients = RECIPE_CATALOG[id].ingredients
+    const currentInventory = get().inventory
+    const iterableRecipe = Object.entries(recipeIngredients)
+
+    let canCraft = true
+
+    for (const [ingredientId, amount] of iterableRecipe) {
+      const isInInventory = currentInventory[ingredientId]
+      const isEnough = currentInventory[ingredientId] >= amount
+      if (!isInInventory || !isEnough) {
+        canCraft = false
+      }
+    }
+
+    if (!canCraft) {
+      console.log('cannot craft because I do not have enough ingredients')
+      return
+    }
+
+    // remove ingredients from the inventory
+    const newInventory = { ...currentInventory }
+    for (const [ingredientId, amount] of iterableRecipe) {
+      console.log(ingredientId, currentInventory[ingredientId])
+      newInventory[ingredientId] -= amount
+      if (newInventory[ingredientId] <= 0) {
+        delete newInventory[ingredientId]
+      }
+    }
+
+    const productId = RECIPE_CATALOG[id].productId
+    const yieldAmount = RECIPE_CATALOG[id].yieldAmount
+    const amountAlreadyPresent = newInventory[RECIPE_CATALOG[id].productId] || 0
+
+    newInventory[productId] = amountAlreadyPresent + yieldAmount
+
+    set(() => ({ inventory: newInventory }))
+
+    const updatedInventory = get().inventory
+    await updateDbInventory(updatedInventory)
+  },
   buyItem: async (id: string, cost: number) => {
     const currentInventory = get().inventory
 
