@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { InventoriesState } from '#/types'
 import { db } from '#/db/initDb'
+import { useMoney } from './currency'
 
 const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
@@ -20,36 +21,41 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
   ): Promise<void> => {
+    if (useMoney.getState().money < cost) {
+      console.log('not enough funds for this purchase')
+      return
+    }
     console.log('buying', id, cost, 'for', businessId)
     const currentInventories = get().inventories
     const newInventories = { ...currentInventories }
-    
+
     const currentAmount = newInventories[businessId][id] || 0
     newInventories[businessId][id] = currentAmount + 1
 
     set(() => ({ inventories: newInventories }))
     const updatedInventories = get().inventories
 
+    useMoney.getState().decreaseMoney(cost)
+
     try {
-        await updateDbInventories(updatedInventories)
+      await updateDbInventories(updatedInventories)
     } catch (error) {
-        console.error('could not buy item for business', error)
+      console.error('could not buy item for business', error)
     }
-    
   },
   addBusinessToInventory: async (businessId: string): Promise<void> => {
     const currentInventories = get().inventories
     const inventoriesCopy = { ...currentInventories }
 
     inventoriesCopy[businessId] = {}
-    set(() => ({inventories: inventoriesCopy}))
-    
+    set(() => ({ inventories: inventoriesCopy }))
+
     const updatedInventories = get().inventories
 
     try {
-        await updateDbInventories(updatedInventories)
+      await updateDbInventories(updatedInventories)
     } catch (error) {
-        console.error('could not add business to inventory', error)
+      console.error('could not add business to inventory', error)
     }
   },
   hydrateInventories: (
