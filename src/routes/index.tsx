@@ -19,6 +19,11 @@ function Home() {
   const buyBusiness = useBusiness((state) => state.buyBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
 
+  const inventoryState = useInventory((state) => state.inventory)
+
+  const inventoriesState = useInventories((state) => state.inventories)
+  const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
+
   useEffect(() => {
     // This useEffect auto-saves the lastSavedAt property of the db
     // every 10 seconds.
@@ -61,9 +66,7 @@ function Home() {
             </button>
             <span>
               owned:{' '}
-              {useBusiness
-                .getState()
-                .ownedBusinesses.some((businessId: string) => businessId === id)
+              {ownedBusinesses.some((businessId: string) => businessId === id)
                 ? 'true'
                 : 'false'}
             </span>
@@ -85,7 +88,7 @@ function Home() {
               </button>
               <span>
                 owned:{' '}
-                {useInventory.getState().inventory[
+                {inventoryState[
                   RECIPE_CATALOG[recipe].productId
                 ]
                   ? 'true'
@@ -122,14 +125,34 @@ function Home() {
               </button>
               <span>
                 qt:{' '}
-                {useInventory.getState().inventory[item]
-                  ? useInventory.getState().inventory[item]
+                {inventoryState[item]
+                  ? inventoryState[item]
                   : 0}
               </span>
               <div>
                 <span>buy for business</span>
-                {useBusiness.getState().ownedBusinesses.map((business) => {
-                  return (<button key={business} onClick={() => useInventories.getState().buyItemForBusiness(item, INVENTORY_CATALOG[item].baseCost, business)}>{business}</button>)
+                {ownedBusinesses.map((business) => {
+                  return (
+                    <div key={business}>
+                      <button
+                        onClick={() =>
+                          useInventories
+                            .getState()
+                            .buyItemForBusiness(
+                              item,
+                              INVENTORY_CATALOG[item].baseCost,
+                              business,
+                            )
+                        }
+                      >
+                        {business}
+                      </button>
+                      <span>
+                        qt:{' '}
+                        {inventoriesState[business][item]}
+                      </span>
+                    </div>
+                  )
                 })}
               </div>
             </div>

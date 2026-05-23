@@ -23,17 +23,10 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     console.log('buying', id, cost, 'for', businessId)
     const currentInventories = get().inventories
     const newInventories = { ...currentInventories }
-
-    if (businessId in newInventories) {
-        console.log(businessId, 'is in', newInventories)
-    } else {
-        console.log(businessId, 'is not in', newInventories)
-        newInventories[businessId] = {}
-    }
     
     const currentAmount = newInventories[businessId][id] || 0
     newInventories[businessId][id] = currentAmount + 1
-    
+
     set(() => ({ inventories: newInventories }))
     const updatedInventories = get().inventories
 
@@ -43,6 +36,21 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         console.error('could not buy item for business', error)
     }
     
+  },
+  addBusinessToInventory: async (businessId: string): Promise<void> => {
+    const currentInventories = get().inventories
+    const inventoriesCopy = { ...currentInventories }
+
+    inventoriesCopy[businessId] = {}
+    set(() => ({inventories: inventoriesCopy}))
+    
+    const updatedInventories = get().inventories
+
+    try {
+        await updateDbInventories(updatedInventories)
+    } catch (error) {
+        console.error('could not add business to inventory', error)
+    }
   },
   hydrateInventories: (
     savedInventories: Record<string, Record<string, number>>,

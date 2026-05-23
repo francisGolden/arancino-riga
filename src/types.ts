@@ -49,6 +49,7 @@ export interface InventoryState {
 export interface InventoriesState {
   inventories: Record<string, Record<string, number>>;
   buyItemForBusiness: (id: string, cost: number, businessId: string) => void;
+  addBusinessToInventory: (businessId: string) => void;
   hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
 }
 
