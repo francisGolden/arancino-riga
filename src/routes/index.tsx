@@ -88,9 +88,7 @@ function Home() {
               </button>
               <span>
                 owned:{' '}
-                {inventoryState[
-                  RECIPE_CATALOG[recipe].productId
-                ]
+                {inventoryState[RECIPE_CATALOG[recipe].productId]
                   ? 'true'
                   : 'false'}
               </span>
@@ -123,12 +121,7 @@ function Home() {
               >
                 Sell item
               </button>
-              <span>
-                qt:{' '}
-                {inventoryState[item]
-                  ? inventoryState[item]
-                  : 0}
-              </span>
+              <span>qt: {inventoryState[item] ? inventoryState[item] : 0}</span>
               <div>
                 <span>buy for business</span>
                 {ownedBusinesses.map((business) => {
@@ -145,12 +138,22 @@ function Home() {
                             )
                         }
                       >
-                        {business}
+                        buy for {business}
                       </button>
-                      <span>
-                        qt:{' '}
-                        {inventoriesState[business][item]}
-                      </span>
+                      <button
+                        onClick={() =>
+                          useInventories
+                            .getState()
+                            .sellBusinessItem(
+                              item,
+                              INVENTORY_CATALOG[item].baseCost,
+                              business,
+                            )
+                        }
+                      >
+                        sell from {business}
+                      </button>
+                      <span>qt: {inventoriesState[business][item]}</span>
                     </div>
                   )
                 })}
