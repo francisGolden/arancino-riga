@@ -39,7 +39,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     let checkIngredients = true
     for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
       console.log(inventoriesCopy[businessId][ingredientId])
-      const amountHad = inventoriesCopy[businessId][ingredientId]
+      const amountHad = inventoriesCopy[businessId][ingredientId] || 0
       if (!amountHad || amountHad < amountNeeded) {
         checkIngredients = false
       }
