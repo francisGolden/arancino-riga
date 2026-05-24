@@ -31,10 +31,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
     const iterableRecipeIngredients = Object.entries(
-      RECIPE_CATALOG[recipeItemId].ingredients,
+      ingredients,
     )
-
-    console.log(ingredients)
 
     // look up if the business has enough ingredients
     let checkIngredients = true
@@ -60,10 +58,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     inventoriesCopy[businessId][itemId] = currentAmount + yieldAmount
 
     set(() => ({ inventories: inventoriesCopy }))
-    const updatedInventories = get().inventories
 
     try {
-      await updateDbInventories(updatedInventories)
+      await updateDbInventories(inventoriesCopy)
     } catch (error) {
       console.error('could not update inventories with crafted item')
     }
@@ -84,10 +81,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     inventoriesCopy[businessId][id] = currentAmount + 1
 
     set(() => ({ inventories: inventoriesCopy }))
-    const updatedInventories = get().inventories
 
     try {
-      await updateDbInventories(updatedInventories)
+      await updateDbInventories(inventoriesCopy)
       useMoney.getState().decreaseMoney(cost)
     } catch (error) {
       console.error('could not buy item for business', error)
@@ -103,25 +99,23 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     const currentInventories = get().inventories
     const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
+
     if (id in inventoriesCopy[businessId]) {
     } else {
       console.log('item. not in business inventory. cannot sell')
       return
     }
 
-    const newInventories = { ...inventoriesCopy }
-    newInventories[businessId][id] -= 1
+    inventoriesCopy[businessId][id] -= 1
 
-    if (newInventories[businessId][id] <= 0) {
-      delete newInventories[businessId][id]
+    if (inventoriesCopy[businessId][id] <= 0) {
+      delete inventoriesCopy[businessId][id]
     }
 
-    set(() => ({ inventories: newInventories }))
-
-    const updatedInventories = get().inventories
+    set(() => ({ inventories: inventoriesCopy }))
 
     try {
-      await updateDbInventories(updatedInventories)
+      await updateDbInventories(inventoriesCopy)
       useMoney.getState().increaseMoney(cost)
     } catch (error) {
       console.error('could not sell item from business inventory', error)
@@ -134,10 +128,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     inventoriesCopy[businessId] = {}
     set(() => ({ inventories: inventoriesCopy }))
 
-    const updatedInventories = get().inventories
-
     try {
-      await updateDbInventories(updatedInventories)
+      await updateDbInventories(inventoriesCopy)
     } catch (error) {
       console.error('could not add business to inventory', error)
     }
