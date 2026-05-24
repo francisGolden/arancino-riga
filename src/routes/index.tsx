@@ -145,6 +145,7 @@ function Home() {
               <div>
                 <span>buy for business</span>
                 {ownedBusinesses.map((business) => {
+                  if (BUSINESS_CATALOG.find((obj) => obj.id === business)?.allowedItems.some((allowedItem) => allowedItem === item))
                   return (
                     <div key={business}>
                       <button
