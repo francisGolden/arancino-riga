@@ -27,7 +27,8 @@ const defaultData: GameDb = {
     lastSavedAt: 0,
     money: 0,
     ownedBusinesses: [],
-    inventory: {}
+    inventory: {},
+    inventories: {}
 }
 
 const adapter = new IndexedDBAdapter<GameDb>("game-db")

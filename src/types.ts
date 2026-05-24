@@ -4,6 +4,7 @@ export interface GameDb {
   money: number;
   ownedBusinesses: string[];
   inventory: Record<string, number>;
+  inventories: Record<string, Record<string, number>>;
 }
 
 export interface ElapsedTimeResult {
@@ -43,6 +44,15 @@ export interface InventoryState {
   sellItem: (id: string, cost: number) => void;
   setInventory: (inventory: Record<string, number>) => void;
   hydrateInventory: (savedInventory: Record<string, number>) => void;
+}
+
+export interface InventoriesState {
+  inventories: Record<string, Record<string, number>>;
+  craftBusinessProduct: (recipeItemId: string, businessId: string) => void;
+  buyItemForBusiness: (id: string, cost: number, businessId: string) => void;
+  sellBusinessItem: (id: string, cost: number, businessId: string) => void;
+  addBusinessToInventory: (businessId: string) => void;
+  hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
 }
 
 export type ItemType = 'ingredient' | 'product';

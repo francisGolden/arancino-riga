@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { BusinessListState } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
+import { useInventories } from './inventories'
 
 const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
   try {
@@ -28,6 +29,8 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
 
     set((state) => ({ ownedBusinesses: [...state.ownedBusinesses, id] }))
     useMoney.getState().decreaseMoney(cost)
+
+    useInventories.getState().addBusinessToInventory(id)
     
     const updatedBusinesses = get().ownedBusinesses
     await updateDbBusiness(updatedBusinesses)

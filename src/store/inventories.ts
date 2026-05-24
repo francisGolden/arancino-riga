@@ -1,0 +1,153 @@
+import { create } from 'zustand'
+import type { InventoriesState } from '#/types'
+import { db } from '#/db/initDb'
+import { useMoney } from './currency'
+import { RECIPE_CATALOG } from '#/db/recipeList'
+
+const updateDbInventories = async (
+  newInventories: Record<string, Record<string, number>>,
+) => {
+  try {
+    await db.update((data) => (data.inventories = newInventories))
+    console.log('inventory updated on db')
+  } catch (error) {
+    console.error('could not update inventory', error)
+  }
+}
+
+export const useInventories = create<InventoriesState>((set, get) => ({
+  inventories: {},
+  craftBusinessProduct: async (
+    recipeItemId: string,
+    businessId: string,
+  ): Promise<void> => {
+    const itemId = RECIPE_CATALOG[recipeItemId].productId
+    const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
+    const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
+    const currentInventories = get().inventories
+
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
+    }
+
+    const iterableRecipeIngredients = Object.entries(ingredients)
+
+    // look up if the business has enough ingredients
+    let checkIngredients = true
+    for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+      const amountHad = inventoriesCopy[businessId][ingredientId] || 0
+      if (!amountHad || amountHad < amountNeeded) {
+        checkIngredients = false
+      }
+    }
+
+    if (!checkIngredients) {
+      console.log('not enough ingredients')
+      return
+    }
+
+    // remove ingredients from inventory
+    for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+      inventoriesCopy[businessId][ingredientId] -= amountNeeded
+    }
+
+    const currentAmount = inventoriesCopy[businessId][itemId] || 0
+    inventoriesCopy[businessId][itemId] = currentAmount + yieldAmount
+
+    set(() => ({ inventories: inventoriesCopy }))
+
+    try {
+      await updateDbInventories(inventoriesCopy)
+    } catch (error) {
+      console.error('could not update inventories with crafted item')
+      // revert state on failure
+      set(() => ({ inventories: currentInventories }))
+    }
+  },
+  buyItemForBusiness: async (
+    id: string,
+    cost: number,
+    businessId: string,
+  ): Promise<void> => {
+    if (useMoney.getState().money < cost) {
+      console.log('not enough funds for this purchase')
+      return
+    }
+    const currentInventories = get().inventories
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
+    }
+
+    const currentAmount = inventoriesCopy[businessId][id] || 0
+    inventoriesCopy[businessId][id] = currentAmount + 1
+
+    set(() => ({ inventories: inventoriesCopy }))
+
+    try {
+      await updateDbInventories(inventoriesCopy)
+      useMoney.getState().decreaseMoney(cost)
+    } catch (error) {
+      console.error('could not buy item for business', error)
+      set(() => ({ inventories: currentInventories }))
+    }
+  },
+  sellBusinessItem: async (
+    id: string,
+    cost: number,
+    businessId: string,
+  ): Promise<void> => {
+    console.log('sell', id, cost, businessId)
+
+    const currentInventories = get().inventories
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
+    }
+
+    if (id in inventoriesCopy[businessId]) {
+    } else {
+      console.log('item. not in business inventory. cannot sell')
+      return
+    }
+
+    inventoriesCopy[businessId][id] -= 1
+
+    if (inventoriesCopy[businessId][id] <= 0) {
+      delete inventoriesCopy[businessId][id]
+    }
+
+    set(() => ({ inventories: inventoriesCopy }))
+
+    try {
+      await updateDbInventories(inventoriesCopy)
+      useMoney.getState().increaseMoney(cost)
+    } catch (error) {
+      console.error('could not sell item from business inventory', error)
+      set(() => ({ inventories: currentInventories }))
+    }
+  },
+  addBusinessToInventory: async (businessId: string): Promise<void> => {
+    const currentInventories = get().inventories
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
+    }
+
+    inventoriesCopy[businessId] = {}
+    set(() => ({ inventories: inventoriesCopy }))
+
+    try {
+      await updateDbInventories(inventoriesCopy)
+    } catch (error) {
+      console.error('could not add business to inventory', error)
+      set(() => ({ inventories: currentInventories }))
+    }
+  },
+  hydrateInventories: (
+    savedInventories: Record<string, Record<string, number>>,
+  ): void => {
+    set(() => ({ inventories: savedInventories }))
+  },
+}))
