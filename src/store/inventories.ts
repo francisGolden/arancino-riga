@@ -69,11 +69,27 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     id: string,
     cost: number,
     businessId: string,
+    allowedItems: string[]
   ): Promise<void> => {
     if (useMoney.getState().money < cost) {
       console.log('not enough funds for this purchase')
       return
     }
+
+    let checkAllowedItems = false
+    for (const item of allowedItems) {
+        if (item === id) {
+            checkAllowedItems = true
+        }
+    }
+
+    console.log(checkAllowedItems)
+
+    if (!checkAllowedItems) {
+        console.log('item not allowed to be bought for this business')
+        return
+    }
+
     const currentInventories = get().inventories
     const inventoriesCopy = {
       ...currentInventories,

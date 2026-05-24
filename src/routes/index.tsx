@@ -155,6 +155,7 @@ function Home() {
                               item,
                               INVENTORY_CATALOG[item].baseCost,
                               business,
+                              (BUSINESS_CATALOG.find((obj) => obj.id === business)?.allowedItems || [])
                             )
                         }
                       >
