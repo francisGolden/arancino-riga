@@ -27,7 +27,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
     const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
     const currentInventories = get().inventories
-    const inventoriesCopy = { ...currentInventories }
+
+    const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
     const iterableRecipeIngredients = Object.entries(
       RECIPE_CATALOG[recipeItemId].ingredients,
