@@ -25,9 +25,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       console.log('not enough funds for this purchase')
       return
     }
-    console.log('buying', id, cost, 'for', businessId)
-    const currentInventories = get().inventories
-    const newInventories = { ...currentInventories }
+    const inventoriesCopy = get().inventories
+    const newInventories = { ...inventoriesCopy }
 
     const currentAmount = newInventories[businessId][id] || 0
     newInventories[businessId][id] = currentAmount + 1
@@ -35,10 +34,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     set(() => ({ inventories: newInventories }))
     const updatedInventories = get().inventories
 
-    useMoney.getState().decreaseMoney(cost)
-
     try {
       await updateDbInventories(updatedInventories)
+      useMoney.getState().decreaseMoney(cost)
     } catch (error) {
       console.error('could not buy item for business', error)
     }
@@ -46,18 +44,32 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   sellBusinessItem: async (id: string, cost: number, businessId: string): Promise<void> => {
     console.log('sell', id, cost, businessId)
 
-    const currentInventories = get().inventories
+    const inventoriesCopy = get().inventories
 
-    if (id in currentInventories[businessId]) {
+    if (id in inventoriesCopy[businessId]) {
     } else {
         console.log('item. not in business inventory. cannot sell')
         return
     }
 
-    console.log('item in business inventory. can sell')
+    const newInventories = { ...inventoriesCopy }
+    newInventories[businessId][id] -= 1
+
+    if (newInventories[businessId][id] <= 0) {
+        delete newInventories[businessId][id]
+    }
+
+    set(() => ({ inventories: newInventories }))
+
+    const updatedInventories = get().inventories
+
+    try {
+        await updateDbInventories(updatedInventories)
+        useMoney.getState().increaseMoney(cost)
+    } catch (error) {
+        console.error('could not sell item from business inventory', error)
+    }
     
-
-
   },
   addBusinessToInventory: async (businessId: string): Promise<void> => {
     const currentInventories = get().inventories
