@@ -92,9 +92,29 @@ function Home() {
                   ? 'true'
                   : 'false'}
               </span>
+              {ownedBusinesses.map((business) => {
+          return (
+            <div key={business}>
+              <button
+                onClick={() =>
+                  useInventories
+                    .getState()
+                    .craftBusinessProduct(
+                      recipe,
+                      business
+                    )
+                }
+              >
+                craft for {business}
+              </button>
+              <span>qt: {inventoriesState[business][RECIPE_CATALOG[recipe].productId] || 0}</span>
             </div>
           )
         })}
+            </div>
+          )
+        })}
+        
       </div>
       <br />
       <div>
@@ -153,7 +173,7 @@ function Home() {
                       >
                         sell from {business}
                       </button>
-                      <span>qt: {inventoriesState[business][item]}</span>
+                      <span>qt: {inventoriesState[business][item] || 0}</span>
                     </div>
                   )
                 })}
