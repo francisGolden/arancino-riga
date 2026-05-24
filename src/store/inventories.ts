@@ -77,13 +77,13 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       console.log('not enough funds for this purchase')
       return
     }
-    const inventoriesCopy = get().inventories
-    const newInventories = { ...inventoriesCopy }
+    const currentInventories = get().inventories
+    const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
-    const currentAmount = newInventories[businessId][id] || 0
-    newInventories[businessId][id] = currentAmount + 1
+    const currentAmount = inventoriesCopy[businessId][id] || 0
+    inventoriesCopy[businessId][id] = currentAmount + 1
 
-    set(() => ({ inventories: newInventories }))
+    set(() => ({ inventories: inventoriesCopy }))
     const updatedInventories = get().inventories
 
     try {
@@ -100,7 +100,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   ): Promise<void> => {
     console.log('sell', id, cost, businessId)
 
-    const inventoriesCopy = get().inventories
+    const currentInventories = get().inventories
+    const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
     if (id in inventoriesCopy[businessId]) {
     } else {
@@ -128,7 +129,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   },
   addBusinessToInventory: async (businessId: string): Promise<void> => {
     const currentInventories = get().inventories
-    const inventoriesCopy = { ...currentInventories }
+    const inventoriesCopy = { ...currentInventories, [businessId]: { ...currentInventories[businessId]} }
 
     inventoriesCopy[businessId] = {}
     set(() => ({ inventories: inventoriesCopy }))
