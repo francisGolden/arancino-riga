@@ -21,8 +21,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     recipeItemId: string,
     businessId: string,
   ): Promise<void> => {
-    console.log(recipeItemId, businessId)
-    console.log(RECIPE_CATALOG[recipeItemId].productId)
     const itemId = RECIPE_CATALOG[recipeItemId].productId
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
     const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
@@ -38,7 +36,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     // look up if the business has enough ingredients
     let checkIngredients = true
     for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
-      console.log(inventoriesCopy[businessId][ingredientId])
       const amountHad = inventoriesCopy[businessId][ingredientId] || 0
       if (!amountHad || amountHad < amountNeeded) {
         checkIngredients = false
