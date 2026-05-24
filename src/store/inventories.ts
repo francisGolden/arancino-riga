@@ -35,6 +35,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     console.log(ingredients)
 
+    // look up if the business has enough ingredients
     let checkIngredients = true
     for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
       console.log(inventoriesCopy[businessId][ingredientId])
@@ -44,7 +45,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       }
     }
 
-    // look up if the business has enough ingredients
     if (!checkIngredients) {
       console.log('not enough ingredients')
       return
