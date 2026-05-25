@@ -93,28 +93,43 @@ function Home() {
                   : 'false'}
               </span>
               {ownedBusinesses.map((business) => {
-          return (
-            <div key={business}>
-              <button
-                onClick={() =>
-                  useInventories
-                    .getState()
-                    .craftBusinessProduct(
-                      recipe,
-                      business
-                    )
-                }
-              >
-                craft for {business}
-              </button>
-              <span>qt: {inventoriesState[business][RECIPE_CATALOG[recipe].productId] || 0}</span>
+                if (
+                  BUSINESS_CATALOG.find(
+                    (obj) => obj.id === business,
+                  )?.allowedItems.some(
+                    (allowedItem) =>
+                      allowedItem === RECIPE_CATALOG[recipe].productId,
+                  )
+                )
+                  return (
+                    <div key={business}>
+                      <button
+                        onClick={() =>
+                          useInventories
+                            .getState()
+                            .craftBusinessProduct(
+                              recipe,
+                              business,
+                              BUSINESS_CATALOG.find(
+                                (obj) => obj.id === business,
+                              )?.allowedItems || [],
+                            )
+                        }
+                      >
+                        craft {RECIPE_CATALOG[recipe].productId} for {business}
+                      </button>
+                      <span>
+                        qt:{' '}
+                        {inventoriesState[business][
+                          RECIPE_CATALOG[recipe].productId
+                        ] || 0}
+                      </span>
+                    </div>
+                  )
+              })}
             </div>
           )
         })}
-            </div>
-          )
-        })}
-        
       </div>
       <br />
       <div>
@@ -146,40 +161,46 @@ function Home() {
                 <br />
                 <span>buy for business</span>
                 {ownedBusinesses.map((business) => {
-                  if (BUSINESS_CATALOG.find((obj) => obj.id === business)?.allowedItems.some((allowedItem) => allowedItem === item))
-                  return (
-                    <div key={business}>
-                      <button
-                        onClick={() =>
-                          useInventories
-                            .getState()
-                            .buyItemForBusiness(
-                              item,
-                              INVENTORY_CATALOG[item].baseCost,
-                              business,
-                              (BUSINESS_CATALOG.find((obj) => obj.id === business)?.allowedItems || [])
-                            )
-                        }
-                      >
-                        buy for {business}
-                      </button>
-                      <button
-                        onClick={() =>
-                          useInventories
-                            .getState()
-                            .sellBusinessItem(
-                              item,
-                              INVENTORY_CATALOG[item].baseCost,
-                              business,
-                            )
-                        }
-                      >
-                        sell from {business}
-                      </button>
-                      <span>qt: {inventoriesState[business][item] || 0}</span>
-                      <br />
-                    </div>
+                  if (
+                    BUSINESS_CATALOG.find(
+                      (obj) => obj.id === business,
+                    )?.allowedItems.some((allowedItem) => allowedItem === item)
                   )
+                    return (
+                      <div key={business}>
+                        <button
+                          onClick={() =>
+                            useInventories
+                              .getState()
+                              .buyItemForBusiness(
+                                item,
+                                INVENTORY_CATALOG[item].baseCost,
+                                business,
+                                BUSINESS_CATALOG.find(
+                                  (obj) => obj.id === business,
+                                )?.allowedItems || [],
+                              )
+                          }
+                        >
+                          buy for {business}
+                        </button>
+                        <button
+                          onClick={() =>
+                            useInventories
+                              .getState()
+                              .sellBusinessItem(
+                                item,
+                                INVENTORY_CATALOG[item].baseCost,
+                                business,
+                              )
+                          }
+                        >
+                          sell from {business}
+                        </button>
+                        <span>qt: {inventoriesState[business][item] || 0}</span>
+                        <br />
+                      </div>
+                    )
                 })}
               </div>
             </div>

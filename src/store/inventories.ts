@@ -20,11 +20,24 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   craftBusinessProduct: async (
     recipeItemId: string,
     businessId: string,
+    allowedItems: string[]
   ): Promise<void> => {
     const itemId = RECIPE_CATALOG[recipeItemId].productId
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
     const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
     const currentInventories = get().inventories
+
+    let checkAllowedItems = false
+    for (const item of allowedItems) {
+        if (item === itemId) {
+            checkAllowedItems = true
+        }
+    }
+
+    if (!checkAllowedItems) {
+        console.log('item not allowed to be crafted for this business')
+        return
+    }
 
     const inventoriesCopy = {
       ...currentInventories,
@@ -82,8 +95,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
             checkAllowedItems = true
         }
     }
-
-    console.log(checkAllowedItems)
 
     if (!checkAllowedItems) {
         console.log('item not allowed to be bought for this business')
