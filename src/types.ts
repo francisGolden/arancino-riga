@@ -53,7 +53,7 @@ export interface InventoriesState {
   buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[]) => void;
   sellBusinessItem: (id: string, cost: number, businessId: string) => void;
   addBusinessToInventory: (businessId: string) => void;
-  getAllowedRecipes: (businessId: string, allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => RecipeConfig[];
+  getAllowedRecipes: (allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => RecipeConfig[];
   hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
 }
 

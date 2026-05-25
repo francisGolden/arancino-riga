@@ -6,9 +6,6 @@ import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { GameClock } from '#/components/gameClock'
-import { useInventory } from '#/store/inventory'
-import { useInventories } from '#/store/inventories'
-import { RECIPE_CATALOG } from '#/db/recipeList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -29,9 +26,6 @@ function Home() {
     })
   }
 
-  const inventoryState = useInventory((state) => state.inventory)
-
-  const inventoriesState = useInventories((state) => state.inventories)
   const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
 
   useEffect(() => {
