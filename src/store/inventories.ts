@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { InventoriesState } from '#/types'
+import type { InventoriesState, RecipeConfig } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
@@ -171,6 +171,23 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       console.error('could not add business to inventory', error)
       set(() => ({ inventories: currentInventories }))
     }
+  },
+  getAllowedRecipes: (businessId: string, allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => {
+    console.log(businessId, allowedItems, recipe_catalog)
+    const allowedRecipes = []
+    const iterableRecipeCatalog = Object.entries(recipe_catalog)
+    console.log(iterableRecipeCatalog)
+
+    for (const [recipeName, recipeObject] of iterableRecipeCatalog) {
+      for (const allowedItem of allowedItems) {
+        if (allowedItem === recipeObject.productId) {
+          allowedRecipes.push({...recipeObject, recipeName})
+        }
+      }
+    }
+    console.log(allowedRecipes)
+    return allowedRecipes
+
   },
   hydrateInventories: (
     savedInventories: Record<string, Record<string, number>>,

@@ -4,6 +4,8 @@ import { GameClock } from '#/components/gameClock'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
+import { RECIPE_CATALOG } from '#/db/recipeList'
+import type { RecipeConfig } from '#/types'
 
 export const Route = createFileRoute('/business/$businessId')({
   component: RouteComponent,
@@ -19,8 +21,10 @@ function RouteComponent() {
   const allowedItems = BUSINESS_CATALOG.find(
     (business) => business.id === businessId,
   )?.allowedItems
+  const allowedRecipes: RecipeConfig[] = useInventories.getState().getAllowedRecipes(businessId, allowedItems || [], RECIPE_CATALOG)
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
+  const craftBusinessProduct = useInventories((state) => state.craftBusinessProduct)
 
   return (
     <div>
@@ -64,7 +68,11 @@ function RouteComponent() {
       </div>
       <div>
         <h4>Craft</h4>
-        <ul>{}</ul>
+        <ul>{allowedRecipes.map((allowedRecipe: RecipeConfig, index: number) => {
+            return (<li key={index}><span>{allowedRecipe.productId}</span>
+                <button onClick={() => craftBusinessProduct(allowedRecipe.recipeName || '', businessId, allowedItems || [])}>craft {allowedRecipe.yieldAmount}</button>
+                </li>)
+        })}</ul>
       </div>
       <GameClock />
     </div>

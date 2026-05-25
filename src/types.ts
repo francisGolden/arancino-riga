@@ -53,6 +53,7 @@ export interface InventoriesState {
   buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[]) => void;
   sellBusinessItem: (id: string, cost: number, businessId: string) => void;
   addBusinessToInventory: (businessId: string) => void;
+  getAllowedRecipes: (businessId: string, allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => RecipeConfig[];
   hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
 }
 
@@ -70,4 +71,5 @@ export interface RecipeConfig {
   productId: string; // ID of finished product (must exist in inventoryList)
   ingredients: Record<string, number>; // Which ingredients are needed and how many
   yieldAmount: number; // How many products does this recipe yield?
+  recipeName?: string
 }
