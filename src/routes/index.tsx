@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
@@ -13,11 +13,21 @@ import { RECIPE_CATALOG } from '#/db/recipeList'
 export const Route = createFileRoute('/')({ component: Home })
 
 function Home() {
+  const navigate = useNavigate()
   const increaseMoney = useMoney((state) => state.increaseMoney)
   const setMoney = useMoney((state) => state.setMoney)
   const money = useMoney((state) => state.money)
   const buyBusiness = useBusiness((state) => state.buyBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
+
+  const handleBuyBusiness = async (businessId: string, cost: number) => {
+    const buyBusinessResult = await buyBusiness(businessId, cost)
+    if (!buyBusinessResult) return
+    navigate({
+      to: "/business/$businessId",
+      params: { businessId: businessId }
+    })
+  }
 
   const inventoryState = useInventory((state) => state.inventory)
 
@@ -70,7 +80,7 @@ function Home() {
       {BUSINESS_CATALOG.map(({ id, name, baseCost }) => {
         return (
           <div key={id}>
-            <button onClick={() => buyBusiness(id, baseCost)}>
+            <button onClick={() => handleBuyBusiness(id, baseCost)}>
               buy {name}
             </button>
             <button onClick={() => sellBusiness(id, baseCost)}>
