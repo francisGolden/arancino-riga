@@ -177,7 +177,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       set(() => ({ inventories: currentInventories }))
     }
   },
-  getAllowedRecipes: (businessId: string, allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => {
+  getAllowedRecipes: (allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => {
     const allowedRecipes = []
     const iterableRecipeCatalog = Object.entries(recipe_catalog)
 

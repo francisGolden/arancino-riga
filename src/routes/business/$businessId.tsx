@@ -25,7 +25,7 @@ function RouteComponent() {
   )?.allowedItems
   const allowedRecipes: RecipeConfig[] = useInventories
     .getState()
-    .getAllowedRecipes(businessId, allowedItems || [], RECIPE_CATALOG)
+    .getAllowedRecipes(allowedItems || [], RECIPE_CATALOG)
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
