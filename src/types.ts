@@ -5,6 +5,7 @@ export interface GameDb {
   ownedBusinesses: string[];
   inventory: Record<string, number>;
   inventories: Record<string, Record<string, number>>;
+  businessEmployees: Record<string, string[]>
 }
 
 export interface ElapsedTimeResult {
