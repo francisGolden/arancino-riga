@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
@@ -53,6 +53,18 @@ function Home() {
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
       <br />
+      <div>
+        <span>My businesses</span>
+        <ul>
+          {ownedBusinesses.map((business, index) => {
+            return (
+              <li key={index}>
+                <Link to={'/business/' + business}>{business}</Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
       <br />
       <span>business</span>
       {BUSINESS_CATALOG.map(({ id, name, baseCost }) => {
