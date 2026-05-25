@@ -33,8 +33,14 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     useInventories.getState().addBusinessToInventory(id)
     
     const updatedBusinesses = get().ownedBusinesses
-    await updateDbBusiness(updatedBusinesses)
-    return true
+    try {
+      await updateDbBusiness(updatedBusinesses)
+      return true
+    } catch (error) {
+      console.error('cannot buy business', error)
+      return false
+    }
+    
   },
   sellBusiness: async (id: string, cost: number): Promise<boolean> => {
     const currentOwnedBusinesses = get().ownedBusinesses
