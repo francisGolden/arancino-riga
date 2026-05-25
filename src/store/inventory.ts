@@ -106,6 +106,9 @@ export const useInventory = create<InventoryState>((set, get) => ({
     set(() => ({ inventory }))
     await updateDbInventory(inventory)
   },
+  getAllowedRecipes: (businessId: string, ) => {
+
+  },
   hydrateInventory: (savedInventory: Record<string, number>): void =>
     set({ inventory: savedInventory }),
 }))
