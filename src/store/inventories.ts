@@ -23,9 +23,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     allowedItems: string[]
   ): Promise<void> => {
     const itemId = RECIPE_CATALOG[recipeItemId].productId
-    const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
-    const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
-    const currentInventories = get().inventories
 
     let checkAllowedItems = false
     for (const item of allowedItems) {
@@ -38,6 +35,11 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         console.log('item not allowed to be crafted for this business')
         return
     }
+
+    const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
+    const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
+
+    const currentInventories = get().inventories
 
     const inventoriesCopy = {
       ...currentInventories,
@@ -111,13 +113,14 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     inventoriesCopy[businessId][id] = currentAmount + 1
 
     set(() => ({ inventories: inventoriesCopy }))
+    useMoney.getState().decreaseMoney(cost)
 
     try {
       await updateDbInventories(inventoriesCopy)
-      useMoney.getState().decreaseMoney(cost)
     } catch (error) {
       console.error('could not buy item for business', error)
       set(() => ({ inventories: currentInventories }))
+      useMoney.getState().increaseMoney(cost)
     }
   },
   sellBusinessItem: async (
@@ -128,15 +131,16 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     console.log('sell', id, cost, businessId)
 
     const currentInventories = get().inventories
-    const inventoriesCopy = {
-      ...currentInventories,
-      [businessId]: { ...currentInventories[businessId] },
-    }
 
-    if (id in inventoriesCopy[businessId]) {
+    if (id in currentInventories[businessId]) {
     } else {
       console.log('item. not in business inventory. cannot sell')
       return
+    }
+
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
     }
 
     inventoriesCopy[businessId][id] -= 1
@@ -146,13 +150,14 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     set(() => ({ inventories: inventoriesCopy }))
+    useMoney.getState().increaseMoney(cost)
 
     try {
       await updateDbInventories(inventoriesCopy)
-      useMoney.getState().increaseMoney(cost)
     } catch (error) {
       console.error('could not sell item from business inventory', error)
       set(() => ({ inventories: currentInventories }))
+      useMoney.getState().decreaseMoney(cost)
     }
   },
   addBusinessToInventory: async (businessId: string): Promise<void> => {
@@ -173,10 +178,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
   },
   getAllowedRecipes: (businessId: string, allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => {
-    console.log(businessId, allowedItems, recipe_catalog)
     const allowedRecipes = []
     const iterableRecipeCatalog = Object.entries(recipe_catalog)
-    console.log(iterableRecipeCatalog)
 
     for (const [recipeName, recipeObject] of iterableRecipeCatalog) {
       for (const allowedItem of allowedItems) {
@@ -185,7 +188,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         }
       }
     }
-    console.log(allowedRecipes)
     return allowedRecipes
 
   },
