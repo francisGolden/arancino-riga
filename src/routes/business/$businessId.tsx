@@ -33,8 +33,9 @@ function RouteComponent() {
     (state) => state.craftBusinessProduct,
   )
 
-  const handleSellBusiness = (id: string, cost: number) => {
-    sellBusiness(id, cost)
+  const handleSellBusiness = async (id: string, cost: number) => {
+    const businessSaleResult = await sellBusiness(id, cost)
+    if (!businessSaleResult) return
     navigate({
         to: "/"
     })

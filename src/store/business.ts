@@ -35,20 +35,27 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     const updatedBusinesses = get().ownedBusinesses
     await updateDbBusiness(updatedBusinesses)
   },
-  sellBusiness: async (id: string, cost: number) => {
+  sellBusiness: async (id: string, cost: number): Promise<boolean> => {
     const currentOwnedBusinesses = get().ownedBusinesses
     const match = currentOwnedBusinesses.includes(id)
     if (!match) {
         console.log('cannot sell because I do not own this business')
-        return
+        return false
     }
     
     useMoney.getState().increaseMoney(cost)
     const newOwnedBusinesses = currentOwnedBusinesses.filter((currentOwnedBusinessId: string) => currentOwnedBusinessId !== id)
-    set(() => ({ ownedBusinesses: newOwnedBusinesses }))
+    
 
-    const updatesBusinesses = get().ownedBusinesses
-    await updateDbBusiness(updatesBusinesses)
+    try {
+      await updateDbBusiness(newOwnedBusinesses)
+      set(() => ({ ownedBusinesses: newOwnedBusinesses }))
+      return true
+    } catch (error) {
+      console.error('cannot update business')
+      return false
+    }
+    
   },
   setBusinessList: async(list: string[]) => {
     set(() => ({ ownedBusinesses: list}))
