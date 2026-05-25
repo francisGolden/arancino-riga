@@ -27,6 +27,7 @@ export interface BusinessConfig {
   name: string;
   description: string;
   location: string;
+  allowedItems: string[];
 }
 
 export interface BusinessListState {
@@ -48,8 +49,8 @@ export interface InventoryState {
 
 export interface InventoriesState {
   inventories: Record<string, Record<string, number>>;
-  craftBusinessProduct: (recipeItemId: string, businessId: string) => void;
-  buyItemForBusiness: (id: string, cost: number, businessId: string) => void;
+  craftBusinessProduct: (recipeItemId: string, businessId: string, allowedItems: string[]) => void;
+  buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[]) => void;
   sellBusinessItem: (id: string, cost: number, businessId: string) => void;
   addBusinessToInventory: (businessId: string) => void;
   hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
