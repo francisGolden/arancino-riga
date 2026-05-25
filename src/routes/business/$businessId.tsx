@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useInventories } from '#/store/inventories'
 import { GameClock } from '#/components/gameClock'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
@@ -6,12 +6,14 @@ import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import type { RecipeConfig } from '#/types'
+import { useBusiness } from '#/store/business'
 
 export const Route = createFileRoute('/business/$businessId')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const money = useMoney((state) => state.money)
   const { businessId } = Route.useParams()
   const businessInventory = useInventories(
@@ -21,10 +23,22 @@ function RouteComponent() {
   const allowedItems = BUSINESS_CATALOG.find(
     (business) => business.id === businessId,
   )?.allowedItems
-  const allowedRecipes: RecipeConfig[] = useInventories.getState().getAllowedRecipes(businessId, allowedItems || [], RECIPE_CATALOG)
+  const allowedRecipes: RecipeConfig[] = useInventories
+    .getState()
+    .getAllowedRecipes(businessId, allowedItems || [], RECIPE_CATALOG)
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
-  const craftBusinessProduct = useInventories((state) => state.craftBusinessProduct)
+  const sellBusiness = useBusiness((state) => state.sellBusiness)
+  const craftBusinessProduct = useInventories(
+    (state) => state.craftBusinessProduct,
+  )
+
+  const handleSellBusiness = (id: string, cost: number) => {
+    sellBusiness(id, cost)
+    navigate({
+        to: "/"
+    })
+  }
 
   return (
     <div>
@@ -68,11 +82,39 @@ function RouteComponent() {
       </div>
       <div>
         <h4>Craft</h4>
-        <ul>{allowedRecipes.map((allowedRecipe: RecipeConfig, index: number) => {
-            return (<li key={index}><span>{allowedRecipe.productId}</span>
-                <button onClick={() => craftBusinessProduct(allowedRecipe.recipeName || '', businessId, allowedItems || [])}>craft {allowedRecipe.yieldAmount}</button>
-                </li>)
-        })}</ul>
+        <ul>
+          {allowedRecipes.map((allowedRecipe: RecipeConfig, index: number) => {
+            return (
+              <li key={index}>
+                <span>{allowedRecipe.productId}</span>
+                <button
+                  onClick={() =>
+                    craftBusinessProduct(
+                      allowedRecipe.recipeName || '',
+                      businessId,
+                      allowedItems || [],
+                    )
+                  }
+                >
+                  craft {allowedRecipe.yieldAmount}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div>
+        <button
+          onClick={() =>
+            handleSellBusiness(
+              businessId,
+              BUSINESS_CATALOG.find((business) => business.id === businessId)
+                ?.baseCost || 0,
+            )
+          }
+        >
+          Sell this business
+        </button>
       </div>
       <GameClock />
     </div>
