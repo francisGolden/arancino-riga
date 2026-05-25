@@ -143,6 +143,7 @@ function Home() {
               </button>
               <span>qt: {inventoryState[item] ? inventoryState[item] : 0}</span>
               <div>
+                <br />
                 <span>buy for business</span>
                 {ownedBusinesses.map((business) => {
                   if (BUSINESS_CATALOG.find((obj) => obj.id === business)?.allowedItems.some((allowedItem) => allowedItem === item))
@@ -176,6 +177,7 @@ function Home() {
                         sell from {business}
                       </button>
                       <span>qt: {inventoriesState[business][item] || 0}</span>
+                      <br />
                     </div>
                   )
                 })}
