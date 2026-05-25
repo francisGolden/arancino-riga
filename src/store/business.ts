@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { BusinessListState } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
+import { useInventories } from './inventories'
 
 const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
   try {
@@ -14,42 +15,67 @@ const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
 
 export const useBusiness = create<BusinessListState>((set, get) => ({
   ownedBusinesses: [],
-  buyBusiness: async (id: string, cost: number) => {
+  buyBusiness: async (id: string, cost: number): Promise<boolean> => {
     const currentOwnedBusinesses = get().ownedBusinesses
     if (currentOwnedBusinesses.includes(id)) {
-        console.log('business already owned')
-        return
+      console.log('business already owned')
+      return false
     }
 
     if (useMoney.getState().money < cost) {
-        console.log('not enough funds for this purchase')
-        return
+      console.log('not enough funds for this purchase')
+      return false
     }
+    const ownedBusinessesCopy = [...currentOwnedBusinesses]
 
-    set((state) => ({ ownedBusinesses: [...state.ownedBusinesses, id] }))
+    ownedBusinessesCopy.push(id)
+
+    set(() => ({ ownedBusinesses: ownedBusinessesCopy }))
+
+    useInventories.getState().addBusinessToInventory(id)
     useMoney.getState().decreaseMoney(cost)
-    
-    const updatedBusinesses = get().ownedBusinesses
-    await updateDbBusiness(updatedBusinesses)
+
+    try {
+      await updateDbBusiness(ownedBusinessesCopy)
+      return true
+    } catch (error) {
+      console.error('cannot buy business', error)
+      set(() => ({ ownedBusinesses: currentOwnedBusinesses }))
+      useMoney.getState().increaseMoney(cost)
+
+      // TO-DO: add also removeBusinessFromInventory(id)
+      return false
+    }
   },
-  sellBusiness: async (id: string, cost: number) => {
+  sellBusiness: async (id: string, cost: number): Promise<boolean> => {
     const currentOwnedBusinesses = get().ownedBusinesses
     const match = currentOwnedBusinesses.includes(id)
     if (!match) {
-        console.log('cannot sell because I do not own this business')
-        return
+      console.log('cannot sell because I do not own this business')
+      return false
     }
-    
-    useMoney.getState().increaseMoney(cost)
-    const newOwnedBusinesses = currentOwnedBusinesses.filter((currentOwnedBusinessId: string) => currentOwnedBusinessId !== id)
-    set(() => ({ ownedBusinesses: newOwnedBusinesses }))
 
-    const updatesBusinesses = get().ownedBusinesses
-    await updateDbBusiness(updatesBusinesses)
+    const newOwnedBusinesses = currentOwnedBusinesses.filter(
+      (currentOwnedBusinessId: string) => currentOwnedBusinessId !== id,
+    )
+
+    set(() => ({ ownedBusinesses: newOwnedBusinesses }))
+    useMoney.getState().increaseMoney(cost)
+
+    try {
+      await updateDbBusiness(newOwnedBusinesses)
+      return true
+    } catch (error) {
+      set(() => ({ ownedBusinesses: currentOwnedBusinesses }))
+      useMoney.getState().decreaseMoney(cost)
+      console.error('cannot sell business')
+      return false
+    }
   },
-  setBusinessList: async(list: string[]) => {
-    set(() => ({ ownedBusinesses: list}))
+  setBusinessList: async (list: string[]) => {
+    set(() => ({ ownedBusinesses: list }))
     await updateDbBusiness(list)
   },
-  hydrateBusinessList: (savedBusinesses: string[]): void => set({ ownedBusinesses: savedBusinesses }),
+  hydrateBusinessList: (savedBusinesses: string[]): void =>
+    set({ ownedBusinesses: savedBusinesses }),
 }))

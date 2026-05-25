@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
@@ -6,20 +6,27 @@ import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { GameClock } from '#/components/gameClock'
-import { useInventory } from '#/store/inventory'
-import { RECIPE_CATALOG } from '#/db/recipeList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
-
-
 function Home() {
-  
+  const navigate = useNavigate()
   const increaseMoney = useMoney((state) => state.increaseMoney)
   const setMoney = useMoney((state) => state.setMoney)
   const money = useMoney((state) => state.money)
   const buyBusiness = useBusiness((state) => state.buyBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
+
+  const handleBuyBusiness = async (businessId: string, cost: number) => {
+    const buyBusinessResult = await buyBusiness(businessId, cost)
+    if (!buyBusinessResult) return
+    navigate({
+      to: "/business/$businessId",
+      params: { businessId: businessId }
+    })
+  }
+
+  const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
 
   useEffect(() => {
     // This useEffect auto-saves the lastSavedAt property of the db
@@ -50,12 +57,24 @@ function Home() {
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>
       <br />
+      <div>
+        <span>My businesses</span>
+        <ul>
+          {ownedBusinesses.map((business, index) => {
+            return (
+              <li key={index}>
+                <Link to={'/business/' + business}>{business}</Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
       <br />
       <span>business</span>
       {BUSINESS_CATALOG.map(({ id, name, baseCost }) => {
         return (
           <div key={id}>
-            <button onClick={() => buyBusiness(id, baseCost)}>
+            <button onClick={() => handleBuyBusiness(id, baseCost)}>
               buy {name}
             </button>
             <button onClick={() => sellBusiness(id, baseCost)}>
@@ -63,9 +82,7 @@ function Home() {
             </button>
             <span>
               owned:{' '}
-              {useBusiness
-                .getState()
-                .ownedBusinesses.some((businessId: string) => businessId === id)
+              {ownedBusinesses.some((businessId: string) => businessId === id)
                 ? 'true'
                 : 'false'}
             </span>
@@ -73,33 +90,6 @@ function Home() {
         )
       })}
       <br />
-      
-      <div>
-        <span>products</span>
-        {Object.entries(RECIPE_CATALOG).map(([recipe]) => {
-          return (
-            <div key={recipe} id={recipe}>
-              <span>{recipe}</span>
-              <button onClick={() => useInventory.getState().craftProduct(recipe, 1)}>Create product</button>
-              <span>owned: {useInventory.getState().inventory[RECIPE_CATALOG[recipe].productId] ? 'true' : 'false'}</span>
-            </div>
-          )
-        })}
-      </div>
-      <br />
-      <div>
-        <span>ingredients</span>
-        {Object.keys(INVENTORY_CATALOG).map((item) => {
-          return (
-            <div key={item}>
-              <span>{item}</span>
-              <button onClick={() => useInventory.getState().buyItem(item, INVENTORY_CATALOG[item].baseCost)}>Buy item</button>
-              <button onClick={() => useInventory.getState().sellItem(item, INVENTORY_CATALOG[item].baseCost)}>Sell item</button>
-              <span>qt: {useInventory.getState().inventory[item] ? useInventory.getState().inventory[item] : 0}</span>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }

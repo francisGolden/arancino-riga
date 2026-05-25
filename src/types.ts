@@ -4,6 +4,7 @@ export interface GameDb {
   money: number;
   ownedBusinesses: string[];
   inventory: Record<string, number>;
+  inventories: Record<string, Record<string, number>>;
 }
 
 export interface ElapsedTimeResult {
@@ -26,12 +27,13 @@ export interface BusinessConfig {
   name: string;
   description: string;
   location: string;
+  allowedItems: string[];
 }
 
 export interface BusinessListState {
   ownedBusinesses: string[];
-  buyBusiness: (id: string, cost: number) => void;
-  sellBusiness: (id: string, cost: number) => void;
+  buyBusiness: (id: string, cost: number) => Promise<boolean>;
+  sellBusiness: (id: string, cost: number) => Promise<boolean>;
   setBusinessList: (list: string[]) => void;
   hydrateBusinessList: (savedBusinesses: string[]) => void;
 }
@@ -43,6 +45,16 @@ export interface InventoryState {
   sellItem: (id: string, cost: number) => void;
   setInventory: (inventory: Record<string, number>) => void;
   hydrateInventory: (savedInventory: Record<string, number>) => void;
+}
+
+export interface InventoriesState {
+  inventories: Record<string, Record<string, number>>;
+  craftBusinessProduct: (recipeItemId: string, businessId: string, allowedItems: string[]) => void;
+  buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[]) => void;
+  sellBusinessItem: (id: string, cost: number, businessId: string) => void;
+  addBusinessToInventory: (businessId: string) => void;
+  getAllowedRecipes: (allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => RecipeConfig[];
+  hydrateInventories: (savedInventories: Record<string, Record<string, number>>) => void;
 }
 
 export type ItemType = 'ingredient' | 'product';
@@ -59,4 +71,5 @@ export interface RecipeConfig {
   productId: string; // ID of finished product (must exist in inventoryList)
   ingredients: Record<string, number>; // Which ingredients are needed and how many
   yieldAmount: number; // How many products does this recipe yield?
+  recipeName?: string
 }
