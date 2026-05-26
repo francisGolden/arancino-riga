@@ -84,47 +84,38 @@ function RouteComponent() {
                     onClick={() =>
                       useEmployees.getState().fireEmployee(businessId, employee)
                     }
-                  >Fire</button>
+                  >
+                    Fire
+                  </button>
                 </li>
               )
             })}
           </ul>
         </div>
-        <button
-          onClick={() =>
-            useEmployees
-              .getState()
-              .getCompatibleEmployees(
-                businessId,
-                businessCatalogObject?.type || '',
+        <div>
+            <h5>Available Employees to Hire</h5>
+          <ul>
+            {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
+              return (
+                <li key={compatibleEmployee.id}>
+                  <button
+                    onClick={() =>
+                      useEmployees
+                        .getState()
+                        .hireEmployee(
+                          businessId,
+                          compatibleEmployee.id,
+                          compatibleEmployee.baseWage,
+                        )
+                    }
+                  >
+                    Hire {compatibleEmployee.name}
+                  </button>
+                </li>
               )
-          }
-        >
-          Get Compatible Employees
-        </button>
-        <button onClick={() => useEmployees.getState().hireEmployee}>
-          Hire Employee
-        </button>
-        <ul></ul>
-        {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
-          return (
-            <li key={compatibleEmployee.id}>
-              <button
-                onClick={() =>
-                  useEmployees
-                    .getState()
-                    .hireEmployee(
-                      businessId,
-                      compatibleEmployee.id,
-                      compatibleEmployee.baseWage,
-                    )
-                }
-              >
-                Hire {compatibleEmployee.name}
-              </button>
-            </li>
-          )
-        })}
+            })}
+          </ul>
+        </div>
       </div>
       <div>
         <h4>Buy from supplier</h4>
