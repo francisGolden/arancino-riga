@@ -103,7 +103,7 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
         return false
     }
   },
-  hydrateEmployees: async (savedEmployees: Record<string, string[]>) => {
+  hydrateEmployees: (savedEmployees: Record<string, string[]>) => {
     set(() => ({ businessEmployees: savedEmployees }))
   }
 }))
