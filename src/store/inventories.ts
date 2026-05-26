@@ -255,13 +255,21 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     allowedItems: string[],
     recipe_catalog: Record<string, RecipeConfig>,
   ) => {
-    const allowedRecipes = []
+    const allowedRecipes: RecipeConfig[] = []
     const iterableRecipeCatalog = Object.entries(recipe_catalog)
 
     for (const [recipeName, recipeObject] of iterableRecipeCatalog) {
       for (const allowedItem of allowedItems) {
         if (allowedItem === recipeObject.productId) {
-          allowedRecipes.push({ ...recipeObject, recipeName })
+          // avoid duplicate recipes to craft
+          if (
+            !allowedRecipes.some(
+              (allowedRecipe) =>
+                allowedRecipe.productId === recipeObject.productId,
+            )
+          ) {
+            allowedRecipes.push({ ...recipeObject, recipeName })
+          }
         }
       }
     }
