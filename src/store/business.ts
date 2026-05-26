@@ -3,6 +3,7 @@ import type { BusinessListState } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
 import { useInventories } from './inventories'
+import { useEmployees } from './employees'
 
 const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
   try {
@@ -35,8 +36,10 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     useInventories.getState().addBusinessToInventory(id)
     useMoney.getState().decreaseMoney(cost)
 
+
     try {
       await updateDbBusiness(ownedBusinessesCopy)
+      await useEmployees.getState().addBusinessToEmployees(id)
       return true
     } catch (error) {
       console.error('cannot buy business', error)

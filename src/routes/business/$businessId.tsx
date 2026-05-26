@@ -77,7 +77,7 @@ function RouteComponent() {
           <h5>My employees</h5>
           <ul>
             {businessEmployees.map((employee) => {
-              return <li>{EMPLOYEES_CATALOG[employee].name}</li>
+              return <li key={employee}>{EMPLOYEES_CATALOG[employee].name}</li>
             })}
           </ul>
         </div>
