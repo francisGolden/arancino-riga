@@ -8,6 +8,7 @@ import { RECIPE_CATALOG } from '#/db/recipeList'
 import type { EmployeeConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
 import { useEmployees } from '#/store/employees'
+import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 export const Route = createFileRoute('/business/$businessId')({
   component: RouteComponent,
@@ -34,6 +35,10 @@ function RouteComponent() {
   const compatibleEmployees = useEmployees
     .getState()
     .getCompatibleEmployees(businessId, businessCatalogObject?.type || '')
+
+  const businessEmployees = useEmployees((state) => state.businessEmployees)[
+    businessId
+  ]
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
@@ -68,6 +73,14 @@ function RouteComponent() {
       </div>
       <div>
         <h4>Employees</h4>
+        <div>
+          <h5>My employees</h5>
+          <ul>
+            {businessEmployees.map((employee) => {
+              return <li>{EMPLOYEES_CATALOG[employee].name}</li>
+            })}
+          </ul>
+        </div>
         <button
           onClick={() =>
             useEmployees
@@ -87,7 +100,19 @@ function RouteComponent() {
         {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
           return (
             <li key={compatibleEmployee.id}>
-              <button>Hire {compatibleEmployee.name}</button>
+              <button
+                onClick={() =>
+                  useEmployees
+                    .getState()
+                    .hireEmployee(
+                      businessId,
+                      compatibleEmployee.id,
+                      compatibleEmployee.baseWage,
+                    )
+                }
+              >
+                Hire {compatibleEmployee.name}
+              </button>
             </li>
           )
         })}

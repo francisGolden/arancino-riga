@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { db } from '#/db/initDb'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 import type { EmployeeConfig } from '#/types'
+import { useMoney } from './currency'
 
 interface EmployeesState {
   businessEmployees: Record<string, string[]>
@@ -10,7 +11,11 @@ interface EmployeesState {
     businessId: string,
     businessType: string,
   ) => EmployeeConfig[]
-  hireEmployee: (businessId: string, employeeId: string) => Promise<boolean>
+  hireEmployee: (
+    businessId: string,
+    employeeId: string,
+    employeeWage: number,
+  ) => Promise<boolean>
 }
 
 export const useEmployees = create<EmployeesState>((set, get) => ({
@@ -32,7 +37,7 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
         )
       ) {
         if (businessEmployees.includes(id)) {
-            console.log(id, 'already in', businessEmployees)
+          console.log(id, 'already in', businessEmployees)
         } else {
           compatibleEmployees.push(object)
         }
@@ -44,8 +49,19 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
   hireEmployee: async (
     businessId: string,
     employeeId: string,
+    employeeWage: number,
   ): Promise<boolean> => {
-    console.log(businessId, employeeId)
+    console.log('hire', businessId, employeeId)
+    const currentBusinessEmployees = get().businessEmployees
+    if (currentBusinessEmployees[businessId].includes(employeeId)) return false
+    if (useMoney.getState().money < employeeWage) return false
+
+    console.log('passed checks')
+    const businessEmployeesCopy = { ...currentBusinessEmployees }
+    businessEmployeesCopy[businessId].push(employeeId)
+    console.log(businessEmployeesCopy)
+
+    set((state) => ({ businessEmployees: businessEmployeesCopy }))
     return true
   },
 }))
