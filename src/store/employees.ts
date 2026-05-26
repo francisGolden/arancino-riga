@@ -20,7 +20,8 @@ interface EmployeesState {
     businessId: string,
     employeeId: string,
   ) => Promise<boolean>
-  addBusinessToEmployees: (businessId: string) => Promise<boolean>
+  addBusinessToEmployees: (businessId: string) => Promise<boolean>;
+  getBusinessEmployeesTotalWage: (businessId: string) => number;
   hydrateEmployees: (savedEmployees: Record<string, string[]>) => void
 }
 
@@ -127,6 +128,16 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
       console.error('could not add business to employees', error)
       return false
     }
+  },
+  getBusinessEmployeesTotalWage: (businessId: string) => {
+    console.log(businessId)
+    const currentBusinessEmployees = get().businessEmployees[businessId]
+    let sum = 0
+    for (const employee of currentBusinessEmployees) {
+        console.log(EMPLOYEES_CATALOG[employee].baseWage)
+        sum += EMPLOYEES_CATALOG[employee].baseWage
+    }
+    return sum
   },
   hydrateEmployees: (savedEmployees: Record<string, string[]>) => {
     set(() => ({ businessEmployees: savedEmployees }))

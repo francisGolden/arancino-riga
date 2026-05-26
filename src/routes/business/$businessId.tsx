@@ -73,6 +73,7 @@ function RouteComponent() {
       </div>
       <div>
         <h4>Employees</h4>
+        <span >total wage {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}</span>
         <div>
           <h5>My employees</h5>
           <ul>
