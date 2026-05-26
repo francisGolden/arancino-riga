@@ -5,8 +5,9 @@ import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
-import type { RecipeConfig } from '#/types'
+import type { EmployeeConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
+import { useEmployees } from '#/store/employees'
 
 export const Route = createFileRoute('/business/$businessId')({
   component: RouteComponent,
@@ -20,7 +21,7 @@ function RouteComponent() {
     (state) => state.inventories[businessId],
   )
 
-  const businessCatalogObject =  BUSINESS_CATALOG.find(
+  const businessCatalogObject = BUSINESS_CATALOG.find(
     (business) => business.id === businessId,
   )
 
@@ -29,6 +30,10 @@ function RouteComponent() {
   const allowedRecipes: RecipeConfig[] = useInventories
     .getState()
     .getAllowedRecipes(allowedItems || [], RECIPE_CATALOG)
+
+  const compatibleEmployees = useEmployees
+    .getState()
+    .getCompatibleEmployees(businessId, businessCatalogObject?.type || '')
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
@@ -40,7 +45,7 @@ function RouteComponent() {
     const businessSaleResult = await sellBusiness(id, cost)
     if (!businessSaleResult) return
     navigate({
-        to: "/"
+      to: '/',
     })
   }
 
@@ -60,6 +65,32 @@ function RouteComponent() {
             )
           })}
         </ul>
+      </div>
+      <div>
+        <h4>Employees</h4>
+        <button
+          onClick={() =>
+            useEmployees
+              .getState()
+              .getCompatibleEmployees(
+                businessId,
+                businessCatalogObject?.type || '',
+              )
+          }
+        >
+          Get Compatible Employees
+        </button>
+        <button onClick={() => useEmployees.getState().hireEmployee}>
+          Hire Employee
+        </button>
+        <ul></ul>
+        {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
+          return (
+            <li key={compatibleEmployee.id}>
+              <button>Hire {compatibleEmployee.name}</button>
+            </li>
+          )
+        })}
       </div>
       <div>
         <h4>Buy from supplier</h4>
@@ -111,10 +142,7 @@ function RouteComponent() {
       <div>
         <button
           onClick={() =>
-            handleSellBusiness(
-              businessId,
-              businessCatalogObject?.baseCost || 0,
-            )
+            handleSellBusiness(businessId, businessCatalogObject?.baseCost || 0)
           }
         >
           Sell this business
