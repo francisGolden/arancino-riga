@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { InventoriesState, RecipeConfig } from '#/types'
+import type { EmployeeRole, InventoriesState, RecipeConfig } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
 import { useEmployees } from './employees'
@@ -22,7 +22,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   craftBusinessProduct: async (
     recipeItemId: string,
     businessId: string,
-    allowedItems: string[]
+    allowedItems: string[],
+    requiredRole: EmployeeRole
   ): Promise<void> => {
     const itemId = RECIPE_CATALOG[recipeItemId].productId
 
@@ -38,14 +39,21 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         return
     }
 
+    let checkRequiredEmployeeRoles = false
     // Preparation for Employee crafting
-    // const businessEmployees = useEmployees.getState().businessEmployees[businessId]
-    // console.log(businessEmployees, EMPLOYEES_CATALOG)
-    // for (const employee of businessEmployees) {
-    //   if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
-    //     console.log(EMPLOYEES_CATALOG[employee])
-    //   }
-    // }
+    const businessEmployees = useEmployees.getState().businessEmployees[businessId]
+    for (const employee of businessEmployees) {
+      if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
+        if (EMPLOYEES_CATALOG[employee].roles.includes(requiredRole)) {
+          checkRequiredEmployeeRoles = true
+        }
+      }
+    }
+
+    if (!checkRequiredEmployeeRoles) {
+      console.log('we cannot make this recipe with the current workforce')
+      return
+    }
 
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
     const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount

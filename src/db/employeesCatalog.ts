@@ -4,7 +4,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
   janis_scooper: {
     id: 'janis_scooper',
     name: 'Jānis',
-    roles: ['cashier'],
+    roles: ['cashier', 'pastry chef'],
     description:
       'A cheerful guy with a talent for handling loud weekend rushes. Thrives in outdoor environments and family-oriented dessert shops.',
     baseWage: 8,
@@ -40,7 +40,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
   juris_baker: {
     id: 'juris_baker',
     name: 'Juris',
-    roles: ['cook'],
+    roles: ['cook', 'pastry chef'],
     description:
       'Ferments dough with artisanal passion. He is at his best working with organic ingredients in artisan bakeries and slow-food spots.',
     baseWage: 15,
@@ -125,7 +125,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
   liga_mixer: {
     id: 'liga_mixer',
     name: 'Līga',
-    roles: ['cook'],
+    roles: ['cook', 'pastry chef'],
     description:
       'Mixes sweet bases and creams with incredible precision. A natural fit for dessert trucks and sweet-tooth crowds.',
     baseWage: 9,
@@ -148,7 +148,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
   ilze_cinnamon: {
     id: 'ilze_cinnamon',
     name: 'Ilze',
-    roles: ['cook'],
+    roles: ['cook', 'pastry chef'],
     description:
       'An early bird who loves baking sweet pastries. Shines in cozy kiosks that rely on the morning rush and the smell of fresh butter.',
     baseWage: 14,
