@@ -19,10 +19,13 @@ function RouteComponent() {
   const businessInventory = useInventories(
     (state) => state.inventories[businessId],
   )
-  const objectInventoryIterable = Object.entries(businessInventory)
-  const allowedItems = BUSINESS_CATALOG.find(
+
+  const businessCatalogObject =  BUSINESS_CATALOG.find(
     (business) => business.id === businessId,
-  )?.allowedItems
+  )
+
+  const objectInventoryIterable = Object.entries(businessInventory)
+  const allowedItems = businessCatalogObject?.allowedItems
   const allowedRecipes: RecipeConfig[] = useInventories
     .getState()
     .getAllowedRecipes(allowedItems || [], RECIPE_CATALOG)
@@ -44,6 +47,7 @@ function RouteComponent() {
   return (
     <div>
       <h1>{businessId}</h1>
+      <h4>{businessCatalogObject?.type}</h4>
       <span>{money} money</span>
       <div>
         <h4>Business Inventory</h4>
@@ -109,8 +113,7 @@ function RouteComponent() {
           onClick={() =>
             handleSellBusiness(
               businessId,
-              BUSINESS_CATALOG.find((business) => business.id === businessId)
-                ?.baseCost || 0,
+              businessCatalogObject?.baseCost || 0,
             )
           }
         >
