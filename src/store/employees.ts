@@ -131,11 +131,9 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
     }
   },
   getBusinessEmployeesTotalWage: (businessId: string) => {
-    console.log(businessId)
     const currentBusinessEmployees = get().businessEmployees[businessId]
     let sum = 0
     for (const employee of currentBusinessEmployees) {
-        console.log(EMPLOYEES_CATALOG[employee].baseWage)
         sum += EMPLOYEES_CATALOG[employee].baseWage
     }
     return sum

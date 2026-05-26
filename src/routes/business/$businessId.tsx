@@ -73,8 +73,13 @@ function RouteComponent() {
       </div>
       <div>
         <h4>Employees</h4>
-        <span >total wage {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}</span>
-        <button onClick={() => useEmployees.getState().payWages(businessId)}>Pay wages</button>
+        <span>
+          total wage{' '}
+          {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}
+        </span>
+        <button onClick={() => useEmployees.getState().payWages(businessId)}>
+          Pay wages
+        </button>
         <div>
           <h5>My employees</h5>
           <ul>
@@ -95,7 +100,7 @@ function RouteComponent() {
           </ul>
         </div>
         <div>
-            <h5>Available Employees to Hire</h5>
+          <h5>Available Employees to Hire</h5>
           <ul>
             {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
               return (
@@ -156,12 +161,24 @@ function RouteComponent() {
                       allowedRecipe.recipeName || '',
                       businessId,
                       allowedItems || [],
-                      RECIPE_CATALOG[allowedRecipe.recipeName || ''].requiredRole
+                      RECIPE_CATALOG[allowedRecipe.recipeName || '']
+                        .requiredRole,
                     )
                   }
                 >
                   craft {allowedRecipe.yieldAmount}
                 </button>
+                <button
+                  onClick={() =>
+                    useInventories
+                      .getState()
+                      .buyRecipeIngredients(
+                        allowedRecipe.recipeName || '',
+                        allowedItems || [],
+                        businessId,
+                      )
+                  }
+                >Buy required ingredients</button>
               </li>
             )
           })}

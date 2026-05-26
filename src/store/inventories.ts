@@ -5,6 +5,7 @@ import { useMoney } from './currency'
 import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
+import { INVENTORY_CATALOG } from '#/db/inventoryList'
 
 const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
@@ -23,25 +24,26 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     recipeItemId: string,
     businessId: string,
     allowedItems: string[],
-    requiredRole: EmployeeRole
+    requiredRole: EmployeeRole,
   ): Promise<void> => {
     const itemId = RECIPE_CATALOG[recipeItemId].productId
 
     let checkAllowedItems = false
     for (const item of allowedItems) {
-        if (item === itemId) {
-            checkAllowedItems = true
-        }
+      if (item === itemId) {
+        checkAllowedItems = true
+      }
     }
 
     if (!checkAllowedItems) {
-        console.log('item not allowed to be crafted for this business')
-        return
+      console.log('item not allowed to be crafted for this business')
+      return
     }
 
     let checkRequiredEmployeeRoles = false
     // Preparation for Employee crafting
-    const businessEmployees = useEmployees.getState().businessEmployees[businessId]
+    const businessEmployees =
+      useEmployees.getState().businessEmployees[businessId]
     for (const employee of businessEmployees) {
       if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
         if (EMPLOYEES_CATALOG[employee].roles.includes(requiredRole)) {
@@ -99,27 +101,78 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       set(() => ({ inventories: currentInventories }))
     }
   },
+  buyRecipeIngredients: async (
+    recipeName: string,
+    allowedItems: string[],
+    businessId: string,
+  ): Promise<boolean> => {
+    const requiredIngredients = RECIPE_CATALOG[recipeName].ingredients
+
+    let totalCost = 0
+
+    for (const requiredIngredient of Object.keys(requiredIngredients)) {
+      totalCost += INVENTORY_CATALOG[requiredIngredient].baseCost
+    }
+
+    if (useMoney.getState().money < totalCost) {
+      return false
+    }
+
+    console.log('hi')
+
+    const ingredientsToBuy = []
+    for (const requiredIngredient of Object.keys(requiredIngredients)) {
+      console.log('buying ...', INVENTORY_CATALOG[requiredIngredient].id)
+      const obj = {
+        id: INVENTORY_CATALOG[requiredIngredient].id,
+        cost: INVENTORY_CATALOG[requiredIngredient].baseCost,
+        businessId,
+        allowedItems,
+      }
+      ingredientsToBuy.push(obj)
+    }
+    console.log(ingredientsToBuy)
+
+    return true
+
+    // try {
+    //   for (const requiredIngredient of Object.keys(requiredIngredients)) {
+    //     console.log('buying ...', INVENTORY_CATALOG[requiredIngredient].id)
+    //     await get().buyItemForBusiness(
+    //       INVENTORY_CATALOG[requiredIngredient].id,
+    //       INVENTORY_CATALOG[requiredIngredient].baseCost,
+    //       businessId,
+    //       allowedItems,
+    //     )
+    //   }
+
+    //   return true
+    // } catch (error) {
+    //   console.error('could not buy items for business', error)
+    //   return false
+    // }
+  },
   buyItemForBusiness: async (
     id: string,
     cost: number,
     businessId: string,
-    allowedItems: string[]
-  ): Promise<void> => {
+    allowedItems: string[],
+  ): Promise<boolean> => {
     if (useMoney.getState().money < cost) {
       console.log('not enough funds for this purchase')
-      return
+      return false
     }
 
     let checkAllowedItems = false
     for (const item of allowedItems) {
-        if (item === id) {
-            checkAllowedItems = true
-        }
+      if (item === id) {
+        checkAllowedItems = true
+      }
     }
 
     if (!checkAllowedItems) {
-        console.log('item not allowed to be bought for this business')
-        return
+      console.log('item not allowed to be bought for this business')
+      return false
     }
 
     const currentInventories = get().inventories
@@ -136,10 +189,12 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     try {
       await updateDbInventories(inventoriesCopy)
+      return true
     } catch (error) {
       console.error('could not buy item for business', error)
       set(() => ({ inventories: currentInventories }))
       useMoney.getState().increaseMoney(cost)
+      return false
     }
   },
   sellBusinessItem: async (
@@ -196,19 +251,21 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       set(() => ({ inventories: currentInventories }))
     }
   },
-  getAllowedRecipes: (allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => {
+  getAllowedRecipes: (
+    allowedItems: string[],
+    recipe_catalog: Record<string, RecipeConfig>,
+  ) => {
     const allowedRecipes = []
     const iterableRecipeCatalog = Object.entries(recipe_catalog)
 
     for (const [recipeName, recipeObject] of iterableRecipeCatalog) {
       for (const allowedItem of allowedItems) {
         if (allowedItem === recipeObject.productId) {
-          allowedRecipes.push({...recipeObject, recipeName})
+          allowedRecipes.push({ ...recipeObject, recipeName })
         }
       }
     }
     return allowedRecipes
-
   },
   hydrateInventories: (
     savedInventories: Record<string, Record<string, number>>,
