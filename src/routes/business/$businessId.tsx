@@ -77,7 +77,16 @@ function RouteComponent() {
           <h5>My employees</h5>
           <ul>
             {businessEmployees.map((employee) => {
-              return <li key={employee}>{EMPLOYEES_CATALOG[employee].name}</li>
+              return (
+                <li key={employee}>
+                  {EMPLOYEES_CATALOG[employee].name}{' '}
+                  <button
+                    onClick={() =>
+                      useEmployees.getState().fireEmployee(businessId, employee)
+                    }
+                  >Fire</button>
+                </li>
+              )
             })}
           </ul>
         </div>

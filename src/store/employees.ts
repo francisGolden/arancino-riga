@@ -10,32 +10,36 @@ interface EmployeesState {
   getCompatibleEmployees: (
     businessId: string,
     businessType: string,
-  ) => EmployeeConfig[] 
+  ) => EmployeeConfig[]
   hireEmployee: (
     businessId: string,
     employeeId: string,
     employeeWage: number,
-  ) => Promise<boolean>;
-  addBusinessToEmployees: (businessId: string) => Promise<boolean>;
-  hydrateEmployees: (savedEmployees: Record<string, string[]>) => void;
+  ) => Promise<boolean>
+  fireEmployee: (
+    businessId: string,
+    employeeId: string,
+  ) => Promise<boolean>
+  addBusinessToEmployees: (businessId: string) => Promise<boolean>
+  hydrateEmployees: (savedEmployees: Record<string, string[]>) => void
 }
 
-const updateDbEmployees = async (newBusinessEmployees: Record<string, string[]>): Promise<void> => {
-    try {
-        await db.update((data) => data.businessEmployees = newBusinessEmployees)
-    } catch (error) {
-        console.error('could not update business employees', error)
-    }
+const updateDbEmployees = async (
+  newBusinessEmployees: Record<string, string[]>,
+): Promise<void> => {
+  try {
+    await db.update((data) => (data.businessEmployees = newBusinessEmployees))
+  } catch (error) {
+    console.error('could not update business employees', error)
+  }
 }
 
 export const useEmployees = create<EmployeesState>((set, get) => ({
   businessEmployees: {
-    // penguin_saldejums_uzvaras: ['janis_scooper']
-},
+  },
   getBusinessEmployees: (businessId: string): string[] => {
-    
     const currentBusinessEmployees = get().businessEmployees
-    return currentBusinessEmployees[businessId] 
+    return currentBusinessEmployees[businessId]
   },
   getCompatibleEmployees: (
     businessId: string,
@@ -69,37 +73,62 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
 
     console.log('passed checks')
     const businessEmployeesCopy = { ...currentBusinessEmployees }
-    businessEmployeesCopy[businessId] = [...businessEmployeesCopy[businessId], employeeId]
+    businessEmployeesCopy[businessId] = [
+      ...businessEmployeesCopy[businessId],
+      employeeId,
+    ]
 
     set(() => ({ businessEmployees: businessEmployeesCopy }))
 
     try {
-        await updateDbEmployees(businessEmployeesCopy)
-        return true
+      await updateDbEmployees(businessEmployeesCopy)
+      return true
     } catch (error) {
-        console.error('could not hire employee')
-        set(() => ({ businessEmployees: currentBusinessEmployees }))
-        return false
+      console.error('could not hire employee')
+      set(() => ({ businessEmployees: currentBusinessEmployees }))
+      return false
     }
-    
+  },
+  fireEmployee: async (
+    businessId: string,
+    employeeId: string,
+  ): Promise<boolean> => {
+    console.log('fire', businessId, employeeId)
+    const currentBusinessEmployees = get().businessEmployees
+    if (!currentBusinessEmployees[businessId].includes(employeeId)) return false
+
+    console.log('passed checks')
+    const businessEmployeesCopy = { ...currentBusinessEmployees }
+    businessEmployeesCopy[businessId] = currentBusinessEmployees[businessId].filter((employee) => employee !== employeeId)
+
+    set(() => ({ businessEmployees: businessEmployeesCopy}))
+
+    try {
+      await updateDbEmployees(businessEmployeesCopy)
+      return true
+    } catch (error) {
+      console.error('could not fire employee')
+      set(() => ({ businessEmployees: currentBusinessEmployees }))
+      return false
+    }
   },
   addBusinessToEmployees: async (businessId: string) => {
     const currentEmployees = get().businessEmployees
 
     const currentEmployeesCopy = { ...currentEmployees }
     currentEmployeesCopy[businessId] = []
-    set(() => ({businessEmployees: currentEmployeesCopy }))
+    set(() => ({ businessEmployees: currentEmployeesCopy }))
 
     try {
-        await updateDbEmployees(currentEmployeesCopy)
-        return true
+      await updateDbEmployees(currentEmployeesCopy)
+      return true
     } catch (error) {
-        set(() => ({ businessEmployees: currentEmployees }))
-        console.error('could not add business to employees', error)
-        return false
+      set(() => ({ businessEmployees: currentEmployees }))
+      console.error('could not add business to employees', error)
+      return false
     }
   },
   hydrateEmployees: (savedEmployees: Record<string, string[]>) => {
     set(() => ({ businessEmployees: savedEmployees }))
-  }
+  },
 }))
