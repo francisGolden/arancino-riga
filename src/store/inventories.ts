@@ -2,7 +2,9 @@ import { create } from 'zustand'
 import type { InventoriesState, RecipeConfig } from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
+import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
+import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
@@ -35,6 +37,15 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         console.log('item not allowed to be crafted for this business')
         return
     }
+
+    // Preparation for Employee crafting
+    // const businessEmployees = useEmployees.getState().businessEmployees[businessId]
+    // console.log(businessEmployees, EMPLOYEES_CATALOG)
+    // for (const employee of businessEmployees) {
+    //   if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
+    //     console.log(EMPLOYEES_CATALOG[employee])
+    //   }
+    // }
 
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
     const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount

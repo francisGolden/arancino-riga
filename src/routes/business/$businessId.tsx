@@ -5,8 +5,10 @@ import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
-import type { RecipeConfig } from '#/types'
+import type { EmployeeConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
+import { useEmployees } from '#/store/employees'
+import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 export const Route = createFileRoute('/business/$businessId')({
   component: RouteComponent,
@@ -19,13 +21,24 @@ function RouteComponent() {
   const businessInventory = useInventories(
     (state) => state.inventories[businessId],
   )
-  const objectInventoryIterable = Object.entries(businessInventory)
-  const allowedItems = BUSINESS_CATALOG.find(
+
+  const businessCatalogObject = BUSINESS_CATALOG.find(
     (business) => business.id === businessId,
-  )?.allowedItems
+  )
+
+  const objectInventoryIterable = Object.entries(businessInventory)
+  const allowedItems = businessCatalogObject?.allowedItems
   const allowedRecipes: RecipeConfig[] = useInventories
     .getState()
     .getAllowedRecipes(allowedItems || [], RECIPE_CATALOG)
+
+  const compatibleEmployees = useEmployees
+    .getState()
+    .getCompatibleEmployees(businessId, businessCatalogObject?.type || '')
+
+  const businessEmployees = useEmployees((state) => state.businessEmployees)[
+    businessId
+  ]
 
   const buyItemForBusiness = useInventories((state) => state.buyItemForBusiness)
   const sellBusiness = useBusiness((state) => state.sellBusiness)
@@ -37,13 +50,14 @@ function RouteComponent() {
     const businessSaleResult = await sellBusiness(id, cost)
     if (!businessSaleResult) return
     navigate({
-        to: "/"
+      to: '/',
     })
   }
 
   return (
     <div>
       <h1>{businessId}</h1>
+      <h4>{businessCatalogObject?.type}</h4>
       <span>{money} money</span>
       <div>
         <h4>Business Inventory</h4>
@@ -56,6 +70,52 @@ function RouteComponent() {
             )
           })}
         </ul>
+      </div>
+      <div>
+        <h4>Employees</h4>
+        <div>
+          <h5>My employees</h5>
+          <ul>
+            {businessEmployees.map((employee) => {
+              return (
+                <li key={employee}>
+                  {EMPLOYEES_CATALOG[employee].name}{' '}
+                  <button
+                    onClick={() =>
+                      useEmployees.getState().fireEmployee(businessId, employee)
+                    }
+                  >
+                    Fire
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <div>
+            <h5>Available Employees to Hire</h5>
+          <ul>
+            {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
+              return (
+                <li key={compatibleEmployee.id}>
+                  <button
+                    onClick={() =>
+                      useEmployees
+                        .getState()
+                        .hireEmployee(
+                          businessId,
+                          compatibleEmployee.id,
+                          compatibleEmployee.baseWage,
+                        )
+                    }
+                  >
+                    Hire {compatibleEmployee.name}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </div>
       <div>
         <h4>Buy from supplier</h4>
@@ -107,11 +167,7 @@ function RouteComponent() {
       <div>
         <button
           onClick={() =>
-            handleSellBusiness(
-              businessId,
-              BUSINESS_CATALOG.find((business) => business.id === businessId)
-                ?.baseCost || 0,
-            )
+            handleSellBusiness(businessId, businessCatalogObject?.baseCost || 0)
           }
         >
           Sell this business
