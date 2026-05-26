@@ -13,9 +13,10 @@ export type EmployeeRole = 'cook' | 'cashier' | 'barista'
 export interface EmployeeConfig {
   id: string;
   name: string;
-  role: EmployeeRole;
+  roles: EmployeeRole[];
   description: string;
   baseWage: number;
+  preferredBusinessTypes: BusinessType[];
 }
 
 export interface ElapsedTimeResult {
@@ -31,6 +32,13 @@ export interface MoneyState {
   hydrateMoney: (savedAmount: number) => void;
 }
 
+export type BusinessType = 
+  | 'street_food'
+  | 'cafe_bakery'
+  | 'restaurant'
+  | 'luxury'
+  | 'fast_food';
+
 export interface BusinessConfig {
   id: string;
   baseCost: number;
@@ -38,6 +46,7 @@ export interface BusinessConfig {
   name: string;
   description: string;
   location: string;
+  type: BusinessType;
   allowedItems: string[];
 }
 

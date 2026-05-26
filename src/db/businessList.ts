@@ -9,6 +9,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'A colorful ice cream truck strategically parked in Uzvaras Parks. Perfect for refreshing families and kids after a skateboarding session.',
     location: 'Uzvaras Parks',
+    type: 'street_food',
     // Ingredienti gelati + Prodotti finiti
     allowedItems: [
       'milk_l',
@@ -28,6 +29,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'Artisan arancini shop located inside the beautiful, renovated Āgenskalns indoor market (Āgenskalna tirgus). Blends Sicilian street food with the Latvian spirit.',
     location: 'Āgenskalns',
+    type: 'street_food',
     // Ingredienti arancini base, latvian, cheesy + Prodotti finiti
     allowedItems: [
       'rice_kg',
@@ -50,6 +52,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'A small but bustling coffee and cereal bar kiosk in the historic Vērmanes dārzs park. The favorite pit stop for downtown commuters.',
     location: 'Vērmanes dārzs',
+    type: 'cafe_bakery',
     // Ingredienti caffetteria e cinnamon roll + Prodotti finiti
     allowedItems: [
       'coffee_beans_kg',
@@ -71,6 +74,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'Artisan pizza shop in the heart of the Tallinas creative district. Attracts hipsters, artists, and lovers of organic baked goods.',
     location: 'Tallinas Kvartāls',
+    type: 'cafe_bakery',
     // Ingredienti panetteria (Rupjmaize) + Prodotti finiti
     allowedItems: ['rye_flour_kg', 'yeast_g', 'sugar_kg', 'rupjmaize_loaf'],
   },
@@ -82,6 +86,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'A cozy spot specializing in sweet and savory pancakes, nestled among the characteristic wooden houses of the Kalnciema kvartāls Saturday market.',
     location: 'Kalnciema',
+    type: 'cafe_bakery',
     // Ingredienti pancakes sweet e savory + Prodotti finiti
     allowedItems: [
       'flour_kg',
@@ -102,6 +107,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       "Literary cafe and independent roastery on Riga's most alternative street. Great atmosphere for students and matcha tea lovers.",
     location: 'Brasa (Miera iela)',
+    type: 'cafe_bakery',
     // Ingredienti matcha latte, avocado toast (e sua variante from scratch) + Prodotti finiti
     allowedItems: [
       'matcha_powder_g',
@@ -123,6 +129,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'A modern fast-casual bistro located in the Jaunā Teika technology hub. Feeds hundreds of hungry programmers and startup founders every lunch break.',
     location: 'Jaunā Teika',
+    type: 'fast_food',
     // Ingredienti poke bowl + caffè industriale + Prodotti finiti
     allowedItems: [
       'salmon_kg',
@@ -141,6 +148,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'Elegant restaurant with a terrace overlooking the Daugava river in the marina area. Generates massive profits during summer evenings thanks to the sunset view.',
     location: 'Andrejosta',
+    type: 'restaurant',
     // Ingredienti steak, birra artigianale + Prodotti finiti
     allowedItems: [
       'premium_beef_kg',
@@ -159,6 +167,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'Haute cuisine restaurant located in a historic building in the Old Town. An exclusive destination for wealthy tourists, gala dinners, and diplomatic delegations.',
     location: 'Vecrīga',
+    type: 'luxury',
     // Ingredienti lusso estremo (risotto, blini, truffle arancino) + Prodotti finiti
     allowedItems: [
       'rice_kg',
@@ -185,6 +194,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     description:
       'The pinnacle of your commercial empire: an entire block in the food court of Riga International Airport. Guaranteed customer traffic 24/7.',
     location: 'Mārupe (Lidosta Rīga)',
+    type: 'fast_food',
     // Ingredienti fast food e travel sandwich + Prodotti finiti
     allowedItems: [
       'burger_patty',
