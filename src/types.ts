@@ -8,6 +8,16 @@ export interface GameDb {
   businessEmployees: Record<string, string[]>
 }
 
+export type EmployeeRole = 'cook' | 'cashier' | 'barista'
+
+export interface EmployeeConfig {
+  id: string;
+  name: string;
+  role: EmployeeRole;
+  description: string;
+  baseWage: number;
+}
+
 export interface ElapsedTimeResult {
   elapsedTime: number;
   elapsedSeconds: number;
