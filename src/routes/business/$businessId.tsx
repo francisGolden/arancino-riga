@@ -154,6 +154,7 @@ function RouteComponent() {
                       allowedRecipe.recipeName || '',
                       businessId,
                       allowedItems || [],
+                      RECIPE_CATALOG[allowedRecipe.recipeName || ''].requiredRole
                     )
                   }
                 >
