@@ -50,13 +50,11 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
         )
       ) {
         if (businessEmployees[businessId].includes(id)) {
-          console.log(id, 'already in', businessEmployees)
         } else {
           compatibleEmployees.push(object)
         }
       }
     }
-    console.log(compatibleEmployees)
     return compatibleEmployees
   },
   hireEmployee: async (
@@ -72,7 +70,6 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
     console.log('passed checks')
     const businessEmployeesCopy = { ...currentBusinessEmployees }
     businessEmployeesCopy[businessId] = [...businessEmployeesCopy[businessId], employeeId]
-    console.log(businessEmployeesCopy)
 
     set(() => ({ businessEmployees: businessEmployeesCopy }))
 
@@ -88,7 +85,6 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
   },
   addBusinessToEmployees: async (businessId: string) => {
     const currentEmployees = get().businessEmployees
-    console.log(currentEmployees, businessId)
 
     const currentEmployeesCopy = { ...currentEmployees }
     currentEmployeesCopy[businessId] = []
