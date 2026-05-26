@@ -8,7 +8,7 @@ export interface GameDb {
   businessEmployees: Record<string, string[]>
 }
 
-export type EmployeeRole = 'cook' | 'cashier' | 'barista'
+export type EmployeeRole = 'cook' | 'cashier' | 'barista' | 'pastry chef'
 
 export interface EmployeeConfig {
   id: string;
@@ -92,4 +92,5 @@ export interface RecipeConfig {
   ingredients: Record<string, number>; // Which ingredients are needed and how many
   yieldAmount: number; // How many products does this recipe yield?
   recipeName?: string
+  requiredRole: EmployeeRole
 }

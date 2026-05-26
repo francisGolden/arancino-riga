@@ -7,6 +7,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   arancino_base_recipe: {
     productId: 'arancino_base',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 1,
       saffron_g: 1,
@@ -20,6 +21,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   arancino_latvian_recipe: {
     productId: 'arancino_latvian',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 1,
       saffron_g: 1,
@@ -32,6 +34,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   arancino_truffle_recipe: {
     productId: 'arancino_truffle',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 1,
       truffle_whole: 1,
@@ -44,6 +47,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   scoop_vanilla_recipe: {
     productId: 'scoop_vanilla',
+    requiredRole: 'pastry chef',
     ingredients: {
       milk_l: 1,
       sugar_kg: 1,
@@ -55,6 +59,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   scoop_chocolate_recipe: {
     productId: 'scoop_chocolate',
+    requiredRole: 'pastry chef',
     ingredients: {
       milk_l: 1,
       sugar_kg: 1,
@@ -66,24 +71,28 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   espresso_recipe: {
     productId: 'espresso',
+    requiredRole: 'barista',
     ingredients: { coffee_beans_kg: 1 },
     yieldAmount: 100, // 1kg di caffè fa 100 espressi
   },
 
   cappuccino_recipe: {
     productId: 'cappuccino',
+    requiredRole: 'barista',
     ingredients: { coffee_beans_kg: 1, milk_l: 2 },
     yieldAmount: 50,
   },
 
   rupjmaize_loaf_recipe: {
     productId: 'rupjmaize_loaf',
+    requiredRole: 'pastry chef',
     ingredients: { rye_flour_kg: 2, yeast_g: 10, sugar_kg: 1 },
     yieldAmount: 5,
   },
 
   cinnamon_roll_recipe: {
     productId: 'cinnamon_roll',
+    requiredRole: 'pastry chef',
     ingredients: {
       flour_kg: 1,
       butter_kg: 1,
@@ -96,6 +105,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   pancake_sweet_recipe: {
     productId: 'pancake_sweet',
+    requiredRole: 'pastry chef',
     ingredients: {
       flour_kg: 1,
       eggs_dozen: 1,
@@ -108,6 +118,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   pancake_savory_recipe: {
     productId: 'pancake_savory',
+    requiredRole: 'cook',
     ingredients: {
       flour_kg: 1,
       eggs_dozen: 1,
@@ -120,6 +131,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   matcha_latte_recipe: {
     productId: 'matcha_latte',
+    requiredRole: 'barista',
     ingredients: { matcha_powder_g: 10, oat_milk_l: 2 },
     yieldAmount: 10,
   },
@@ -127,18 +139,21 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
   // Catena di produzione: Usa il Rupjmaize appena sfornato come ingrediente!
   avocado_toast_recipe: {
     productId: 'avocado_toast',
+    requiredRole: 'cook',
     ingredients: { rupjmaize_loaf: 1, avocado_unit: 4, eggs_dozen: 1 },
     yieldAmount: 4,
   },
 
   poke_bowl_recipe: {
     productId: 'poke_bowl',
+    requiredRole: 'cook',
     ingredients: { salmon_kg: 1, rice_kg: 1, avocado_unit: 2 },
     yieldAmount: 5,
   },
 
   grilled_steak_recipe: {
     productId: 'grilled_steak',
+    requiredRole: 'cook',
     ingredients: { premium_beef_kg: 2, potatoes_kg: 3, butter_kg: 1 },
     yieldAmount: 4,
   },
@@ -146,30 +161,35 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
   // 1 Fusto di birra -> 80 pinte
   beer_pint_recipe: {
     productId: 'beer_pint',
+    requiredRole: 'barista',
     ingredients: { craft_beer_keg: 1 },
     yieldAmount: 80,
   },
 
   truffle_risotto_recipe: {
     productId: 'truffle_risotto',
+    requiredRole: 'cook',
     ingredients: { rice_kg: 2, truffle_whole: 1, butter_kg: 1, gold_leaf: 1 },
     yieldAmount: 8,
   },
 
   caviar_blini_recipe: {
     productId: 'caviar_blini',
+    requiredRole: 'cook',
     ingredients: { flour_kg: 1, eggs_dozen: 1, milk_l: 1, caviar_tin: 1 },
     yieldAmount: 15,
   },
 
   airport_burger_recipe: {
     productId: 'airport_burger',
+    requiredRole: 'cook',
     ingredients: { burger_patty: 10, burger_bun: 10, bacon_kg: 1 },
     yieldAmount: 10,
   },
 
   travel_sandwich_recipe: {
     productId: 'travel_sandwich',
+    requiredRole: 'cook',
     ingredients: { rupjmaize_loaf: 1, salmon_kg: 1, eggs_dozen: 1 },
     yieldAmount: 6,
   },
@@ -180,6 +200,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   arancino_base_batch: {
     productId: 'arancino_base',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 10,
       saffron_g: 10,
@@ -193,6 +214,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   arancino_latvian_batch: {
     productId: 'arancino_latvian',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 10,
       saffron_g: 10,
@@ -205,6 +227,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   scoop_vanilla_batch: {
     productId: 'scoop_vanilla',
+    requiredRole: 'pastry chef',
     ingredients: {
       milk_l: 10,
       sugar_kg: 10,
@@ -216,18 +239,21 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   espresso_industrial: {
     productId: 'espresso',
+    requiredRole: 'barista',
     ingredients: { coffee_beans_kg: 10 },
     yieldAmount: 1000, // La gioia di Teika
   },
 
   cappuccino_industrial: {
     productId: 'cappuccino',
+    requiredRole: 'barista',
     ingredients: { coffee_beans_kg: 10, milk_l: 20 },
     yieldAmount: 500,
   },
 
   cinnamon_roll_batch: {
     productId: 'cinnamon_roll',
+    requiredRole: 'pastry chef',
     ingredients: {
       flour_kg: 10,
       butter_kg: 10,
@@ -240,12 +266,14 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
 
   beer_festival_kegs: {
     productId: 'beer_pint',
+    requiredRole: 'barista',
     ingredients: { craft_beer_keg: 10 },
     yieldAmount: 800, // Perfetto per le serate estive ad Andrejosta
   },
 
   airport_burger_batch: {
     productId: 'airport_burger',
+    requiredRole: 'cook',
     ingredients: { burger_patty: 100, burger_bun: 100, bacon_kg: 10 },
     yieldAmount: 100,
   },
@@ -257,6 +285,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
   // Una variante dell'Avocado Toast che usa la farina per fare il pane al momento (più costoso, ma salta un passaggio)
   avocado_toast_from_scratch: {
     productId: 'avocado_toast',
+    requiredRole: 'cook',
     ingredients: {
       rye_flour_kg: 1,
       yeast_g: 5,
@@ -269,6 +298,7 @@ export const RECIPE_CATALOG: Record<string, RecipeConfig> = {
   // Un arancino gourmet che usa il formaggio fuso al posto dei piselli
   arancino_base_cheesy: {
     productId: 'arancino_base',
+    requiredRole: 'cook',
     ingredients: {
       rice_kg: 1,
       saffron_g: 1,
