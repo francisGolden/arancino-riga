@@ -22,6 +22,7 @@ interface EmployeesState {
   ) => Promise<boolean>
   addBusinessToEmployees: (businessId: string) => Promise<boolean>;
   getBusinessEmployeesTotalWage: (businessId: string) => number;
+  payWages: (businessId: string) => Promise<boolean>;
   hydrateEmployees: (savedEmployees: Record<string, string[]>) => void
 }
 
@@ -138,6 +139,23 @@ export const useEmployees = create<EmployeesState>((set, get) => ({
         sum += EMPLOYEES_CATALOG[employee].baseWage
     }
     return sum
+  },
+  payWages: async (businessId: string): Promise<boolean> => {
+    const totalWages = get().getBusinessEmployeesTotalWage(businessId)
+    const moneyAvailable = useMoney.getState().money
+
+    if (moneyAvailable < totalWages) {
+        console.log('not enough money to pay wages')
+        return false
+    }
+
+    try {
+        await useMoney.getState().decreaseMoney(totalWages)
+        return true
+    } catch (error) {
+        console.error('could not update', error)
+        return false
+    }
   },
   hydrateEmployees: (savedEmployees: Record<string, string[]>) => {
     set(() => ({ businessEmployees: savedEmployees }))

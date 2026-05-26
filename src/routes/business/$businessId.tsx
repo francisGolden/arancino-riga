@@ -74,6 +74,7 @@ function RouteComponent() {
       <div>
         <h4>Employees</h4>
         <span >total wage {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}</span>
+        <button onClick={() => useEmployees.getState().payWages(businessId)}>Pay wages</button>
         <div>
           <h5>My employees</h5>
           <ul>
