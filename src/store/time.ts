@@ -44,5 +44,10 @@ export const useTime = create<TimeState>((set, get) => ({
   },
   gameLoop: () => {
     console.log('game loop')
+    const elapsedTime = get().time.elapsedTime
+    const lastSavedAt = get().time.lastSavedAt || db.data.lastSavedAt
+    const now = Date.now()
+    const timeDifference = now - lastSavedAt 
+    console.log('elapsedTime: ', elapsedTime, 'lastSavedAt: ', lastSavedAt, 'now: ', now, 'timeDifference: ', timeDifference)
   },
 }))

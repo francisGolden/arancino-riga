@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
-import { db } from '#/db/initDb'
 
 export const GameClock = () => {
   // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds

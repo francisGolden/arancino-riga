@@ -1,6 +1,4 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
