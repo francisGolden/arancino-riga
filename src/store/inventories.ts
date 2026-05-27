@@ -129,7 +129,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         allowedItems,
         amount: RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
       }
-      const myPromise = new Promise((resolve, reject) => {
+      const myPromise = new Promise((resolve) => {
         setTimeout(async () => {
           try {
             const success = await get().buyItemForBusiness(obj.id, obj.cost, businessId, allowedItems, obj.amount)
