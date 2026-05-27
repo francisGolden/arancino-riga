@@ -113,7 +113,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
       totalCost += INVENTORY_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
     }
-    console.log(totalCost)
 
     if (useMoney.getState().money < totalCost) {
       return false
@@ -149,7 +148,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     try {
       const results = await Promise.all(buyIngredientsPromises)
-      console.log(results)
       const checkPromises = results.every((item) => item === true)
       return checkPromises
     } catch (error) {
