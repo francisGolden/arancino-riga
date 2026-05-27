@@ -4,7 +4,7 @@ import { db } from '#/db/initDb'
 
 interface TimeState {
   time: Record<string, number>
-  processSomething: (something: any) => Promise<boolean>
+  processSomething: (timeSinceLastSaved: number) => () => Promise<boolean>
   setTime: (timeObj: ElapsedTimeResult) => void
   setLastSavedAt: (lastSavedAt: number) => Promise<boolean>
   gameLoop: () => void
@@ -12,10 +12,6 @@ interface TimeState {
 
 export const useTime = create<TimeState>((set, get) => ({
   time: {},
-  processSomething: async (something) => {
-    console.log(something)
-    return true
-  },
   setTime: async (timeObj: ElapsedTimeResult) => {
     const currentTime = get().time
     const currentTimeCopy = { ...currentTime }
@@ -35,6 +31,7 @@ export const useTime = create<TimeState>((set, get) => ({
         data.lastSavedAt = Date.now()
       })
       console.log('Game auto-saved.')
+
       return true
     } catch (error) {
       console.error('Auto-save failed', error)
@@ -44,10 +41,24 @@ export const useTime = create<TimeState>((set, get) => ({
   },
   gameLoop: () => {
     console.log('game loop')
-    const elapsedTime = get().time.elapsedTime
     const lastSavedAt = get().time.lastSavedAt || db.data.lastSavedAt
     const now = Date.now()
-    const timeDifference = now - lastSavedAt 
-    console.log('elapsedTime: ', elapsedTime, 'lastSavedAt: ', lastSavedAt, 'now: ', now, 'timeDifference: ', timeDifference)
+    const timeDifference = now - lastSavedAt
+    const processSomethingWrapper = get().processSomething(timeDifference)
+    processSomethingWrapper()
+  },
+  processSomething: (timeSinceLastSave) => {
+    // function to explore the logic needed to process actions like orders, etc
+    // through a catch-up mechanic that looks at the time difference between lastSavedAt and Date.now()
+
+    // for example, if I know that an order is requested every x ticks and is completed every y ticks,
+    // I can process z amount of orders depending on the time lasted since the last save.
+
+    let ordersToProcess = 0
+    return async function () {
+      ordersToProcess = ordersToProcess + (timeSinceLastSave/1000)
+      console.log('orders to process: ', ordersToProcess, 'timeSinceLastSave: ', timeSinceLastSave)
+      return true
+    }
   },
 }))

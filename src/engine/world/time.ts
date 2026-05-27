@@ -5,6 +5,7 @@ import { useBusiness } from '#/store/business'
 import { useInventory } from '#/store/inventory'
 import { useInventories } from '#/store/inventories'
 import { useEmployees } from '#/store/employees'
+import { useTime } from '#/store/time'
 
 export const currentTime = Date.now()
 
@@ -27,6 +28,7 @@ export const initializeGameTime = async (): Promise<void> => {
         useMoney.getState().setMoney(1000)
         useBusiness.getState().setBusinessList([])
       })
+      useTime.getState().setLastSavedAt(Date.now())
     } catch (error) {
       console.error(error)
     }
@@ -42,7 +44,7 @@ export const initializeGameTime = async (): Promise<void> => {
     useInventory.getState().hydrateInventory(db.data.inventory)
     useInventories.getState().hydrateInventories(db.data.inventories)
     useEmployees.getState().hydrateEmployees(db.data.businessEmployees)
-    
+    useTime.getState().setLastSavedAt(Date.now())
   }
 }
 
