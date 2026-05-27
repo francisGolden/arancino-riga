@@ -71,7 +71,7 @@ export interface InventoriesState {
   inventories: Record<string, Record<string, number>>;
   craftBusinessProduct: (recipeItemId: string, businessId: string, allowedItems: string[], requiredRole: EmployeeRole) => void;
   buyRecipeIngredients: (recipeItemId: string, allowedItems: string[], businessId: string, ) => Promise<boolean>;
-  buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[]) => Promise<boolean>;
+  buyItemForBusiness: (id: string, cost: number, businessId: string, allowedItems: string[], yieldAmount?: number) => Promise<boolean>;
   sellBusinessItem: (id: string, cost: number, businessId: string) => void;
   addBusinessToInventory: (businessId: string) => void;
   getAllowedRecipes: (allowedItems: string[], recipe_catalog: Record<string, RecipeConfig>) => RecipeConfig[];
