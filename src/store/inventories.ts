@@ -118,9 +118,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
-    console.log('hi')
-
-    const ingredientsToBuy = []
+    const buyIngredientsPromises = []
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
       console.log('buying ...', INVENTORY_CATALOG[requiredIngredient].id)
       const obj = {
@@ -129,28 +127,32 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         businessId,
         allowedItems,
       }
-      ingredientsToBuy.push(obj)
+      const myPromise = new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            const success = await get().buyItemForBusiness(obj.id, obj.cost, businessId, allowedItems)
+            if (success) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          } catch (error) {
+            console.error(error)
+          }
+        }, 1000)
+      })
+      buyIngredientsPromises.push(myPromise)
     }
-    console.log(ingredientsToBuy)
 
-    return true
-
-    // try {
-    //   for (const requiredIngredient of Object.keys(requiredIngredients)) {
-    //     console.log('buying ...', INVENTORY_CATALOG[requiredIngredient].id)
-    //     await get().buyItemForBusiness(
-    //       INVENTORY_CATALOG[requiredIngredient].id,
-    //       INVENTORY_CATALOG[requiredIngredient].baseCost,
-    //       businessId,
-    //       allowedItems,
-    //     )
-    //   }
-
-    //   return true
-    // } catch (error) {
-    //   console.error('could not buy items for business', error)
-    //   return false
-    // }
+    try {
+      const results = await Promise.all(buyIngredientsPromises)
+      console.log(results)
+      const checkPromises = results.every((item) => item === true)
+      return checkPromises
+    } catch (error) {
+      console.error(error)
+      return false
+    }
   },
   buyItemForBusiness: async (
     id: string,
