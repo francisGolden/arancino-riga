@@ -140,7 +140,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
             }
           } catch (error) {
             console.error(error)
-            reject(error)
+            resolve(false)
           }
         }, 1000)
       })
