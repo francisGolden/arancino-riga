@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react"
-import type { ElapsedTimeResult } from "#/types"
-import { getElapsedGameTime } from "#/engine/world/time"
-import { useTime } from "#/store/time"
+import { useEffect } from 'react'
+import type { ElapsedTimeResult } from '#/types'
+import { getElapsedGameTime } from '#/engine/world/time'
+import { useTime } from '#/store/time'
+import { db } from '#/db/initDb'
 
 export const GameClock = () => {
   // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds
   // aka re-render hell.
   const setTime = useTime((state) => state.setTime)
+  const setLastSavedAt = useTime((state) => state.setLastSavedAt)
   const time = useTime((state) => state.time)
-
+  const lastSavedAt = useTime((state) => state.time.lastSavedAt)
 
   // const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
@@ -25,11 +27,26 @@ export const GameClock = () => {
     const intervalId: number = window.setInterval((): void => {
       const { elapsedTime, elapsedSeconds } = getElapsedGameTimeWrapper()
       // setElapsed(elapsedTime)
-      setTime({elapsedTime, elapsedSeconds})
+      setTime({ elapsedTime, elapsedSeconds })
     }, UPDATE_ELAPSED_TIME_MS)
 
     return () => window.clearInterval(intervalId)
   }, [])
 
-  return <span>elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}</span>
+  useEffect(() => {
+    // This useEffect auto-saves the lastSavedAt property of the db
+    // every 10 seconds.
+
+    const AUTOSAVE_INTERVAL_MS = 10000
+
+    const intervalId: number = window.setInterval(async (): Promise<void> => {
+      await setLastSavedAt(Date.now())
+    }, AUTOSAVE_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  return (
+    <span>elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}. Last saved at: {lastSavedAt}</span>
+  )
 }
