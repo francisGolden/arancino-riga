@@ -111,7 +111,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     let totalCost = 0
 
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
-      totalCost += INVENTORY_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].yieldAmount
+      totalCost += INVENTORY_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
     }
     console.log(totalCost)
 
@@ -127,12 +127,12 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         cost: INVENTORY_CATALOG[requiredIngredient].baseCost,
         businessId,
         allowedItems,
-        yieldAmount: RECIPE_CATALOG[recipeName].yieldAmount
+        amount: RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
       }
       const myPromise = new Promise((resolve, reject) => {
         setTimeout(async () => {
           try {
-            const success = await get().buyItemForBusiness(obj.id, obj.cost, businessId, allowedItems, obj.yieldAmount)
+            const success = await get().buyItemForBusiness(obj.id, obj.cost, businessId, allowedItems, obj.amount)
             if (success) {
               resolve(true)
             } else {
@@ -162,7 +162,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
     allowedItems: string[],
-    yieldAmount?: number
+    amount?: number
   ): Promise<boolean> => {
     if (useMoney.getState().money < cost) {
       console.log('not enough funds for this purchase')
@@ -188,7 +188,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     const currentAmount = inventoriesCopy[businessId][id] || 0
-    inventoriesCopy[businessId][id] = currentAmount + (yieldAmount || 1) 
+    inventoriesCopy[businessId][id] = currentAmount + (amount || 1) 
 
     set(() => ({ inventories: inventoriesCopy }))
     useMoney.getState().decreaseMoney(cost)
