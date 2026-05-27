@@ -137,8 +137,7 @@ function RouteComponent() {
                       allowedItem,
                       INVENTORY_CATALOG[allowedItem].baseCost,
                       businessId,
-                      allowedItems,
-                      1
+                      allowedItems
                     )
                   }
                 >
