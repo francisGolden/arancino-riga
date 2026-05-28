@@ -11,7 +11,8 @@ export const useLoop = create<LoopState>((set, get) => ({
   offlineDelta: 0,
   offlineProgressProcessed: false,
   processOfflineProgress: async (offlineDelta: number): Promise<boolean> => {
-    if (!get().offlineProgressProcessed) {
+    const offlineProgressProcessed = get().offlineProgressProcessed
+    if (!offlineProgressProcessed) {
       set(() => ({ offlineProgressProcessed: true }))
 
       // processing simulation with promises
@@ -27,23 +28,18 @@ export const useLoop = create<LoopState>((set, get) => ({
         }),
       ]
 
-      const processStuff = async () => {
-        try {
-          console.log('start processing')
-          const results = await Promise.all(promises)
-          console.log('All completed!', results)
-          return true
-        } catch (error) {
-          console.error('Something went wrong :(', error)
-          return false
-        }
-      }
-      if (await processStuff()) {
+      try {
+        console.log('start processing')
+        const results = await Promise.all(promises)
+        console.log('All completed!', results)
         return true
+      } catch (error) {
+        console.error('Something went wrong :(', error)
+        set(() => ({ offlineProgressProcessed: false }))
+        return false
       }
-      set(() => ({ offlineProgressProcessed: false }))
-      return false
     }
+    console.log('Processing already working...')
     return false
   },
   setOfflineDelta: (lastSavedAt: number, currentTime: number) => {
