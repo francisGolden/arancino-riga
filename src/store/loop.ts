@@ -1,29 +1,49 @@
 import { create } from 'zustand'
 
 interface LoopState {
-  tick: number
   offlineDelta: number
   offlineProgressProcessed: boolean
-  updateTick: (currentTime: number) => void
-  processOfflineProgress: (offlineDelta: number) => boolean
+  processOfflineProgress: (offlineDelta: number) => Promise<boolean>
   setOfflineDelta: (lastSavedAt: number, currentTime: number) => number
 }
 
 export const useLoop = create<LoopState>((set, get) => ({
-  tick: 0,
   offlineDelta: 0,
   offlineProgressProcessed: false,
-  updateTick: (currentTime: number): void => {},
-  processOfflineProgress: (offlineDelta: number): boolean => {
+  processOfflineProgress: async (offlineDelta: number): Promise<boolean> => {
     if (!get().offlineProgressProcessed) {
       set(() => ({ offlineProgressProcessed: true }))
-      console.log(
-        'processing stuff considering that offline delta is ',
-        offlineDelta,
-      )
-      return true
+
+      // processing simulation with promises
+      const promises = [
+        new Promise((resolve) => {
+          setTimeout(() => resolve('action 1 completed'), 2000)
+        }),
+        new Promise((resolve) => {
+          setTimeout(() => resolve('action 2 completed'), 3000)
+        }),
+        new Promise((resolve) => {
+          setTimeout(() => resolve('action 3 completed'), 4000)
+        }),
+      ]
+
+      const processStuff = async () => {
+        try {
+          console.log('start processing')
+          const results = await Promise.all(promises)
+          console.log('All completed!', results)
+          return true
+        } catch (error) {
+          console.error('Something went wrong :(', error)
+          return false
+        }
+      }
+      if (await processStuff()) {
+        return true
+      }
+      set(() => ({ offlineProgressProcessed: false }))
+      return false
     }
-    console.log('offline progress already processed')
     return false
   },
   setOfflineDelta: (lastSavedAt: number, currentTime: number) => {
