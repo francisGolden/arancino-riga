@@ -5,9 +5,8 @@ interface LoopState {
   offlineDelta: number
   offlineProgressProcessed: boolean
   updateTick: (currentTime: number) => void
-  processOfflineProgress: (offlineDelta: number) => () => boolean
-  setOfflineDelta: (lastSavedAt: number,
-    currentTime: number,) => number
+  processOfflineProgress: (offlineDelta: number) => boolean
+  setOfflineDelta: (lastSavedAt: number, currentTime: number) => number
 }
 
 export const useLoop = create<LoopState>((set, get) => ({
@@ -15,20 +14,20 @@ export const useLoop = create<LoopState>((set, get) => ({
   offlineDelta: 0,
   offlineProgressProcessed: false,
   updateTick: (currentTime: number): void => {},
-  processOfflineProgress: (offlineDelta: number): (() => boolean) => {
-    return () => {
-        if (!get().offlineProgressProcessed) {
-            set(() => ({offlineProgressProcessed: true}))
-            console.log('processing stuff considering that offline delta is ', offlineDelta)
-            return true
-        }
-        console.log('offline progress already processed')
-        return false
+  processOfflineProgress: (offlineDelta: number): boolean => {
+    if (!get().offlineProgressProcessed) {
+      set(() => ({ offlineProgressProcessed: true }))
+      console.log(
+        'processing stuff considering that offline delta is ',
+        offlineDelta,
+      )
+      return true
     }
+    console.log('offline progress already processed')
+    return false
   },
-  setOfflineDelta: (lastSavedAt: number,
-    currentTime: number,) => {
-    set(() => ({offlineDelta: currentTime - lastSavedAt}))
+  setOfflineDelta: (lastSavedAt: number, currentTime: number) => {
+    set(() => ({ offlineDelta: currentTime - lastSavedAt }))
     return currentTime - lastSavedAt
-  }
+  },
 }))
