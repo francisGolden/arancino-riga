@@ -14,17 +14,34 @@ const updateDbMoney = async (currentMoney: number) => {
 export const useMoney = create<MoneyState>((set, get) => ({
   money: 0,
   increaseMoney: async (amount: number) => {
-    set((state) => ({ money: state.money + amount }))
-
     const currentMoney = get().money
-    await updateDbMoney(currentMoney)
+    const newMoney = currentMoney + amount
+
+    set(() => ({ money: newMoney }))
+
+    try {
+      await updateDbMoney(currentMoney)
+      return true
+    } catch (error) {
+      console.error('could not increase money')
+      set(() => ({ money: currentMoney }))
+      return false
+    }
+    
   },
   decreaseMoney: async (amount: number) => {
-    set((state) => ({ money: state.money - amount }))
-
     const currentMoney = get().money
-    await updateDbMoney(currentMoney)
+    const newMoney = currentMoney + amount
+    set(() => ({ money: newMoney }))
 
+    try {
+      await updateDbMoney(currentMoney)
+      return true
+    } catch (error) {
+      console.error('could not decrease money', error)
+      return false
+    }
+  
   },
   setMoney: async(amount: number) => {
     set(() => ({ money: amount}))

@@ -1,11 +1,8 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { db } from '#/db/initDb'
 import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
-import { GameClock } from '#/components/gameClock'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -28,31 +25,10 @@ function Home() {
 
   const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
 
-  useEffect(() => {
-    // This useEffect auto-saves the lastSavedAt property of the db
-    // every 10 seconds.
-
-    const AUTOSAVE_INTERVAL_MS = 10000
-
-    const intervalId: number = window.setInterval(async (): Promise<void> => {
-      try {
-        await db.update((data) => {
-          data.lastSavedAt = Date.now()
-        })
-        console.log('Game auto-saved.')
-      } catch (error) {
-        console.error('Auto-save failed', error)
-      }
-    }, AUTOSAVE_INTERVAL_MS)
-
-    return () => window.clearInterval(intervalId)
-  }, [])
-
   console.log(INVENTORY_CATALOG.rice_kg)
 
   return (
     <div className="">
-      <GameClock />
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>

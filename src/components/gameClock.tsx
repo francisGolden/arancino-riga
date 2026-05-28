@@ -1,12 +1,19 @@
-import { useState, useEffect } from "react"
-import type { ElapsedTimeResult } from "#/types"
-import { getElapsedGameTime } from "#/engine/world/time"
+import { useEffect } from 'react'
+import type { ElapsedTimeResult } from '#/types'
+import { getElapsedGameTime } from '#/engine/world/time'
+import { useTime } from '#/store/time'
+import { useLoop } from '#/store/loop'
+import { db } from '#/db/initDb'
 
 export const GameClock = () => {
   // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds
   // aka re-render hell.
-  
-  const [elapsed, setElapsed] = useState(0)
+  const setTime = useTime((state) => state.setTime)
+  const setLastSavedAt = useTime((state) => state.setLastSavedAt)
+  const time = useTime((state) => state.time)
+  const lastSavedAt = useTime((state) => state.time.lastSavedAt)
+
+  // const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
     // every 3 seconds and updates the elapsed state.
@@ -16,15 +23,54 @@ export const GameClock = () => {
     const getElapsedGameTimeWrapper: () => ElapsedTimeResult =
       getElapsedGameTime()
 
+    console.log('useEffect setTime')
+
     // using window.setInterval to avoid the type ambiguity
     // between browser's setInterval and NodeJS.Timeout
     const intervalId: number = window.setInterval((): void => {
-      const { elapsedTime } = getElapsedGameTimeWrapper()
-      setElapsed(elapsedTime)
+      const { elapsedTime, elapsedSeconds } = getElapsedGameTimeWrapper()
+      // setElapsed(elapsedTime)
+      setTime({ elapsedTime, elapsedSeconds })
     }, UPDATE_ELAPSED_TIME_MS)
 
     return () => window.clearInterval(intervalId)
   }, [])
 
-  return <span>elapsed minutes {Math.floor(elapsed / 1000 / 60)}</span>
+  useEffect(() => {
+    // This useEffect auto-saves the lastSavedAt property of the db
+    // every 10 seconds.
+
+    const AUTOSAVE_INTERVAL_MS = 10000
+
+    const intervalId: number = window.setInterval(async (): Promise<void> => {
+      await setLastSavedAt(Date.now())
+    }, AUTOSAVE_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    const GAMELOOP_INTERVAL_MS = 1000
+    const offlineDelta = useLoop
+      .getState()
+      .setOfflineDelta(
+        useTime.getState().time['lastSavedAt'] || db.data.lastSavedAt,
+        Date.now(),
+      )
+
+    useLoop.getState().processOfflineProgress(offlineDelta)
+
+    const intervalId: number = window.setInterval(async (): Promise<void> => {
+      // console.log(useLoop.getState().offlineDelta)
+    }, GAMELOOP_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  return (
+    <span>
+      elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}. Last saved
+      at: {lastSavedAt}
+    </span>
+  )
 }
