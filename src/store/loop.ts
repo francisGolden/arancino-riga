@@ -22,6 +22,7 @@ export const useLoop = create<LoopState>((set, get) => ({
     }
 
     set(() => ({ offlineProgressStatus: 'processing' }))
+    console.log('start processing')
 
     // offline processing simulation with promises
     const promises = [
@@ -48,7 +49,6 @@ export const useLoop = create<LoopState>((set, get) => ({
     ]
 
     try {
-      console.log('start processing')
       const results = await Promise.allSettled(promises)
       set(() => ({ offlineProgressStatus: 'done' }))
       console.log('All completed!', results)
