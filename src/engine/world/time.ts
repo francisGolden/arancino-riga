@@ -42,7 +42,6 @@ export const initializeGameTime = async (): Promise<void> => {
     useInventory.getState().hydrateInventory(db.data.inventory)
     useInventories.getState().hydrateInventories(db.data.inventories)
     useEmployees.getState().hydrateEmployees(db.data.businessEmployees)
-    
   }
 }
 

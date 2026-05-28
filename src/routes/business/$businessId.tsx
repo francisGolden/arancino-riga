@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useInventories } from '#/store/inventories'
-import { GameClock } from '#/components/gameClock'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
@@ -193,7 +192,6 @@ function RouteComponent() {
           Sell this business
         </button>
       </div>
-      <GameClock />
     </div>
   )
 }
