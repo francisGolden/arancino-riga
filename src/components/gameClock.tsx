@@ -13,6 +13,7 @@ export const GameClock = () => {
   const time = useTime((state) => state.time)
   const lastSavedAt = useTime((state) => state.time.lastSavedAt)
 
+
   // const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
@@ -57,6 +58,8 @@ export const GameClock = () => {
         useTime.getState().time['lastSavedAt'] || db.data.lastSavedAt,
         Date.now(),
       )
+    console.log('reading lastSavedAt from db', new Date(db.data.lastSavedAt).toLocaleString())
+    console.log('reading lastSavedAt from store: ', new Date(Number(lastSavedAt).toLocaleString()))
 
     useLoop.getState().processOfflineProgress(offlineDelta)
 
