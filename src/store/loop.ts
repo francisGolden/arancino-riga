@@ -15,22 +15,22 @@ export const useLoop = create<LoopState>((set, get) => ({
     if (!offlineProgressProcessed) {
       set(() => ({ offlineProgressProcessed: true }))
 
-      // processing simulation with promises
+      // offline processing simulation with promises
       const promises = [
         new Promise((resolve) => {
-          setTimeout(() => resolve('action 1 completed'), 2000)
+          setTimeout(() => resolve('action 1 completed with offline delta ' + offlineDelta), 2000)
         }),
         new Promise((resolve) => {
-          setTimeout(() => resolve('action 2 completed'), 3000)
+          setTimeout(() => resolve('action 2 completed with offline delta ' + offlineDelta), 3000)
         }),
         new Promise((resolve) => {
-          setTimeout(() => resolve('action 3 completed'), 4000)
+          setTimeout(() => resolve('action 3 completedwith offline delta ' + offlineDelta), 4000)
         }),
       ]
 
       try {
         console.log('start processing')
-        const results = await Promise.all(promises)
+        const results = await Promise.allSettled(promises)
         console.log('All completed!', results)
         return true
       } catch (error) {
