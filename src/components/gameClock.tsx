@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
-import { useLoop } from '#/store/loop'
+import { useLoop } from '#/store/offlineProgress'
 import { db } from '#/db/initDb'
 
 export const GameClock = () => {
@@ -49,8 +49,8 @@ export const GameClock = () => {
     return () => window.clearInterval(intervalId)
   }, [])
 
+  // offline progress useEffect
   useEffect(() => {
-    const GAMELOOP_INTERVAL_MS = 1000
     const offlineDelta = useLoop
       .getState()
       .setOfflineDelta(
@@ -60,11 +60,6 @@ export const GameClock = () => {
 
     useLoop.getState().processOfflineProgress(offlineDelta)
 
-    const intervalId: number = window.setInterval(async (): Promise<void> => {
-      // console.log(useLoop.getState().offlineDelta)
-    }, GAMELOOP_INTERVAL_MS)
-
-    return () => window.clearInterval(intervalId)
   }, [])
 
   return (
