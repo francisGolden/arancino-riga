@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
+import { useLoop } from '#/store/loop'
+import { db } from '#/db/initDb'
 
 export const GameClock = () => {
   // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds
@@ -29,13 +31,9 @@ export const GameClock = () => {
       const { elapsedTime, elapsedSeconds } = getElapsedGameTimeWrapper()
       // setElapsed(elapsedTime)
       setTime({ elapsedTime, elapsedSeconds })
-      
     }, UPDATE_ELAPSED_TIME_MS)
 
-    return () => {
-      console.log('clear Interval', intervalId)
-      window.clearInterval(intervalId)
-    }
+    return () => window.clearInterval(intervalId)
   }, [])
 
   useEffect(() => {
@@ -48,13 +46,30 @@ export const GameClock = () => {
       await setLastSavedAt(Date.now())
     }, AUTOSAVE_INTERVAL_MS)
 
-    return () => {
-      console.log('clear interval', intervalId)
-      window.clearInterval(intervalId)
-    }
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    const GAMELOOP_INTERVAL_MS = 1000
+    useLoop
+      .getState()
+      .setOfflineDelta(
+        useTime.getState().time['lastSavedAt'] || db.data.lastSavedAt,
+        Date.now(),
+      )
+    console.log(useLoop.getState().offlineDelta)
+
+    const intervalId: number = window.setInterval(async (): Promise<void> => {
+      // console.log(useLoop.getState().offlineDelta)
+    }, GAMELOOP_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
   }, [])
 
   return (
-    <span>elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}. Last saved at: {lastSavedAt}</span>
+    <span>
+      elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}. Last saved
+      at: {lastSavedAt}
+    </span>
   )
 }

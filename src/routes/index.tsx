@@ -3,7 +3,6 @@ import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { INVENTORY_CATALOG } from '#/db/inventoryList'
-import { GameClock } from '#/components/gameClock'
 
 export const Route = createFileRoute('/')({ component: Home })
 
