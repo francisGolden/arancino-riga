@@ -193,7 +193,6 @@ function RouteComponent() {
           Sell this business
         </button>
       </div>
-      <GameClock />
     </div>
   )
 }

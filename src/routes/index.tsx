@@ -30,7 +30,6 @@ function Home() {
 
   return (
     <div className="">
-      <GameClock />
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
       <button onClick={() => setMoney(1000)}>Reset money</button>
       <span>Money: {money}</span>

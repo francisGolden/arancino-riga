@@ -21,15 +21,21 @@ export const GameClock = () => {
     const getElapsedGameTimeWrapper: () => ElapsedTimeResult =
       getElapsedGameTime()
 
+    console.log('useEffect setTime')
+
     // using window.setInterval to avoid the type ambiguity
     // between browser's setInterval and NodeJS.Timeout
     const intervalId: number = window.setInterval((): void => {
       const { elapsedTime, elapsedSeconds } = getElapsedGameTimeWrapper()
       // setElapsed(elapsedTime)
       setTime({ elapsedTime, elapsedSeconds })
+      
     }, UPDATE_ELAPSED_TIME_MS)
 
-    return () => window.clearInterval(intervalId)
+    return () => {
+      console.log('clear Interval', intervalId)
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   useEffect(() => {
@@ -42,7 +48,10 @@ export const GameClock = () => {
       await setLastSavedAt(Date.now())
     }, AUTOSAVE_INTERVAL_MS)
 
-    return () => window.clearInterval(intervalId)
+    return () => {
+      console.log('clear interval', intervalId)
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   return (
