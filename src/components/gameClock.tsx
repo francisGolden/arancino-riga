@@ -51,15 +51,13 @@ export const GameClock = () => {
 
   useEffect(() => {
     const GAMELOOP_INTERVAL_MS = 1000
-    const setOfflineDelta = useLoop.getState().setOfflineDelta
-    const processOfflineProgress = useLoop.getState().processOfflineProgress
-
-    processOfflineProgress(
-      setOfflineDelta(
+    const offlineDelta = useLoop.getState().setOfflineDelta(
         useTime.getState().time['lastSavedAt'] || db.data.lastSavedAt,
         Date.now(),
-      ),
-    )
+      )
+    const runProcessOfflineProgress = useLoop.getState().processOfflineProgress(offlineDelta)
+
+    runProcessOfflineProgress()
 
     const intervalId: number = window.setInterval(async (): Promise<void> => {
       // console.log(useLoop.getState().offlineDelta)
