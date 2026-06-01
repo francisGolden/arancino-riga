@@ -36,6 +36,7 @@ export const initializeGameTime = async (): Promise<void> => {
       'gameStartedAt: ',
       db.data.gameStartedAt,
     )
+    console.log('lastSavedAt: ', new Date(db.data.lastSavedAt).toLocaleString())
     
     useMoney.getState().hydrateMoney(db.data.money)
     useBusiness.getState().hydrateBusinessList(db.data.ownedBusinesses)
