@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
-import { useLoop } from '#/store/loop'
+import { useLoop } from '#/store/offlineProgress'
 import { db } from '#/db/initDb'
 
 export const GameClock = () => {
@@ -10,10 +10,9 @@ export const GameClock = () => {
   // aka re-render hell.
   const setTime = useTime((state) => state.setTime)
   const setLastSavedAt = useTime((state) => state.setLastSavedAt)
-  const time = useTime((state) => state.time)
   const lastSavedAt = useTime((state) => state.time.lastSavedAt)
+  const offlineProgressStatus = useLoop((state) => state.offlineProgressStatus)
 
-  // const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
     // every 3 seconds and updates the elapsed state.
@@ -22,8 +21,6 @@ export const GameClock = () => {
 
     const getElapsedGameTimeWrapper: () => ElapsedTimeResult =
       getElapsedGameTime()
-
-    console.log('useEffect setTime')
 
     // using window.setInterval to avoid the type ambiguity
     // between browser's setInterval and NodeJS.Timeout
@@ -49,28 +46,17 @@ export const GameClock = () => {
     return () => window.clearInterval(intervalId)
   }, [])
 
+  // offline progress useEffect
   useEffect(() => {
-    const GAMELOOP_INTERVAL_MS = 1000
-    const offlineDelta = useLoop
-      .getState()
-      .setOfflineDelta(
-        useTime.getState().time['lastSavedAt'] || db.data.lastSavedAt,
-        Date.now(),
-      )
-
+    const savedAt = lastSavedAt || db.data.lastSavedAt
+    if (!savedAt || offlineProgressStatus === 'done') return // not hydrated yet
+    const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
     useLoop.getState().processOfflineProgress(offlineDelta)
-
-    const intervalId: number = window.setInterval(async (): Promise<void> => {
-      // console.log(useLoop.getState().offlineDelta)
-    }, GAMELOOP_INTERVAL_MS)
-
-    return () => window.clearInterval(intervalId)
-  }, [])
+  }, [lastSavedAt, db.data.lastSavedAt])
 
   return (
-    <span>
-      elapsed minutes {Math.floor(time['elapsedTime'] / 1000 / 60)}. Last saved
-      at: {lastSavedAt}
+    <span> Last saved
+    at: {lastSavedAt ? new Date(lastSavedAt).toLocaleString() : new Date(db.data.lastSavedAt).toLocaleString()}
     </span>
   )
 }

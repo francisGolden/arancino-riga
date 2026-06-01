@@ -25,8 +25,6 @@ function Home() {
 
   const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
 
-  console.log(INVENTORY_CATALOG.rice_kg)
-
   return (
     <div className="">
       <button onClick={() => increaseMoney(1)}>Money + 1</button>
