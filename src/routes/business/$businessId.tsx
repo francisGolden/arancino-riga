@@ -67,13 +67,27 @@ function RouteComponent() {
       <div>
         <h4>Business Inventory</h4>
         <ul>
+          <span>Ingredients</span>
           {objectInventoryIterable.map(([item, amount], index) => {
-            return (
-              <li key={index}>
-                <span>
-                  {item}: {amount}
-                </span>
-                {Object.keys(PRODUCTS_CATALOG).includes(item) && (
+            if (Object.keys(INGREDIENTS_CATALOG).includes(item))
+              return (
+                <li key={index}>
+                  <span>
+                    {item}: {amount}
+                  </span>
+                </li>
+              )
+          })}
+        </ul>
+        <ul>
+          <span>Products to sell</span>
+          {objectInventoryIterable.map(([item, amount], index) => {
+            if (Object.keys(PRODUCTS_CATALOG).includes(item))
+              return (
+                <li key={index}>
+                  <span>
+                    {item}: {amount}
+                  </span>
                   <button
                     onClick={() =>
                       useOrders.getState().addOrder(businessId, item)
@@ -81,9 +95,8 @@ function RouteComponent() {
                   >
                     Add 1 to pending Business Orders
                   </button>
-                )}
-              </li>
-            )
+                </li>
+              )
           })}
         </ul>
       </div>
@@ -92,7 +105,18 @@ function RouteComponent() {
         <ul>
           <span>Pending orders:</span>
           {pendingBusinessOrders.map((order, index) => {
-            return <li key={index}><span>{order}</span><button onClick={() => useOrders.getState().fulfillOrder(businessId, order)}>Fulfill order</button></li>
+            return (
+              <li key={index}>
+                <span>{order}</span>
+                <button
+                  onClick={() =>
+                    useOrders.getState().fulfillOrder(businessId, order)
+                  }
+                >
+                  Fulfill order
+                </button>
+              </li>
+            )
           })}
         </ul>
       </div>
@@ -154,23 +178,23 @@ function RouteComponent() {
         <ul>
           {allowedItems?.map((allowedItem, index) => {
             // user can only buy ingredients from the market
-              return (
-                <li key={index}>
-                  <span>{allowedItem}</span>
-                  <button
-                    onClick={() =>
-                      buyItemForBusiness(
-                        allowedItem,
-                        INGREDIENTS_CATALOG[allowedItem].baseCost || 0,
-                        businessId,
-                        allowedItems,
-                      )
-                    }
-                  >
-                    buy
-                  </button>
-                </li>
-              )
+            return (
+              <li key={index}>
+                <span>{allowedItem}</span>
+                <button
+                  onClick={() =>
+                    buyItemForBusiness(
+                      allowedItem,
+                      INGREDIENTS_CATALOG[allowedItem].baseCost || 0,
+                      businessId,
+                      allowedItems,
+                    )
+                  }
+                >
+                  buy
+                </button>
+              </li>
+            )
           })}
         </ul>
       </div>
