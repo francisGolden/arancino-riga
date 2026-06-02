@@ -126,9 +126,9 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     let pendingOrdersNumber = 0
     Object.entries(pendingBusinessOrders).forEach(
-      ([businessId, orders], index) => {
+      ([businessId, orders]) => {
         console.log(businessId, orders)
-        orders.forEach((order) => {
+        orders.forEach(() => {
           pendingOrdersNumber += 1
         })
       },
