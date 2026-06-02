@@ -84,7 +84,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'rihards_tech',
     name: 'Rihards',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 4 },
+    workRate: { crafting: 0, selling: 4 },
     description:
       'Handles brutal lunch rushes with robotic efficiency. Perfect for high-volume corporate districts where customers want their food instantly.',
     baseWage: 20,
@@ -97,7 +97,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'edgars_grill',
     name: 'Edgars',
     roles: ['cook'],
-    workRate: { crafting: 5, selling: 1 },
+    workRate: { crafting: 5, selling: 0 },
     description:
       'A heavy-duty chef who respects premium cuts of meat. At his best working the grill in upscale, scenic restaurants.',
     baseWage: 28,
@@ -110,7 +110,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'roberts_gourmet',
     name: 'Roberts',
     roles: ['cook'],
-    workRate: { crafting: 5, selling: 2 },
+    workRate: { crafting: 5, selling: 0 },
     description:
       'Treats luxury ingredients like gold leaf and truffles with absolute reverence. Demands a high-end, fine-dining kitchen to truly shine.',
     baseWage: 45,
@@ -123,7 +123,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'toms_airport',
     name: 'Toms',
     roles: ['cook'],
-    workRate: { crafting: 4, selling: 1 },
+    workRate: { crafting: 4, selling: 0 },
     description:
       'Assembles burgers and sandwiches at the speed of light. Shrugs off stress and thrives in 24/7, non-stop transit hubs.',
     baseWage: 22,
@@ -149,7 +149,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'madara_sales',
     name: 'Madara',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 4 },
+    workRate: { crafting: 0, selling: 4 },
     description:
       'Her upselling skills are legendary. Put her in a busy street-food spot and watch your daily revenue multiply.',
     baseWage: 12,
@@ -161,7 +161,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'ilze_cinnamon',
     name: 'Ilze',
     roles: ['cook', 'pastry chef'],
-    workRate: { crafting: 4, selling: 1 },
+    workRate: { crafting: 4, selling: 0 },
     description:
       'An early bird who loves baking sweet pastries. Shines in cozy kiosks that rely on the morning rush and the smell of fresh butter.',
     baseWage: 14,
@@ -174,7 +174,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'laura_hipster',
     name: 'Laura',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 3 },
+    workRate: { crafting: 0, selling: 3 },
     description:
       'Incredibly charismatic and artsy. Customers return just to chat with her, making her perfect for creative neighborhood bakeries.',
     baseWage: 15,
@@ -186,7 +186,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'dace_market',
     name: 'Dace',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 3 },
+    workRate: { crafting: 0, selling: 3 },
     description:
       'Charms weekend crowds with a warm smile. Excels at keeping long lines moving smoothly in bustling market environments.',
     baseWage: 16,
@@ -198,7 +198,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'baiba_plating',
     name: 'Baiba',
     roles: ['cook'],
-    workRate: { crafting: 4, selling: 1 },
+    workRate: { crafting: 4, selling: 0 },
     description:
       'Plates food beautifully for the perfect aesthetic. Ideal for trendy, modern cafes where presentation is just as important as taste.',
     baseWage: 18,
@@ -211,7 +211,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'zane_poke',
     name: 'Zane',
     roles: ['cook'],
-    workRate: { crafting: 5, selling: 1 },
+    workRate: { crafting: 5, selling: 0 },
     description:
       'Slices fresh ingredients with surgical precision. Best suited for modern, health-conscious bistros feeding busy professionals.',
     baseWage: 21,
@@ -236,7 +236,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'agnese_vip',
     name: 'Agnese',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 5 },
+    workRate: { crafting: 0, selling: 5 },
     description:
       'Manages VIPs and wealthy clients with effortless diplomacy. An absolute must-have front-of-house presence for luxury dining rooms.',
     baseWage: 40,
@@ -249,7 +249,7 @@ export const EMPLOYEES_CATALOG: Record<string, EmployeeConfig> = {
     id: 'ieva_polyglot',
     name: 'Ieva',
     roles: ['cashier'],
-    workRate: { crafting: 1, selling: 4 },
+    workRate: { crafting: 0, selling: 4 },
     description:
       'Speaks five languages fluently and never loses her cool. An absolute powerhouse for massive food courts with international foot traffic.',
     baseWage: 22,
