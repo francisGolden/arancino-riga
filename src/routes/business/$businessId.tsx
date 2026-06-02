@@ -90,8 +90,9 @@ function RouteComponent() {
       <div>
         <h4>Orders</h4>
         <ul>
+          <span>Pending orders:</span>
           {pendingBusinessOrders.map((order, index) => {
-            return <li key={index}>{order}</li>
+            return <li key={index}><span>{order}</span><button onClick={() => useOrders.getState().fulfillOrder(businessId, order)}>Fulfill order</button></li>
           })}
         </ul>
       </div>

@@ -2,6 +2,7 @@ import type { OrdersState } from '#/types'
 import { create } from 'zustand'
 import { db } from '#/db/initDb'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
+import { useInventories } from './inventories'
 
 const updateDbOrders = async (
   newPendingBusinessOrders: Record<string, string[]>,
@@ -103,6 +104,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     try {
       await updateDbOrders(newPendingBusinessOrders)
+      useInventories.getState().sellBusinessItem(productId, PRODUCTS_CATALOG[productId].baseSellingPrice, businessId)
       return true
     } catch (error) {
       set(() => ({ pendingBusinessOrders: pendingBusinessOrders }))
