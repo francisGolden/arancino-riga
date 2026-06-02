@@ -97,3 +97,8 @@ export interface RecipeConfig {
   recipeName?: string
   requiredRole: EmployeeRole
 }
+
+export interface OrdersState {
+  businessOrders: Record<string, Record<string, number>>;
+  getBusinessOrders: (businessId: string) => Record<string, number>
+}
