@@ -54,36 +54,36 @@ export const INVENTORY_CATALOG: Record<string, ItemConfig> = {
   // ==========================================
   
   // Arancini
-  arancino_base: { id: 'arancino_base', name: 'Classic Arancino', type: 'product', baseCost: 6, description: 'The classic ragù arancino.' },
-  arancino_latvian: { id: 'arancino_latvian', name: 'Latvian Arancino', type: 'product', baseCost: 8, description: 'Special edition filled with Biezpiens and dill.' },
-  arancino_truffle: { id: 'arancino_truffle', name: 'Truffle Arancino', type: 'product', baseCost: 18, description: 'Gourmet truffle arancino.' },
+  arancino_base: { id: 'arancino_base', name: 'Classic Arancino', type: 'product', baseSellingPrice: 6, description: 'The classic ragù arancino.' },
+  arancino_latvian: { id: 'arancino_latvian', name: 'Latvian Arancino', type: 'product', baseSellingPrice: 8, description: 'Special edition filled with Biezpiens and dill.' },
+  arancino_truffle: { id: 'arancino_truffle', name: 'Truffle Arancino', type: 'product', baseSellingPrice: 18, description: 'Gourmet truffle arancino.' },
   
   // Gelati
-  scoop_vanilla: { id: 'scoop_vanilla', name: 'Vanilla Cone', type: 'product', baseCost: 4, description: 'Classic vanilla cone.' },
-  scoop_chocolate: { id: 'scoop_chocolate', name: 'Chocolate Cone', type: 'product', baseCost: 5, description: 'Dark chocolate cone.' },
+  scoop_vanilla: { id: 'scoop_vanilla', name: 'Vanilla Cone', type: 'product', baseSellingPrice: 4, description: 'Classic vanilla cone.' },
+  scoop_chocolate: { id: 'scoop_chocolate', name: 'Chocolate Cone', type: 'product', baseSellingPrice: 5, description: 'Dark chocolate cone.' },
   
   // Caffetteria & Panetteria
-  espresso: { id: 'espresso', name: 'Espresso', type: 'product', baseCost: 3, description: 'Short and intense coffee.' },
-  cappuccino: { id: 'cappuccino', name: 'Cappuccino', type: 'product', baseCost: 4.5, description: 'Coffee with perfect milk foam.' },
-  rupjmaize_loaf: { id: 'rupjmaize_loaf', name: 'Rupjmaize Loaf', type: 'product', baseCost: 7, description: 'Traditional dark rye bread loaf.' },
-  cinnamon_roll: { id: 'cinnamon_roll', name: 'Cinnamon Roll', type: 'product', baseCost: 5, description: 'Warm and buttery cinnamon roll.' },
+  espresso: { id: 'espresso', name: 'Espresso', type: 'product', baseSellingPrice: 3, description: 'Short and intense coffee.' },
+  cappuccino: { id: 'cappuccino', name: 'Cappuccino', type: 'product', baseSellingPrice: 4.5, description: 'Coffee with perfect milk foam.' },
+  rupjmaize_loaf: { id: 'rupjmaize_loaf', name: 'Rupjmaize Loaf', type: 'product', baseSellingPrice: 7, description: 'Traditional dark rye bread loaf.' },
+  cinnamon_roll: { id: 'cinnamon_roll', name: 'Cinnamon Roll', type: 'product', baseSellingPrice: 5, description: 'Warm and buttery cinnamon roll.' },
   
   // Pancakes
-  pancake_sweet: { id: 'pancake_sweet', name: 'Honey Pancake', type: 'product', baseCost: 9, description: 'Sweet pancake drenched in local honey.' },
-  pancake_savory: { id: 'pancake_savory', name: 'Bacon Pancake', type: 'product', baseCost: 11, description: 'Savory pancake for a hearty breakfast.' },
+  pancake_sweet: { id: 'pancake_sweet', name: 'Honey Pancake', type: 'product', baseSellingPrice: 9, description: 'Sweet pancake drenched in local honey.' },
+  pancake_savory: { id: 'pancake_savory', name: 'Bacon Pancake', type: 'product', baseSellingPrice: 11, description: 'Savory pancake for a hearty breakfast.' },
   
   // Hipster & Tech
-  matcha_latte: { id: 'matcha_latte', name: 'Iced Matcha Latte', type: 'product', baseCost: 7, description: 'The favorite drink of Miera iela creatives.' },
-  avocado_toast: { id: 'avocado_toast', name: 'Avocado Toast', type: 'product', baseCost: 12, description: 'A Sunday brunch must-have.' },
-  poke_bowl: { id: 'poke_bowl', name: 'Salmon Poke Bowl', type: 'product', baseCost: 16, description: 'A healthy, energizing bowl for programmers.' },
+  matcha_latte: { id: 'matcha_latte', name: 'Iced Matcha Latte', type: 'product', baseSellingPrice: 7, description: 'The favorite drink of Miera iela creatives.' },
+  avocado_toast: { id: 'avocado_toast', name: 'Avocado Toast', type: 'product', baseSellingPrice: 12, description: 'A Sunday brunch must-have.' },
+  poke_bowl: { id: 'poke_bowl', name: 'Salmon Poke Bowl', type: 'product', baseSellingPrice: 16, description: 'A healthy, energizing bowl for programmers.' },
   
   // Ristorazione & Lusso
-  grilled_steak: { id: 'grilled_steak', name: 'Sunset Ribeye', type: 'product', baseCost: 65, description: 'Premium steak served by the river.' },
-  beer_pint: { id: 'beer_pint', name: 'Craft Pint', type: 'product', baseCost: 8, description: 'A chilled pint of craft beer.' },
-  truffle_risotto: { id: 'truffle_risotto', name: 'Gold Truffle Risotto', type: 'product', baseCost: 120, description: 'Truffle risotto decorated with gold leaf.' },
-  caviar_blini: { id: 'caviar_blini', name: 'Caviar Blini', type: 'product', baseCost: 180, description: 'Small crêpes served with Beluga caviar.' },
+  grilled_steak: { id: 'grilled_steak', name: 'Sunset Ribeye', type: 'product', baseSellingPrice: 65, description: 'Premium steak served by the river.' },
+  beer_pint: { id: 'beer_pint', name: 'Craft Pint', type: 'product', baseSellingPrice: 8, description: 'A chilled pint of craft beer.' },
+  truffle_risotto: { id: 'truffle_risotto', name: 'Gold Truffle Risotto', type: 'product', baseSellingPrice: 120, description: 'Truffle risotto decorated with gold leaf.' },
+  caviar_blini: { id: 'caviar_blini', name: 'Caviar Blini', type: 'product', baseSellingPrice: 180, description: 'Small crêpes served with Beluga caviar.' },
   
   // Aeroporto
-  airport_burger: { id: 'airport_burger', name: 'Terminal Burger', type: 'product', baseCost: 15, description: 'Airport surcharge included.' },
-  travel_sandwich: { id: 'travel_sandwich', name: 'Flight Sandwich', type: 'product', baseCost: 9, description: 'Easy to eat at the gate.' }
+  airport_burger: { id: 'airport_burger', name: 'Terminal Burger', type: 'product', baseSellingPrice: 15, description: 'Airport surcharge included.' },
+  travel_sandwich: { id: 'travel_sandwich', name: 'Flight Sandwich', type: 'product', baseSellingPrice: 9, description: 'Easy to eat at the gate.' }
 };

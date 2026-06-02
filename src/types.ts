@@ -43,6 +43,7 @@ export interface BusinessConfig {
   id: string;
   baseCost: number;
   baseIncome: number;
+  baseOrderRate: number;
   name: string;
   description: string;
   location: string;
@@ -84,8 +85,9 @@ export interface ItemConfig {
   id: string;
   name: string;
   type: ItemType;
-  baseCost: number;
+  baseCost?: number;
   description?: string;
+  baseSellingPrice?: number;
 }
 
 export interface RecipeConfig {

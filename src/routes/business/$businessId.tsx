@@ -4,7 +4,7 @@ import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
-import type { EmployeeConfig, RecipeConfig } from '#/types'
+import type { EmployeeConfig, ItemConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
 import { useEmployees } from '#/store/employees'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
@@ -124,9 +124,11 @@ function RouteComponent() {
         </div>
       </div>
       <div>
-        <h4>Buy from supplier</h4>
+        <h4>Buy from market</h4>
         <ul>
           {allowedItems?.map((allowedItem, index) => {
+            // user can only buy ingredients from the market
+            if (INVENTORY_CATALOG[allowedItem].type === 'ingredient')
             return (
               <li key={index}>
                 <span>{allowedItem}</span>
@@ -134,7 +136,7 @@ function RouteComponent() {
                   onClick={() =>
                     buyItemForBusiness(
                       allowedItem,
-                      INVENTORY_CATALOG[allowedItem].baseCost,
+                      INVENTORY_CATALOG[allowedItem].baseCost || 0,
                       businessId,
                       allowedItems
                     )
