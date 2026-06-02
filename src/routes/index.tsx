@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMoney } from '#/store/currency'
 import { useBusiness } from '#/store/business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
-import { INVENTORY_CATALOG } from '#/db/inventoryList'
 
 export const Route = createFileRoute('/')({ component: Home })
 
