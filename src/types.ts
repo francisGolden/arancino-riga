@@ -11,6 +11,11 @@ export interface GameDb {
 
 export type EmployeeRole = 'cook' | 'cashier' | 'barista' | 'pastry chef'
 
+export interface WorkRate {
+  crafting: number;
+  selling: number;
+}
+
 export interface EmployeeConfig {
   id: string
   name: string
@@ -18,6 +23,7 @@ export interface EmployeeConfig {
   description: string
   baseWage: number
   preferredBusinessTypes: BusinessType[]
+  workRate: WorkRate;
 }
 
 export interface ElapsedTimeResult {
