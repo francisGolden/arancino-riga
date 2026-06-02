@@ -82,11 +82,18 @@ function RouteComponent() {
         <ul>
           <span>Products to sell</span>
           {objectInventoryIterable.map(([item, amount], index) => {
-            if (Object.keys(PRODUCTS_CATALOG).includes(item))
+            const amountConsideringPendingOrders = amount -
+                      useOrders
+                        .getState()
+                        .getPendingBusinessOrders(businessId)
+                        .filter((orderProductId) => orderProductId === item)
+                        .length
+            if (Object.keys(PRODUCTS_CATALOG).includes(item) && amountConsideringPendingOrders > 0)
               return (
                 <li key={index}>
                   <span>
-                    {item}: {amount}
+                    {item}:{' '}
+                    {amountConsideringPendingOrders}
                   </span>
                   <button
                     onClick={() =>
