@@ -28,6 +28,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const newPendingBusinessOrders = { ...pendingBusinessOrders }
     if (businessId in newPendingBusinessOrders) {
       console.log('business already in orders object')
+      return
     } else {
       newPendingBusinessOrders[businessId] = []
     }
@@ -36,7 +37,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
     try {
       await updateDbOrders(newPendingBusinessOrders)
     } catch (error) {
-      set(() => ({ pendingBusinessOrders: pendingBusinessOrders }))
+      set(() => ({ pendingBusinessOrders }))
       console.error('could not add business to pending business orders', error)
     }
   },
@@ -69,7 +70,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
       await updateDbOrders(newPendingBusinessOrders)
       return true
     } catch (error) {
-      set(() => ({ pendingBusinessOrders: pendingBusinessOrders }))
+      set(() => ({ pendingBusinessOrders }))
       console.error('could not add order to pending business orders', error)
       return false
     }
@@ -107,7 +108,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
       useInventories.getState().sellBusinessItem(productId, PRODUCTS_CATALOG[productId].baseSellingPrice, businessId)
       return true
     } catch (error) {
-      set(() => ({ pendingBusinessOrders: pendingBusinessOrders }))
+      set(() => ({ pendingBusinessOrders }))
       console.error('could not fulfill order', error)
       return false
     }
