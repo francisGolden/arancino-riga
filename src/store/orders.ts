@@ -142,33 +142,37 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const ordersPromises: Promise<any>[] = []
     Object.entries(pendingBusinessOrders).forEach(
       ([businessId, orders], index) => {
-        console.log(businessId, orders)
         const businessOrderRate =
           BUSINESS_CATALOG.find((business) => business.id === businessId)
             ?.baseOrderRate || 1
-        orders.forEach((order) => {
-          if (businessOrderRate > ordersPromises.length) {
-            console.log('passed check. orderPromises length: ', ordersPromises.length)
-            const promise = new Promise((resolve) => {
-              setTimeout(async () => {
-                try {
-                  const fulfilledOrder = await get().fulfillOrder(businessId, order)
-                  resolve(fulfilledOrder)
-                  console.log(businessId, order)
-                } catch (error) {
-                  console.error('order could not be fulfilled')
-                  resolve(false)
-                }
-              }, 1000)
-            })
-            ordersPromises.push(promise)
-          }
+        const ordersToProcess = orders.slice(0, businessOrderRate)
+        console.log(ordersToProcess)
+        ordersToProcess.forEach((order) => {
+          console.log(
+            'passed check. orderPromises length: ',
+            ordersPromises.length,
+          )
+          const promise = new Promise((resolve) => {
+            setTimeout(async () => {
+              try {
+                const fulfilledOrder = await get().fulfillOrder(
+                  businessId,
+                  order,
+                )
+                resolve(fulfilledOrder)
+              } catch (error) {
+                console.error('order could not be fulfilled')
+                resolve(false)
+              }
+            }, 1000)
+          })
+          ordersPromises.push(promise)
         })
       },
     )
 
     try {
-      console.log(await Promise.allSettled(ordersPromises))
+      await Promise.allSettled(ordersPromises)
       console.log('all order promises settled')
       return true
     } catch (error) {
