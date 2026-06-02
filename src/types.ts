@@ -5,7 +5,8 @@ export interface GameDb {
   ownedBusinesses: string[];
   inventory: Record<string, number>;
   inventories: Record<string, Record<string, number>>;
-  businessEmployees: Record<string, string[]>
+  businessEmployees: Record<string, string[]>;
+  pendingBusinessOrders: Record<string, string[]>;
 }
 
 export type EmployeeRole = 'cook' | 'cashier' | 'barista' | 'pastry chef'
@@ -99,6 +100,11 @@ export interface RecipeConfig {
 }
 
 export interface OrdersState {
-  businessOrders: Record<string, Record<string, number>>;
-  getBusinessOrders: (businessId: string) => Record<string, number>
+  pendingBusinessOrders: Record<string, string[]>;
+  getPendingBusinessOrders: (businessId: string) => string[];
+  addBusinessToPendingBusinessOrders: (businessId: string) => Promise<void>;
+  removeBusinessFromOrders: (businessId: string) => Promise<void>;
+  addOrder: (businessId: string, productId: string) => Promise<boolean>;
+  fulfillOrder: (businessId: string, productId: string) => Promise<boolean>;
+  hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => void;
 }

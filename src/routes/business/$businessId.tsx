@@ -7,6 +7,7 @@ import { RECIPE_CATALOG } from '#/db/recipeList'
 import type { EmployeeConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
 import { useEmployees } from '#/store/employees'
+import { useOrders } from '#/store/orders'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 export const Route = createFileRoute('/business/$businessId')({
@@ -53,6 +54,10 @@ function RouteComponent() {
     })
   }
 
+  const pendingBusinessOrders = useOrders(
+    (state) => state.pendingBusinessOrders[businessId],
+  )
+
   return (
     <div>
       <h1>{businessId}</h1>
@@ -64,9 +69,28 @@ function RouteComponent() {
           {objectInventoryIterable.map(([item, amount], index) => {
             return (
               <li key={index}>
-                {item}: {amount}
+                <span>
+                  {item}: {amount}
+                </span>
+                {INVENTORY_CATALOG[item].type === 'product' && (
+                  <button
+                    onClick={() =>
+                      useOrders.getState().addOrder(businessId, item)
+                    }
+                  >
+                    Add 1 to pending Business Orders
+                  </button>
+                )}
               </li>
             )
+          })}
+        </ul>
+      </div>
+      <div>
+        <h4>Orders</h4>
+        <ul>
+          {pendingBusinessOrders.map((order, index) => {
+            return <li key={index}>{order}</li>
           })}
         </ul>
       </div>
@@ -129,23 +153,23 @@ function RouteComponent() {
           {allowedItems?.map((allowedItem, index) => {
             // user can only buy ingredients from the market
             if (INVENTORY_CATALOG[allowedItem].type === 'ingredient')
-            return (
-              <li key={index}>
-                <span>{allowedItem}</span>
-                <button
-                  onClick={() =>
-                    buyItemForBusiness(
-                      allowedItem,
-                      INVENTORY_CATALOG[allowedItem].baseCost || 0,
-                      businessId,
-                      allowedItems
-                    )
-                  }
-                >
-                  buy
-                </button>
-              </li>
-            )
+              return (
+                <li key={index}>
+                  <span>{allowedItem}</span>
+                  <button
+                    onClick={() =>
+                      buyItemForBusiness(
+                        allowedItem,
+                        INVENTORY_CATALOG[allowedItem].baseCost || 0,
+                        businessId,
+                        allowedItems,
+                      )
+                    }
+                  >
+                    buy
+                  </button>
+                </li>
+              )
           })}
         </ul>
       </div>
@@ -179,7 +203,9 @@ function RouteComponent() {
                         businessId,
                       )
                   }
-                >Buy required ingredients</button>
+                >
+                  Buy required ingredients
+                </button>
               </li>
             )
           })}
