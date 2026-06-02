@@ -3,6 +3,7 @@ import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
 import { useLoop } from '#/store/offlineProgress'
+import { useOrders } from '#/store/orders'
 import { db } from '#/db/initDb'
 
 export const GameClock = () => {
@@ -53,6 +54,17 @@ export const GameClock = () => {
     const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
     useLoop.getState().processOfflineProgress(offlineDelta)
   }, [lastSavedAt, db.data.lastSavedAt])
+
+  useEffect(() => {
+    console.log('orders fulfillment useEffect')
+
+    const intervalId: number = window.setInterval(async (): Promise<void> => {
+      console.log('looking at pending orders...')
+      await useOrders.getState().processPendingOrders()
+    }, 5000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   return (
     <span> Last saved

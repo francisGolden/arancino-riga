@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { db } from '#/db/initDb'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 import { useInventories } from './inventories'
+import { BUSINESS_CATALOG } from '#/db/businessList'
 
 const updateDbOrders = async (
   newPendingBusinessOrders: Record<string, string[]>,
@@ -45,14 +46,14 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const pendingBusinessOrders = get().pendingBusinessOrders
     const newPendingBusinessOrders = { ...pendingBusinessOrders }
     delete newPendingBusinessOrders[businessId]
-    
-    set(() => ({pendingBusinessOrders: newPendingBusinessOrders}))
+
+    set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
 
     try {
-        await updateDbOrders(newPendingBusinessOrders)
+      await updateDbOrders(newPendingBusinessOrders)
     } catch (error) {
-        set(() => ({pendingBusinessOrders}))
-        console.error('could not remove business from orders', error)
+      set(() => ({ pendingBusinessOrders }))
+      console.error('could not remove business from orders', error)
     }
   },
   addOrder: async (businessId: string, productId: string): Promise<boolean> => {
@@ -105,7 +106,13 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     try {
       await updateDbOrders(newPendingBusinessOrders)
-      useInventories.getState().sellBusinessItem(productId, PRODUCTS_CATALOG[productId].baseSellingPrice, businessId)
+      useInventories
+        .getState()
+        .sellBusinessItem(
+          productId,
+          PRODUCTS_CATALOG[productId].baseSellingPrice,
+          businessId,
+        )
       return true
     } catch (error) {
       set(() => ({ pendingBusinessOrders }))
@@ -113,7 +120,63 @@ export const useOrders = create<OrdersState>((set, get) => ({
       return false
     }
   },
+  processPendingOrders: async (): Promise<boolean> => {
+    console.log('processing orders')
+    const pendingBusinessOrders = get().pendingBusinessOrders
+
+    let pendingOrdersNumber = 0
+    Object.entries(pendingBusinessOrders).forEach(
+      ([businessId, orders], index) => {
+        console.log(businessId, orders)
+        orders.forEach((order) => {
+          pendingOrdersNumber += 1
+        })
+      },
+    )
+
+    if (pendingOrdersNumber === 0) {
+      console.log('no orders to fulfill')
+      return false
+    }
+
+    const ordersPromises: Promise<any>[] = []
+    Object.entries(pendingBusinessOrders).forEach(
+      ([businessId, orders], index) => {
+        console.log(businessId, orders)
+        const businessOrderRate =
+          BUSINESS_CATALOG.find((business) => business.id === businessId)
+            ?.baseOrderRate || 1
+        orders.forEach((order) => {
+          if (businessOrderRate > ordersPromises.length) {
+            console.log('passed check. orderPromises length: ', ordersPromises.length)
+            const promise = new Promise((resolve) => {
+              setTimeout(async () => {
+                try {
+                  const fulfilledOrder = await get().fulfillOrder(businessId, order)
+                  resolve(fulfilledOrder)
+                  console.log(businessId, order)
+                } catch (error) {
+                  console.error('order could not be fulfilled')
+                  resolve(false)
+                }
+              }, 1000)
+            })
+            ordersPromises.push(promise)
+          }
+        })
+      },
+    )
+
+    try {
+      console.log(await Promise.allSettled(ordersPromises))
+      console.log('all order promises settled')
+      return true
+    } catch (error) {
+      console.error('could not settle all order promises')
+      return false
+    }
+  },
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => {
-    set(() => ({pendingBusinessOrders: savedPendingBusinessOrders}))
-  }
+    set(() => ({ pendingBusinessOrders: savedPendingBusinessOrders }))
+  },
 }))
