@@ -121,59 +121,6 @@ function RouteComponent() {
         </ul>
       </div>
       <div>
-        <h4>Employees</h4>
-        <span>
-          total wage{' '}
-          {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}
-        </span>
-        <button onClick={() => useEmployees.getState().payWages(businessId)}>
-          Pay wages
-        </button>
-        <div>
-          <h5>My employees</h5>
-          <ul>
-            {businessEmployees.map((employee) => {
-              return (
-                <li key={employee}>
-                  {EMPLOYEES_CATALOG[employee].name}{' '}
-                  <button
-                    onClick={() =>
-                      useEmployees.getState().fireEmployee(businessId, employee)
-                    }
-                  >
-                    Fire
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-        <div>
-          <h5>Available Employees to Hire</h5>
-          <ul>
-            {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
-              return (
-                <li key={compatibleEmployee.id}>
-                  <button
-                    onClick={() =>
-                      useEmployees
-                        .getState()
-                        .hireEmployee(
-                          businessId,
-                          compatibleEmployee.id,
-                          compatibleEmployee.baseWage,
-                        )
-                    }
-                  >
-                    Hire {compatibleEmployee.name}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </div>
-      <div>
         <h4>Buy from market</h4>
         <ul>
           {allowedItems?.map((allowedItem, index) => {
@@ -236,6 +183,60 @@ function RouteComponent() {
           })}
         </ul>
       </div>
+      <div>
+        <h4>Employees</h4>
+        <span>
+          total wage{' '}
+          {useEmployees.getState().getBusinessEmployeesTotalWage(businessId)}
+        </span>
+        <button onClick={() => useEmployees.getState().payWages(businessId)}>
+          Pay wages
+        </button>
+        <div>
+          <h5>My employees</h5>
+          <ul>
+            {businessEmployees.map((employee) => {
+              return (
+                <li key={employee}>
+                  {EMPLOYEES_CATALOG[employee].name}{' '}
+                  <button
+                    onClick={() =>
+                      useEmployees.getState().fireEmployee(businessId, employee)
+                    }
+                  >
+                    Fire
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <div>
+          <h5>Available Employees to Hire</h5>
+          <ul>
+            {compatibleEmployees.map((compatibleEmployee: EmployeeConfig) => {
+              return (
+                <li key={compatibleEmployee.id}>
+                  <button
+                    onClick={() =>
+                      useEmployees
+                        .getState()
+                        .hireEmployee(
+                          businessId,
+                          compatibleEmployee.id,
+                          compatibleEmployee.baseWage,
+                        )
+                    }
+                  >
+                    Hire {compatibleEmployee.name}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </div>
+
       <div>
         <button
           onClick={() =>
