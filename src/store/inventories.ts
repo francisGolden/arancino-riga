@@ -5,7 +5,7 @@ import { useMoney } from './currency'
 import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
-import { INVENTORY_CATALOG } from '#/db/inventoryList'
+import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
 
 const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
@@ -111,7 +111,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     let totalCost = 0
 
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
-      totalCost += INVENTORY_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
+      totalCost += INGREDIENTS_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
     }
 
     if (useMoney.getState().money < totalCost) {
@@ -120,10 +120,10 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     const buyIngredientsPromises = []
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
-      console.log('buying ...', INVENTORY_CATALOG[requiredIngredient].id)
+      console.log('buying ...', INGREDIENTS_CATALOG[requiredIngredient].id)
       const obj = {
-        id: INVENTORY_CATALOG[requiredIngredient].id,
-        cost: INVENTORY_CATALOG[requiredIngredient].baseCost,
+        id: INGREDIENTS_CATALOG[requiredIngredient].id,
+        cost: INGREDIENTS_CATALOG[requiredIngredient].baseCost,
         businessId,
         allowedItems,
         amount: RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]

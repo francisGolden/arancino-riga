@@ -1,7 +1,7 @@
 import type { OrdersState } from '#/types'
 import { create } from 'zustand'
-import { INVENTORY_CATALOG } from '#/db/inventoryList'
 import { db } from '#/db/initDb'
+import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 
 const updateDbOrders = async (
   newPendingBusinessOrders: Record<string, string[]>,
@@ -98,7 +98,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
     set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
     console.log(
       'adding product selling price to money... ',
-      INVENTORY_CATALOG[productId].baseSellingPrice,
+      PRODUCTS_CATALOG[productId].baseSellingPrice,
     )
 
     try {

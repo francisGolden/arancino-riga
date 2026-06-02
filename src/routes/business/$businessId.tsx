@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useInventories } from '#/store/inventories'
-import { INVENTORY_CATALOG } from '#/db/inventoryList'
+import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
+import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
@@ -72,7 +73,7 @@ function RouteComponent() {
                 <span>
                   {item}: {amount}
                 </span>
-                {INVENTORY_CATALOG[item].type === 'product' && (
+                {Object.keys(PRODUCTS_CATALOG).includes(item) && (
                   <button
                     onClick={() =>
                       useOrders.getState().addOrder(businessId, item)
@@ -152,7 +153,6 @@ function RouteComponent() {
         <ul>
           {allowedItems?.map((allowedItem, index) => {
             // user can only buy ingredients from the market
-            if (INVENTORY_CATALOG[allowedItem].type === 'ingredient')
               return (
                 <li key={index}>
                   <span>{allowedItem}</span>
@@ -160,7 +160,7 @@ function RouteComponent() {
                     onClick={() =>
                       buyItemForBusiness(
                         allowedItem,
-                        INVENTORY_CATALOG[allowedItem].baseCost || 0,
+                        INGREDIENTS_CATALOG[allowedItem].baseCost || 0,
                         businessId,
                         allowedItems,
                       )
