@@ -16,10 +16,10 @@ function Home() {
   const handleBuyBusiness = async (businessId: string, cost: number) => {
     const buyBusinessResult = await buyBusiness(businessId, cost)
     if (!buyBusinessResult) return
-    navigate({
-      to: "/business/$businessId",
-      params: { businessId: businessId }
-    })
+    // navigate({
+    //   to: "/business/$businessId",
+    //   params: { businessId: businessId }
+    // })
   }
 
   const ownedBusinesses = useBusiness((state) => state.ownedBusinesses)
