@@ -123,6 +123,8 @@ export const useOrders = create<OrdersState>((set, get) => ({
     businessId: string,
     productId: string,
   ): Promise<boolean> => {
+    // TODO: find out why there is an issue when dealing with several business orders added both automatically and manually
+    // Not sure if the bug originates from this function or not.
     const businessOrders = get().getPendingBusinessOrders(businessId)
     const newBusinessOrders = [...businessOrders]
     let toRemoveIndex = 0
