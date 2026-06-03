@@ -110,8 +110,12 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     // TODO: IMPROVE TYPE SAFETY
     const inventories = get().inventories
     const craftingPromises: Promise<any>[] = []
-    const promisesArguments: any = []
-    
+    const productsToCraft: {
+      recipeName: string
+      businessId: string
+      businessAllowedItems: string[]
+      requiredRole: EmployeeRole
+    }[] = []
 
     for (const value of Object.keys(inventories)) {
       const businessAllowedItems = BUSINESS_CATALOG.find(
@@ -126,20 +130,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
             ) || []
           const requiredRole: any = recipeObj[1]?.requiredRole
           const recipeName: any = recipeObj[0]
-          const promise = get()
-            .craftBusinessProduct(
-              recipeName,
-              businessId,
-              businessAllowedItems,
-              requiredRole,
-            )
-            .then((result) => result)
-            .catch((error) => {
-              console.error('error in running the promise', error)
-              return false
-            })
-          craftingPromises.push(promise)
-          promisesArguments.push({
+          productsToCraft.push({
             recipeName,
             businessId,
             businessAllowedItems,
@@ -149,9 +140,23 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       })
     }
 
-    if (craftingPromises.length === 0) {
+    if (productsToCraft.length === 0) {
       return false
     }
+
+    productsToCraft.map(
+      ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
+        get()
+          .craftBusinessProduct(
+            recipeName,
+            businessId,
+            businessAllowedItems,
+            requiredRole,
+          )
+          .then((result) => result)
+          .catch((error) => console.error(error))
+      },
+    )
 
     try {
       await Promise.allSettled(craftingPromises)
@@ -273,7 +278,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
   ): Promise<void> => {
-
     const currentInventories = get().inventories
 
     if (id in currentInventories[businessId]) {
