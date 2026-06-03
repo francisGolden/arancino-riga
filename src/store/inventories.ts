@@ -108,7 +108,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   },
   processProductCrafting: async (): Promise<boolean> => {
     // TODO: IMPROVE TYPE SAFETY
-    console.log('processing crafting...')
     const inventories = get().inventories
     const craftingPromises: Promise<any>[] = []
     const promisesArguments: any = []
@@ -148,10 +147,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       })
     }
 
-    console.log('promisesArguments:', promisesArguments)
-
     if (craftingPromises.length === 0) {
-      console.log('nothing to craft')
       return false
     }
 
@@ -184,7 +180,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     const buyIngredientsPromises = []
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
-      console.log('buying ...', INGREDIENTS_CATALOG[requiredIngredient].id)
       const obj = {
         id: INGREDIENTS_CATALOG[requiredIngredient].id,
         cost: INGREDIENTS_CATALOG[requiredIngredient].baseCost,
@@ -276,7 +271,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
   ): Promise<void> => {
-    console.log('sell', id, cost, businessId)
 
     const currentInventories = get().inventories
 

@@ -57,7 +57,6 @@ export const GameClock = () => {
   }, [lastSavedAt, db.data.lastSavedAt])
 
   useEffect(() => {
-    console.log('orders fulfillment and automatic crafting useEffect')
 
     const intervalId: number = window.setInterval(async (): Promise<void> => {
       await useInventories.getState().processProductCrafting()
