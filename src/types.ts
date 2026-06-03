@@ -82,7 +82,8 @@ export interface InventoriesState {
     businessId: string,
     allowedItems: string[],
     requiredRole: EmployeeRole,
-  ) => void
+  ) => Promise<boolean>
+  processProductCrafting: () => Promise<boolean>
   buyRecipeIngredients: (
     recipeItemId: string,
     allowedItems: string[],

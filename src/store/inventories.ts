@@ -6,6 +6,9 @@ import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
+import { useBusiness } from './business'
+import { BUSINESS_CATALOG } from '#/db/businessList'
+import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 
 const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
@@ -25,7 +28,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     businessId: string,
     allowedItems: string[],
     requiredRole: EmployeeRole,
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     const itemId = RECIPE_CATALOG[recipeItemId].productId
 
     let checkAllowedItems = false
@@ -37,7 +40,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     if (!checkAllowedItems) {
       console.log('item not allowed to be crafted for this business')
-      return
+      return false
     }
 
     let checkRequiredEmployeeRoles = false
@@ -54,7 +57,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     if (!checkRequiredEmployeeRoles) {
       console.log('we cannot make this recipe with the current workforce')
-      return
+      return false
     }
 
     const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
@@ -80,7 +83,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     if (!checkIngredients) {
       console.log('not enough ingredients')
-      return
+      return false
     }
 
     // remove ingredients from inventory
@@ -95,11 +98,52 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     try {
       await updateDbInventories(inventoriesCopy)
+      return true
     } catch (error) {
       console.error('could not update inventories with crafted item')
       // revert state on failure
       set(() => ({ inventories: currentInventories }))
+      return false
     }
+  },
+  processProductCrafting: async (): Promise<boolean> => {
+    console.log('processing crafting...')
+    console.log(get().inventories)
+    const inventories = get().inventories
+    const craftingPromises: Promise<any>[] = []
+    for (const [value, obj] of Object.entries(inventories)) {
+      console.log(value, obj)
+      const businessAllowedItems = BUSINESS_CATALOG.find((business) => business.id === value)?.allowedItems
+      const businessId = value
+      businessAllowedItems?.forEach((allowedItem) => {
+        if (allowedItem in PRODUCTS_CATALOG) {
+          const recipeObj = Object.entries(RECIPE_CATALOG).find(([key, obj]) => obj.productId === allowedItem) || []
+          const requiredRole: any = recipeObj[1]?.requiredRole
+          const recipeName: any = recipeObj[0]
+          console.log('promise arguments', recipeName, businessId, businessAllowedItems, requiredRole)
+          const promise = get().craftBusinessProduct(recipeName, businessId, businessAllowedItems, requiredRole).then((result) => 
+            result
+          ).catch((error) => {
+            console.error('error in running the promise', error)
+            return false
+          })
+          craftingPromises.push(promise)
+        }
+      })
+    }
+
+    if (craftingPromises.length === 0) {
+      return false
+    }
+
+    try {
+      await Promise.allSettled(craftingPromises)
+      return true
+    } catch (error) {
+      console.error(error)
+      return false
+    }
+
   },
   buyRecipeIngredients: async (
     recipeName: string,
