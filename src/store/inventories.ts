@@ -108,31 +108,49 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   },
   processProductCrafting: async (): Promise<boolean> => {
     console.log('processing crafting...')
-    console.log(get().inventories)
     const inventories = get().inventories
     const craftingPromises: Promise<any>[] = []
-    for (const [value, obj] of Object.entries(inventories)) {
-      console.log(value, obj)
-      const businessAllowedItems = BUSINESS_CATALOG.find((business) => business.id === value)?.allowedItems
+    const promisesArguments: any = []
+    for (const value of Object.keys(inventories)) {
+      const businessAllowedItems = BUSINESS_CATALOG.find(
+        (business) => business.id === value,
+      )?.allowedItems
       const businessId = value
       businessAllowedItems?.forEach((allowedItem) => {
         if (allowedItem in PRODUCTS_CATALOG) {
-          const recipeObj = Object.entries(RECIPE_CATALOG).find(([key, obj]) => obj.productId === allowedItem) || []
+          const recipeObj =
+            Object.entries(RECIPE_CATALOG).find(
+              ([key, obj]) => obj.productId === allowedItem,
+            ) || []
           const requiredRole: any = recipeObj[1]?.requiredRole
           const recipeName: any = recipeObj[0]
-          console.log('promise arguments', recipeName, businessId, businessAllowedItems, requiredRole)
-          const promise = get().craftBusinessProduct(recipeName, businessId, businessAllowedItems, requiredRole).then((result) => 
-            result
-          ).catch((error) => {
-            console.error('error in running the promise', error)
-            return false
-          })
+          const promise = get()
+            .craftBusinessProduct(
+              recipeName,
+              businessId,
+              businessAllowedItems,
+              requiredRole,
+            )
+            .then((result) => result)
+            .catch((error) => {
+              console.error('error in running the promise', error)
+              return false
+            })
           craftingPromises.push(promise)
+          promisesArguments.push({
+            recipeName,
+            businessId,
+            businessAllowedItems,
+            requiredRole,
+          })
         }
       })
     }
 
+    console.log('promisesArguments:', promisesArguments)
+
     if (craftingPromises.length === 0) {
+      console.log('nothing to craft')
       return false
     }
 
@@ -143,7 +161,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       console.error(error)
       return false
     }
-
   },
   buyRecipeIngredients: async (
     recipeName: string,
@@ -155,7 +172,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     let totalCost = 0
 
     for (const requiredIngredient of Object.keys(requiredIngredients)) {
-      totalCost += INGREDIENTS_CATALOG[requiredIngredient].baseCost * RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
+      totalCost +=
+        INGREDIENTS_CATALOG[requiredIngredient].baseCost *
+        RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
     }
 
     if (useMoney.getState().money < totalCost) {
@@ -170,12 +189,18 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         cost: INGREDIENTS_CATALOG[requiredIngredient].baseCost,
         businessId,
         allowedItems,
-        amount: RECIPE_CATALOG[recipeName].ingredients[requiredIngredient]
+        amount: RECIPE_CATALOG[recipeName].ingredients[requiredIngredient],
       }
       const myPromise = new Promise((resolve) => {
         setTimeout(async () => {
           try {
-            const success = await get().buyItemForBusiness(obj.id, obj.cost, businessId, allowedItems, obj.amount)
+            const success = await get().buyItemForBusiness(
+              obj.id,
+              obj.cost,
+              businessId,
+              allowedItems,
+              obj.amount,
+            )
             if (success) {
               resolve(true)
             } else {
@@ -204,7 +229,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
     allowedItems: string[],
-    amount?: number
+    amount?: number,
   ): Promise<boolean> => {
     if (useMoney.getState().money < cost) {
       console.log('not enough funds for this purchase')
@@ -230,7 +255,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     const currentAmount = inventoriesCopy[businessId][id] || 0
-    inventoriesCopy[businessId][id] = currentAmount + (amount || 1) 
+    inventoriesCopy[businessId][id] = currentAmount + (amount || 1)
 
     set(() => ({ inventories: inventoriesCopy }))
     useMoney.getState().decreaseMoney(cost)
@@ -296,6 +321,20 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       await updateDbInventories(inventoriesCopy)
     } catch (error) {
       console.error('could not add business to inventory', error)
+      set(() => ({ inventories: currentInventories }))
+    }
+  },
+  removeBusinessFromInventory: async (businessId: string): Promise<void> => {
+    const currentInventories = get().inventories
+    const inventoriesCopy = { ...currentInventories }
+    delete inventoriesCopy[businessId]
+
+    set(() => ({ inventories: inventoriesCopy }))
+
+    try {
+      await updateDbInventories(inventoriesCopy)
+    } catch (error) {
+      console.error('could not remove business from inventory', error)
       set(() => ({ inventories: currentInventories }))
     }
   },

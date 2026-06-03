@@ -66,6 +66,7 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     set(() => ({ ownedBusinesses: newOwnedBusinesses }))
     useMoney.getState().increaseMoney(cost)
     await useOrders.getState().removeBusinessFromOrders(id)
+    await useInventories.getState().removeBusinessFromInventory(id)
 
     try {
       await updateDbBusiness(newOwnedBusinesses)
