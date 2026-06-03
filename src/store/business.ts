@@ -34,9 +34,11 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
 
     set(() => ({ ownedBusinesses: ownedBusinessesCopy }))
 
+
+    console.log({moneyBeforeBuying: useMoney.getState().money, salePrice: cost, expectedNewMoney: useMoney.getState().money - cost})
     useInventories.getState().addBusinessToInventory(id)
-    await useOrders.getState().addBusinessToPendingBusinessOrders(id)
-    await useMoney.getState().decreaseMoney(cost)
+    useOrders.getState().addBusinessToPendingBusinessOrders(id)
+    useMoney.getState().decreaseMoney(cost)
 
     try {
       await updateDbBusiness(ownedBusinessesCopy)
@@ -64,9 +66,11 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     )
 
     set(() => ({ ownedBusinesses: newOwnedBusinesses }))
+    console.log({moneyBeforeSelling: useMoney.getState().money, salePrice: cost, expectedNewMoney: useMoney.getState().money + cost})
     useMoney.getState().increaseMoney(cost)
-    await useOrders.getState().removeBusinessFromOrders(id)
-    await useInventories.getState().removeBusinessFromInventory(id)
+    useOrders.getState().removeBusinessFromOrders(id)
+    useInventories.getState().removeBusinessFromInventory(id)
+    
 
     try {
       await updateDbBusiness(newOwnedBusinesses)

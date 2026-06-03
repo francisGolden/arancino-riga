@@ -28,7 +28,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const pendingBusinessOrders = get().pendingBusinessOrders
     const newPendingBusinessOrders = { ...pendingBusinessOrders }
     if (businessId in newPendingBusinessOrders) {
-      console.log('business already in orders object')
       return
     } else {
       newPendingBusinessOrders[businessId] = []
@@ -99,10 +98,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
       [businessId]: newBusinessOrders,
     }
     set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
-    console.log(
-      'adding product selling price to money... ',
-      PRODUCTS_CATALOG[productId].baseSellingPrice,
-    )
 
     try {
       await updateDbOrders(newPendingBusinessOrders)
@@ -121,13 +116,11 @@ export const useOrders = create<OrdersState>((set, get) => ({
     }
   },
   processPendingOrders: async (): Promise<boolean> => {
-    console.log('processing orders')
     const pendingBusinessOrders = get().pendingBusinessOrders
 
     let pendingOrdersNumber = 0
     Object.entries(pendingBusinessOrders).forEach(
       ([businessId, orders]) => {
-        console.log(businessId, orders)
         orders.forEach(() => {
           pendingOrdersNumber += 1
         })
@@ -135,7 +128,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
     )
 
     if (pendingOrdersNumber === 0) {
-      console.log('no orders to fulfill')
       return false
     }
 
@@ -163,7 +155,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     try {
       await Promise.allSettled(ordersPromises)
-      console.log('all order promises settled')
       return true
     } catch (error) {
       console.error('could not settle all order promises')

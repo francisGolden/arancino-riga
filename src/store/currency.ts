@@ -31,7 +31,7 @@ export const useMoney = create<MoneyState>((set, get) => ({
   },
   decreaseMoney: async (amount: number) => {
     const currentMoney = get().money
-    const newMoney = currentMoney + amount
+    const newMoney = currentMoney - amount
     set(() => ({ money: newMoney }))
 
     try {
@@ -39,6 +39,7 @@ export const useMoney = create<MoneyState>((set, get) => ({
       return true
     } catch (error) {
       console.error('could not decrease money', error)
+      set(() => ({ money: currentMoney }))
       return false
     }
   
