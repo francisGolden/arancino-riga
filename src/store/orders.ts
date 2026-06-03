@@ -125,6 +125,8 @@ export const useOrders = create<OrdersState>((set, get) => ({
   ): Promise<boolean> => {
     // TODO: find out why there is an issue when dealing with several business orders added both automatically and manually
     // Not sure if the bug originates from this function or not.
+
+    // TODO: the orders cannot be fulfilled if there are no workers to sell them
     const businessOrders = get().getPendingBusinessOrders(businessId)
     const newBusinessOrders = [...businessOrders]
     let toRemoveIndex = 0
