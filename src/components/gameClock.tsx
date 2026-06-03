@@ -5,6 +5,7 @@ import { useTime } from '#/store/time'
 import { useLoop } from '#/store/offlineProgress'
 import { useOrders } from '#/store/orders'
 import { db } from '#/db/initDb'
+import { useInventories } from '#/store/inventories'
 
 export const GameClock = () => {
   // this is an isolated component because otherwise the entire components tree would be re-rendered every 3 seconds
@@ -56,10 +57,10 @@ export const GameClock = () => {
   }, [lastSavedAt, db.data.lastSavedAt])
 
   useEffect(() => {
-    console.log('orders fulfillment useEffect')
+    console.log('orders fulfillment and automatic crafting useEffect')
 
     const intervalId: number = window.setInterval(async (): Promise<void> => {
-      console.log('looking at pending orders...')
+      await useInventories.getState().processProductCrafting()
       await useOrders.getState().processPendingOrders()
     }, 5000)
 

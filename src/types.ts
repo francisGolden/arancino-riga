@@ -82,7 +82,8 @@ export interface InventoriesState {
     businessId: string,
     allowedItems: string[],
     requiredRole: EmployeeRole,
-  ) => void
+  ) => Promise<boolean>
+  processProductCrafting: () => Promise<boolean>
   buyRecipeIngredients: (
     recipeItemId: string,
     allowedItems: string[],
@@ -97,6 +98,7 @@ export interface InventoriesState {
   ) => Promise<boolean>
   sellBusinessItem: (id: string, cost: number, businessId: string) => void
   addBusinessToInventory: (businessId: string) => void
+  removeBusinessFromInventory: (businessId: string) => Promise<void>
   getAllowedRecipes: (
     allowedItems: string[],
     recipe_catalog: Record<string, RecipeConfig>,
