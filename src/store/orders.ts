@@ -75,6 +75,50 @@ export const useOrders = create<OrdersState>((set, get) => ({
       return false
     }
   },
+  processAddOrders: async (): Promise<boolean> => {
+    const inventories = useInventories.getState().inventories
+    const PRODUCT_DEMAND = 1
+
+    if (Object.keys(inventories).length === 0) {
+      return false
+    }
+
+    // 1. Collect data of orders to process
+    const ordersToProcess: { inventoryKey: string; productId: string }[] = []
+
+    for (const [key, obj] of Object.entries(inventories)) {
+      for (const productId of Object.keys(obj)) {
+        if (productId in PRODUCTS_CATALOG && obj[productId] > 0) {
+          ordersToProcess.push({ inventoryKey: key, productId })
+        }
+      }
+    }
+
+    if (ordersToProcess.length === 0) {
+      return false
+    }
+
+    // 2. Apply the PRODUCT_DEMAND limit
+    const limitedOrders = ordersToProcess.slice(0, PRODUCT_DEMAND)
+
+    // 3. Execute the promises
+    const promises = limitedOrders.map((order) =>
+      get()
+        .addOrder(order.inventoryKey, order.productId)
+        .catch((error) =>
+          console.error(`Error in the order ${order.productId}:`, error),
+        ),
+    )
+
+    try {
+      await Promise.allSettled(promises)
+      console.log('All the valid orders have been processed')
+      return true
+    } catch (error) {
+      console.error('Error during processAddOrders:', error)
+      return false
+    }
+  },
   fulfillOrder: async (
     businessId: string,
     productId: string,
@@ -119,39 +163,35 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const pendingBusinessOrders = get().pendingBusinessOrders
 
     let pendingOrdersNumber = 0
-    Object.entries(pendingBusinessOrders).forEach(
-      ([businessId, orders]) => {
-        orders.forEach(() => {
-          pendingOrdersNumber += 1
-        })
-      },
-    )
+    Object.entries(pendingBusinessOrders).forEach(([businessId, orders]) => {
+      orders.forEach(() => {
+        pendingOrdersNumber += 1
+      })
+    })
 
     if (pendingOrdersNumber === 0) {
       return false
     }
 
     const ordersPromises: Promise<any>[] = []
-    Object.entries(pendingBusinessOrders).forEach(
-      ([businessId, orders]) => {
-        const businessOrderRate =
-          BUSINESS_CATALOG.find((business) => business.id === businessId)
-            ?.baseOrderRate || 1
-        const ordersToProcess = orders.slice(0, businessOrderRate)
-        ordersToProcess.forEach((order) => {
-          const promise = get()
-            .fulfillOrder(businessId, order)
-            .then((fulfilledOrder) => {
-              return fulfilledOrder
-            })
-            .catch((error) => {
-              console.error(`Errore nell'ordine per ${businessId}:`, error)
-              return false
-            })
-          ordersPromises.push(promise)
-        })
-      },
-    )
+    Object.entries(pendingBusinessOrders).forEach(([businessId, orders]) => {
+      const businessOrderRate =
+        BUSINESS_CATALOG.find((business) => business.id === businessId)
+          ?.baseOrderRate || 1
+      const ordersToProcess = orders.slice(0, businessOrderRate)
+      ordersToProcess.forEach((order) => {
+        const promise = get()
+          .fulfillOrder(businessId, order)
+          .then((fulfilledOrder) => {
+            return fulfilledOrder
+          })
+          .catch((error) => {
+            console.error(`Errore nell'ordine per ${businessId}:`, error)
+            return false
+          })
+        ordersPromises.push(promise)
+      })
+    })
 
     try {
       await Promise.allSettled(ordersPromises)

@@ -60,6 +60,7 @@ export const GameClock = () => {
 
     const intervalId: number = window.setInterval(async (): Promise<void> => {
       await useInventories.getState().processProductCrafting()
+      await useOrders.getState().processAddOrders()
       await useOrders.getState().processPendingOrders()
     }, 5000)
 

@@ -111,6 +111,8 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     const inventories = get().inventories
     const craftingPromises: Promise<any>[] = []
     const promisesArguments: any = []
+    
+
     for (const value of Object.keys(inventories)) {
       const businessAllowedItems = BUSINESS_CATALOG.find(
         (business) => business.id === value,
