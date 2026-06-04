@@ -99,6 +99,8 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const inventories = structuredClone(useInventories.getState().inventories)
     const businessIDs = Object.keys(inventories)
 
+    const MARKET_DEMAND = 3
+
     for (const businessID of businessIDs) {
       console.log('Business', businessID)
       console.log('which of these items are products?')
@@ -108,6 +110,22 @@ export const useOrders = create<OrdersState>((set, get) => ({
           return { productID: item, amount: inventories[businessID][item] }
         })
       console.log(products)
+      console.log('I want to get ', MARKET_DEMAND, ' of these products into the pendingBusinessOrders list')
+      let productsPushedCounter = 0
+      const productsToPush: string[] = []
+      for (const product of products) {
+        while (productsPushedCounter < 3) {
+          productsPushedCounter++
+          product.amount -= 1
+          productsToPush.push(product['productID'])
+        }
+      }
+
+      // TO-DO: continue from here
+      
+      console.log('products after the loop:', products)
+      console.log('products to push', productsToPush)
+
       console.log('---------')
     }
 
