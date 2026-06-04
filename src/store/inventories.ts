@@ -6,16 +6,14 @@ import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
-import { useBusiness } from './business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 
-const updateDbInventories = async (
+export const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
 ) => {
   try {
     await db.update((data) => (data.inventories = newInventories))
-    console.log('inventory updated on db')
   } catch (error) {
     console.error('could not update inventory', error)
   }
@@ -82,7 +80,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     if (!checkIngredients) {
-      console.log('not enough ingredients')
       return false
     }
 
@@ -144,9 +141,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
-    productsToCraft.map(
-      ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
-        get()
+    const myPromisesArray = productsToCraft.map(
+      async ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
+        return get()
           .craftBusinessProduct(
             recipeName,
             businessId,
@@ -159,7 +156,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     )
 
     try {
-      await Promise.allSettled(craftingPromises)
+      await Promise.allSettled(myPromisesArray)
       return true
     } catch (error) {
       console.error(error)
@@ -280,7 +277,10 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   ): Promise<void> => {
     const currentInventories = get().inventories
 
-    if (id in currentInventories[businessId]) {
+    console.log("🔥 URRENT business INVENTORy 🔥", currentInventories[businessId])
+    console.log('item to sell ID: ', id)
+
+    if (currentInventories[businessId][id] > 0) {
     } else {
       console.log('item. not in business inventory. cannot sell')
       return
@@ -293,9 +293,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     inventoriesCopy[businessId][id] -= 1
 
-    if (inventoriesCopy[businessId][id] <= 0) {
-      delete inventoriesCopy[businessId][id]
-    }
+    // if (inventoriesCopy[businessId][id] <= 0) {
+    //   delete inventoriesCopy[businessId][id]
+    // }
 
     set(() => ({ inventories: inventoriesCopy }))
     useMoney.getState().increaseMoney(cost)

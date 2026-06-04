@@ -34,7 +34,9 @@ export interface ElapsedTimeResult {
 export interface MoneyState {
   money: number
   increaseMoney: (amount: number) => Promise<boolean>
+  increaseMoneyMemory: (amount: number) => void
   decreaseMoney: (amount: number) => Promise<boolean>
+  decreaseMoneyMemory: (amount: number) => void
   setMoney: (amount: number) => void
   hydrateMoney: (savedAmount: number) => void
 }
@@ -135,6 +137,7 @@ export interface OrdersState {
   getPendingBusinessOrders: (businessId: string) => string[]
   addBusinessToPendingBusinessOrders: (businessId: string) => Promise<void>
   removeBusinessFromOrders: (businessId: string) => Promise<void>
+  processAllOrdersBulk: () => Promise<boolean>
   addOrder: (businessId: string, productId: string) => Promise<boolean>
   processAddOrders: () => Promise<boolean>
   fulfillOrder: (businessId: string, productId: string) => Promise<boolean>
