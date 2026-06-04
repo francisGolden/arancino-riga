@@ -60,9 +60,9 @@ export const GameClock = () => {
     let timeoutId: number
 
     const run = async (): Promise<void> => {
-      await useInventories.getState().processProductCrafting()
-      await useOrders.getState().processAddOrders()
-      await useOrders.getState().processAllOrdersBulk()
+      // await useInventories.getState().processProductCrafting()
+      // await useOrders.getState().processAddOrders()
+      // await useOrders.getState().processAllOrdersBulk()
       timeoutId = window.setTimeout(run, 5000)
     }
 

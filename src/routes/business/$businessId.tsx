@@ -65,6 +65,14 @@ function RouteComponent() {
       <h4>{businessCatalogObject?.type}</h4>
       <span>{money} money</span>
       <div>
+        <span>Actions</span>
+        <ul>
+          <li><button onClick={useInventories.getState().processProductCrafting}>processProductCrafting</button></li>
+          <li><button onClick={useOrders.getState().processAddOrders}>processAddOrders</button></li>
+          <li><button onClick={useOrders.getState().processAllOrdersBulk}>processAllOrdersBulk</button></li>
+        </ul>
+      </div>
+      <div>
         <h4>Business Inventory</h4>
         <ul>
           <span>Ingredients</span>

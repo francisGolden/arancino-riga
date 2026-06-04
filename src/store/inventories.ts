@@ -106,7 +106,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   processProductCrafting: async (): Promise<boolean> => {
     // TODO: IMPROVE TYPE SAFETY
     const inventories = get().inventories
-    const craftingPromises: Promise<any>[] = []
     const productsToCraft: {
       recipeName: string
       businessId: string
