@@ -173,48 +173,76 @@ export const useOrders = create<OrdersState>((set, get) => ({
     }
   },
   processAddOrders: async (): Promise<boolean> => {
+    const pendingOrders = get().pendingBusinessOrders
+    const pendingOrdersCopy = structuredClone(pendingOrders)
+    const MARKET_DEMAND = 10
+
+    // TO-DO FIX THIS FUNCTION to push products to pending orders in bulk
+
     const inventories = useInventories.getState().inventories
-    const PRODUCT_DEMAND = 1
+    const ordersToPush = []
+    console.log(inventories)
+    // for (let i = 0; i < MARKET_DEMAND; i++) {
+    //   for (const [businessId, businessInventoryObject] of Object.entries(
+    //   inventories,
+    // )) {
+    //   console.log('obj', businessInventoryObject)
+    //   Object.entries(businessInventoryObject).forEach(([key, obj]) => {
+    //     if (key in PRODUCTS_CATALOG) {
+    //       ordersToPush.push(key)
+    //     }
+    //   })
+    // }
+    // }
+    
 
-    if (Object.keys(inventories).length === 0) {
-      return false
-    }
+    console.log('ordersToPush: ', ordersToPush)
 
-    // 1. Collect data of orders to process
-    const ordersToProcess: { inventoryKey: string; productId: string }[] = []
+    return true
+    // const inventories = useInventories.getState().inventories
+    // const PRODUCT_DEMAND = 10
 
-    for (const [key, obj] of Object.entries(inventories)) {
-      for (const productId of Object.keys(obj)) {
-        if (productId in PRODUCTS_CATALOG && obj[productId] > 0) {
-          ordersToProcess.push({ inventoryKey: key, productId })
-        }
-      }
-    }
+    // if (Object.keys(inventories).length === 0) {
+    //   return false
+    // }
 
-    if (ordersToProcess.length === 0) {
-      return false
-    }
+    // // 1. Collect data of orders to process
+    // const ordersToProcess: { inventoryKey: string; productId: string }[] = []
 
-    // 2. Apply the PRODUCT_DEMAND limit
-    const limitedOrders = ordersToProcess.slice(0, PRODUCT_DEMAND)
+    // for (const [key, obj] of Object.entries(inventories)) {
+    //   for (const productId of Object.keys(obj)) {
+    //     if (productId in PRODUCTS_CATALOG && obj[productId] > 0) {
+    //       ordersToProcess.push({ inventoryKey: key, productId })
+    //     }
+    //   }
+    // }
 
-    // 3. Execute the promises
-    const promises = limitedOrders.map(async (order) => {
-      return get()
-        .addOrder(order.inventoryKey, order.productId)
-        .catch((error) =>
-          console.error(`Error in the order ${order.productId}:`, error),
-        )
-    })
+    // if (ordersToProcess.length === 0) {
+    //   return false
+    // }
 
-    try {
-      await Promise.allSettled(promises)
-      console.log('All the valid orders have been processed')
-      return true
-    } catch (error) {
-      console.error('Error during processAddOrders:', error)
-      return false
-    }
+    // console.log(ordersToProcess)
+
+    // // 2. Apply the PRODUCT_DEMAND limit
+    // const limitedOrders = ordersToProcess.slice(0, PRODUCT_DEMAND)
+
+    // // 3. Execute the promises
+    // const promises = limitedOrders.map(async (order) => {
+    //   return get()
+    //     .addOrder(order.inventoryKey, order.productId)
+    //     .catch((error) =>
+    //       console.error(`Error in the order ${order.productId}:`, error),
+    //     )
+    // })
+
+    // try {
+    //   await Promise.allSettled(promises)
+    //   console.log('All the valid orders have been put in the pending orders list')
+    //   return true
+    // } catch (error) {
+    //   console.error('Error during processAddOrders:', error)
+    //   return false
+    // }
   },
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => {
     set(() => ({ pendingBusinessOrders: savedPendingBusinessOrders }))
