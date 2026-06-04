@@ -4,7 +4,8 @@ import { db } from '#/db/initDb'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 import { useInventories, updateDbInventories } from './inventories'
 import { useMoney, updateDbMoney } from './currency'
-import { BUSINESS_CATALOG } from '#/db/businessList'
+import { useEmployees } from './employees'
+import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 const updateDbOrders = async (
   newPendingBusinessOrders: Record<string, string[]>,
@@ -83,11 +84,10 @@ export const useOrders = create<OrdersState>((set, get) => ({
     }
   },
   processAllOrdersBulk: async (): Promise<boolean> => {
-    // 1. FOTOGRAFIA (Clonazione Profonda)
-    // structuredClone taglia tutti i ponti con lo stato originale di Zustand
+    // 1. Deep clonation
+    // structuredClone cuts all the ties with the zustand original state
     const pendingOrders = get().pendingBusinessOrders
     const pendingOrdersCopy = structuredClone(pendingOrders)
-    const currentMoney = useMoney.getState().money
 
     const inventories = useInventories.getState().inventories
     const inventoriesCopy = structuredClone(inventories)
@@ -96,8 +96,31 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     // 2. Transaction processing
     for (const [businessId, arr] of Object.entries(pendingOrders)) {
+      const businessEmployees = useEmployees
+        .getState()
+        .getBusinessEmployees(businessId)
+
+      // TO-DO: logic to limiti order processing to combined selling workrate of business employees
+      let combinedSellingWorkRate = 0
+      for (const employee of businessEmployees) {
+        combinedSellingWorkRate += EMPLOYEES_CATALOG[employee].workRate.selling
+      }
+      console.log(combinedSellingWorkRate)
+
+      if (combinedSellingWorkRate <= 0) {
+        continue
+      }
+
+      let ordersProcessedThisTick = 0
+
       // eslint-disable-next-line @typescript-eslint/prefer-for-of
       for (let i = 0; i < arr.length; i++) {
+        // Employee workrate lock
+        // interrupt the loop when the combined workrate of employees has been reached
+        if (ordersProcessedThisTick >= combinedSellingWorkRate) {
+          break
+        }
+
         const item = arr[i]
 
         // Fallback if the item does not exist in the dictionary
@@ -115,9 +138,11 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
           // C. Accumulate the profits
           totalMoneyEarned += PRODUCTS_CATALOG[item].baseSellingPrice
+
+          ordersProcessedThisTick++
         } else {
           // Bottleneck: no resources
-          console.log(`Finishes the resources for ${item}. Order skipped.`)
+          console.log(`Finished the resources for ${item}. Order skipped.`)
           // continue: go to the next order in the queue
           continue
         }
@@ -129,7 +154,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
       return false
     }
 
-    set(() => ({pendingBusinessOrders: pendingOrdersCopy}))
+    set(() => ({ pendingBusinessOrders: pendingOrdersCopy }))
     useInventories.getState().hydrateInventories(inventoriesCopy)
     useMoney.getState().increaseMoneyMemory(totalMoneyEarned)
 
@@ -137,11 +162,11 @@ export const useOrders = create<OrdersState>((set, get) => ({
       await Promise.all([
         updateDbOrders(pendingOrdersCopy),
         updateDbMoney(useMoney.getState().money),
-        updateDbInventories(inventoriesCopy)
+        updateDbInventories(inventoriesCopy),
       ])
       return true
     } catch (error) {
-      set(() => ({pendingBusinessOrders: pendingOrders}))
+      set(() => ({ pendingBusinessOrders: pendingOrders }))
       useInventories.getState().hydrateInventories(inventories)
       useMoney.getState().decreaseMoney(totalMoneyEarned)
       return false
