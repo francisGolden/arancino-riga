@@ -57,19 +57,25 @@ export const GameClock = () => {
   }, [lastSavedAt, db.data.lastSavedAt])
 
   useEffect(() => {
+    let timeoutId: number
 
-    const intervalId: number = window.setInterval(async (): Promise<void> => {
+    const run = async (): Promise<void> => {
       await useInventories.getState().processProductCrafting()
       await useOrders.getState().processAllOrdersBulk()
-      // await useOrders.getState().processPendingOrders()
-    }, 5000)
+      timeoutId = window.setTimeout(run, 5000)
+    }
 
-    return () => window.clearInterval(intervalId)
+    timeoutId = window.setTimeout(run, 5000)
+    return () => window.clearTimeout(timeoutId)
   }, [])
 
   return (
-    <span> Last saved
-    at: {lastSavedAt ? new Date(lastSavedAt).toLocaleString() : new Date(db.data.lastSavedAt).toLocaleString()}
+    <span>
+      {' '}
+      Last saved at:{' '}
+      {lastSavedAt
+        ? new Date(lastSavedAt).toLocaleString()
+        : new Date(db.data.lastSavedAt).toLocaleString()}
     </span>
   )
 }
