@@ -140,7 +140,5 @@ export interface OrdersState {
   processAllOrdersBulk: () => Promise<boolean>
   addOrder: (businessId: string, productId: string) => Promise<boolean>
   processAddOrders: () => Promise<boolean>
-  fulfillOrder: (businessId: string, productId: string) => Promise<boolean>
-  processPendingOrders: () => Promise<boolean>
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => void
 }

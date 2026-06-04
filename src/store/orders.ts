@@ -94,52 +94,44 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     let totalMoneyEarned = 0
 
-    // 2. CALCOLO DELLA TRANSAZIONE
+    // 2. Transaction processing
     for (const [businessId, arr] of Object.entries(pendingOrders)) {
-      // Usiamo un ciclo for standard invece del forEach
       // eslint-disable-next-line @typescript-eslint/prefer-for-of
       for (let i = 0; i < arr.length; i++) {
         const item = arr[i]
 
-        // Aggiungiamo un fallback a || 0 nel caso l'item non esista affatto nel dizionario
+        // Fallback if the item does not exist in the dictionary
         const itemAvailableAmount = inventoriesCopy[businessId][item] || 0
 
         if (itemAvailableAmount > 0) {
-          // A. Scaliamo l'inventario locale
+          // A. Reduce local inventory item
           inventoriesCopy[businessId][item] -= 1
 
-          // B. Rimuoviamo ESATTAMENTE UN ordine dalla coda locale
+          // B. Remove an order from the local queue
           const orderIndex = pendingOrdersCopy[businessId].indexOf(item)
           if (orderIndex > -1) {
             pendingOrdersCopy[businessId].splice(orderIndex, 1)
           }
 
-          // C. Accumuliamo i ricavi
+          // C. Accumulate the profits
           totalMoneyEarned += PRODUCTS_CATALOG[item].baseSellingPrice
         } else {
-          // Il collo di bottiglia! Non ho risorse per questo specifico ordine.
-          console.log(`Risorse esaurite per ${item}. Ordine saltato.`)
-          // Usiamo 'continue' per passare al prossimo ordine nella coda,
-          // perché magari non ho vaniglia, ma ho risorse per l'ordine successivo di cioccolato!
+          // Bottleneck: no resources
+          console.log(`Finishes the resources for ${item}. Order skipped.`)
+          // continue: go to the next order in the queue
           continue
         }
       }
     }
 
     if (totalMoneyEarned === 0) {
-      console.log('Nessun ordine evaso in questo ciclo.')
+      console.log('No order fulfilled in this cycle')
       return false
     }
 
-    console.log('Nuovo inventario pronto:', inventoriesCopy)
-    console.log('Nuova coda ordini pronta:', pendingOrdersCopy)
-    console.log('Totale da incassare:', totalMoneyEarned)
-
-    // TODO: Manca la Fase 3! (Il set() di Zustand)
     set(() => ({pendingBusinessOrders: pendingOrdersCopy}))
     useInventories.getState().hydrateInventories(inventoriesCopy)
     useMoney.getState().increaseMoneyMemory(totalMoneyEarned)
-    // TODO: Manca la Fase 4! (Il salvataggio su DB e il try...catch per il rollback)
 
     try {
       await Promise.all([
@@ -196,97 +188,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
       return true
     } catch (error) {
       console.error('Error during processAddOrders:', error)
-      return false
-    }
-  },
-  fulfillOrder: async (
-    businessId: string,
-    productId: string,
-  ): Promise<boolean> => {
-    // TODO: find out why there is an issue when dealing with several business orders added both automatically and manually
-    // Not sure if the bug originates from this function or not.
-
-    // TODO: the orders should not be fulfilled if there are no workers to sell them
-    const businessOrders = get().getPendingBusinessOrders(businessId)
-    const newBusinessOrders = [...businessOrders]
-    let toRemoveIndex = 0
-
-    for (let i = 0; i < newBusinessOrders.length; i++) {
-      if (newBusinessOrders[i] === productId) {
-        toRemoveIndex = i
-        break
-      }
-    }
-
-    newBusinessOrders.splice(toRemoveIndex, 1)
-
-    const pendingBusinessOrders = get().pendingBusinessOrders
-    const newPendingBusinessOrders = {
-      ...pendingBusinessOrders,
-      [businessId]: newBusinessOrders,
-    }
-    set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
-
-    try {
-      await updateDbOrders(newPendingBusinessOrders)
-      useInventories
-        .getState()
-        .sellBusinessItem(
-          productId,
-          PRODUCTS_CATALOG[productId].baseSellingPrice,
-          businessId,
-        )
-      return true
-    } catch (error) {
-      set(() => ({ pendingBusinessOrders }))
-      console.error('could not fulfill order', error)
-      return false
-    }
-  },
-  processPendingOrders: async (): Promise<boolean> => {
-    const pendingBusinessOrders = get().pendingBusinessOrders
-
-    let pendingOrdersNumber = 0
-    Object.entries(pendingBusinessOrders).forEach(([businessId, orders]) => {
-      orders.forEach(() => {
-        pendingOrdersNumber += 1
-      })
-    })
-
-    if (pendingOrdersNumber === 0) {
-      return false
-    }
-
-    const pendingOrdersList: { businessId: string; order: string }[] = []
-    Object.entries(pendingBusinessOrders).forEach(([businessId, orders]) => {
-      const businessOrderRate =
-        BUSINESS_CATALOG.find((business) => business.id === businessId)
-          ?.baseOrderRate || 1
-      const ordersToProcess = orders.slice(0, businessOrderRate)
-      ordersToProcess.forEach((order) => {
-        pendingOrdersList.push({ businessId, order })
-      })
-    })
-
-    const myPromisesArray = pendingOrdersList.map(
-      async ({ businessId, order }) => {
-        return get()
-          .fulfillOrder(businessId, order)
-          .then((fulfilledOrder) => {
-            return fulfilledOrder
-          })
-          .catch((error) => {
-            console.error(`Errore nell'ordine per ${businessId}:`, error)
-            return false
-          })
-      },
-    )
-
-    try {
-      await Promise.allSettled(myPromisesArray)
-      return true
-    } catch (error) {
-      console.error('could not settle all order promises')
       return false
     }
   },
