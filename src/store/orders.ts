@@ -84,165 +84,34 @@ export const useOrders = create<OrdersState>((set, get) => ({
     }
   },
   processAllOrdersBulk: async (): Promise<boolean> => {
-    // TODO: FIX ORDERS REMAINING IN THE PENDING ORDER LIST BUT NOT BEING FULFILLED 
+    // This function processes a certain amount of orders present in the pendingBusinessOrders list
+    // The amount of orders is defined by the capacity of the workforce, namely the combined selling workrate
+    // of employees working for the business
+
     return true
-    
-    
-    // // 1. Deep clonation
-    // // structuredClone cuts all the ties with the zustand original state
-    // const pendingOrders = get().pendingBusinessOrders
-    // const pendingOrdersCopy = structuredClone(pendingOrders)
-
-    // const inventories = useInventories.getState().inventories
-    // const inventoriesCopy = structuredClone(inventories)
-
-    // console.log('pending orders copy', pendingOrdersCopy)
-    
-
-    // let totalMoneyEarned = 0
-
-    // // 2. Transaction processing
-    // for (const [businessId, arr] of Object.entries(pendingOrders)) {
-    //   console.log('current inventory of the busines', inventories[businessId])
-    //   const businessEmployees = useEmployees
-    //     .getState()
-    //     .getBusinessEmployees(businessId)
-
-    //   let combinedSellingWorkRate = 0
-    //   for (const employee of businessEmployees) {
-    //     combinedSellingWorkRate += EMPLOYEES_CATALOG[employee].workRate.selling
-    //   }
-    //   console.log(combinedSellingWorkRate)
-
-    //   if (combinedSellingWorkRate <= 0) {
-    //     continue
-    //   }
-
-    //   let ordersProcessedThisTick = 0
-
-    //   // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    //   for (let i = 0; i < arr.length; i++) {
-    //     // Employee workrate lock
-    //     // interrupt the loop when the combined workrate of employees has been reached
-    //     if (ordersProcessedThisTick >= combinedSellingWorkRate) {
-    //       break
-    //     }
-
-    //     const item = arr[i]
-
-    //     // Fallback if the item does not exist in the dictionary
-    //     const itemAvailableAmount = inventoriesCopy[businessId][item] || 0
-
-    //     if (itemAvailableAmount > 0) {
-    //       // A. Reduce local inventory item
-    //       inventoriesCopy[businessId][item] -= 1
-
-    //       // B. Remove an order from the local queue
-    //       const orderIndex = pendingOrdersCopy[businessId].indexOf(item)
-    //       if (orderIndex > -1) {
-    //         pendingOrdersCopy[businessId].splice(orderIndex, 1)
-    //       }
-
-    //       // C. Accumulate the profits
-    //       totalMoneyEarned += PRODUCTS_CATALOG[item].baseSellingPrice
-
-    //       ordersProcessedThisTick++
-    //     } else {
-    //       // Bottleneck: no resources
-    //       console.log(`Finished the resources for ${item}. Order skipped.`)
-    //       // continue: go to the next order in the queue
-    //       continue
-    //     }
-    //   }
-    // }
-
-    // if (totalMoneyEarned === 0) {
-    //   console.log('No order fulfilled in this cycle')
-    //   return false
-    // }
-
-    // set(() => ({ pendingBusinessOrders: pendingOrdersCopy }))
-    // useInventories.getState().hydrateInventories(inventoriesCopy)
-    // useMoney.getState().increaseMoneyMemory(totalMoneyEarned)
-
-    // try {
-    //   await Promise.all([
-    //     updateDbOrders(pendingOrdersCopy),
-    //     updateDbMoney(useMoney.getState().money),
-    //     updateDbInventories(inventoriesCopy),
-    //   ])
-    //   return true
-    // } catch (error) {
-    //   set(() => ({ pendingBusinessOrders: pendingOrders }))
-    //   useInventories.getState().hydrateInventories(inventories)
-    //   useMoney.getState().decreaseMoney(totalMoneyEarned)
-    //   return false
-    // }
   },
   processAddOrders: async (): Promise<boolean> => {
-    // 1. FOTOGRAFIA INIZIALE
-    const pendingOrders = get().pendingBusinessOrders
-    const pendingOrdersCopy = structuredClone(pendingOrders)
-    const MARKET_DEMAND = 7
-    const MAX_QUEUE_SIZE = 20
-    const inventories = useInventories.getState().inventories
+    // This function pushes a certain amount of products present in all businesses inventories to the pendingBusinessOrders list,
+    // where they'll be processes.
+    // The amount of products that can be pushed in the list of business pending orders is set by the MARKET_DEMAND variable.
 
-    // 2. CALCOLO IN MEMORIA (Nessun set() qui dentro!)
-    for (const [businessId, businessInventoryObject] of Object.entries(
-      inventories,
-    )) {
-      // Safety: garantiamo che la coda esista per questo locale
-      pendingOrdersCopy[businessId] ??= []
+    console.log('business inventories')
+    const inventories = structuredClone(useInventories.getState().inventories)
+    const businessIDs = Object.keys(inventories)
 
-      const availableSlots =
-        MAX_QUEUE_SIZE - pendingOrdersCopy[businessId].length
-      if (availableSlots <= 0) {
-        console.log('La coda è troppo lunga, i clienti se ne vanno!')
-        continue
-      }
-
-      // Filtriamo per trovare SOLO i prodotti finiti che abbiamo fisicamente in vetrina
-      const availableProductsInDisplay = Object.keys(
-        businessInventoryObject,
-      ).filter(
-        (key) => key in PRODUCTS_CATALOG && businessInventoryObject[key] > 0,
-      )
-
-      // Se non abbiamo niente da vendere in questo locale, passiamo al prossimo
-      if (availableProductsInDisplay.length === 0) continue
-
-      // RNG: Generiamo clienti casuali fino alla domanda di mercato o agli slot disponibili
-      const ordersToGenerate = Math.min(MARKET_DEMAND, availableSlots)
-      let businessOrdersProcessed = 0
-
-      while (businessOrdersProcessed < ordersToGenerate) {
-        const randomProductIndex = Math.floor(
-          Math.random() * availableProductsInDisplay.length,
-        )
-        const randomProduct = availableProductsInDisplay[randomProductIndex]
-        pendingOrdersCopy[businessId].push(randomProduct)
-        businessOrdersProcessed++
-      }
-
-      console.log(
-        `Nuovi ordini misti per ${businessId}:`,
-        pendingOrdersCopy[businessId],
-      )
+    for (const businessID of businessIDs) {
+      console.log('Business', businessID)
+      console.log('which of these items are products?')
+      const products = Object.keys(inventories[businessID])
+        .filter((item) => item in PRODUCTS_CATALOG)
+        .map((item) => {
+          return { productID: item, amount: inventories[businessID][item] }
+        })
+      console.log(products)
+      console.log('---------')
     }
 
-    // 3. SINGOLO AGGIORNAMENTO DI STATO (Fuori dal loop!)
-    set(() => ({ pendingBusinessOrders: pendingOrdersCopy }))
-
-    // 4. SALVATAGGIO SU DB E ROLLBACK
-    try {
-      await updateDbOrders(pendingOrdersCopy)
-      console.log('Generazione domanda completata e salvata con successo.')
-      return true
-    } catch (error) {
-      console.error('Errore di rete durante il salvataggio della coda:', error)
-      set(() => ({ pendingBusinessOrders: pendingOrders })) // Rollback istantaneo
-      return false
-    }
+    return true
   },
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => {
     set(() => ({ pendingBusinessOrders: savedPendingBusinessOrders }))

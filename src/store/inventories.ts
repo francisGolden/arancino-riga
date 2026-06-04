@@ -122,7 +122,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         if (allowedItem in PRODUCTS_CATALOG) {
           const recipeObj =
             Object.entries(RECIPE_CATALOG).find(
-              ([key, obj]) => obj.productId === allowedItem,
+              ([_, obj]) => obj.productId === allowedItem,
             ) || []
           const requiredRole: any = recipeObj[1]?.requiredRole
           const recipeName: any = recipeObj[0]
