@@ -49,12 +49,12 @@ export const GameClock = () => {
   }, [])
 
   // offline progress useEffect
-  useEffect(() => {
-    const savedAt = lastSavedAt || db.data.lastSavedAt
-    if (!savedAt || offlineProgressStatus === 'done') return // not hydrated yet
-    const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
-    useLoop.getState().processOfflineProgress(offlineDelta)
-  }, [lastSavedAt, db.data.lastSavedAt])
+  // useEffect(() => {
+  //   const savedAt = lastSavedAt || db.data.lastSavedAt
+  //   if (!savedAt || offlineProgressStatus === 'done') return // not hydrated yet
+  //   const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
+  //   useLoop.getState().processOfflineProgress(offlineDelta)
+  // }, [lastSavedAt, db.data.lastSavedAt])
 
   useEffect(() => {
     let timeoutId: number
