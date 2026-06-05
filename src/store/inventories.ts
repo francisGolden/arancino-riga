@@ -104,8 +104,98 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
   },
+  craftBusinessProductsForBulk: async (
+    recipeItemId: string,
+    businessId: string,
+    allowedItems: string[],
+    requiredRole: EmployeeRole,
+  ): Promise<boolean> => {
+    const itemId = RECIPE_CATALOG[recipeItemId].productId
+
+    let checkAllowedItems = false
+    for (const item of allowedItems) {
+      if (item === itemId) {
+        checkAllowedItems = true
+      }
+    }
+
+    if (!checkAllowedItems) {
+      console.log('item not allowed to be crafted for this business')
+      return false
+    }
+
+    let checkRequiredEmployeeRoles = false
+    // Preparation for Employee crafting
+    const businessEmployees =
+      useEmployees.getState().businessEmployees[businessId]
+    for (const employee of businessEmployees) {
+      if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
+        if (EMPLOYEES_CATALOG[employee].roles.includes(requiredRole)) {
+          checkRequiredEmployeeRoles = true
+        }
+      }
+    }
+
+    if (!checkRequiredEmployeeRoles) {
+      console.log('we cannot make this recipe with the current workforce')
+      return false
+    }
+
+    const ingredients = RECIPE_CATALOG[recipeItemId].ingredients
+    const yieldAmount = RECIPE_CATALOG[recipeItemId].yieldAmount
+
+    const currentInventories = get().inventories
+
+    const inventoriesCopy = {
+      ...currentInventories,
+      [businessId]: { ...currentInventories[businessId] },
+    }
+
+    const iterableRecipeIngredients = Object.entries(ingredients)
+
+    // look up if the business has enough ingredients
+    let checkIngredients = true
+    for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+      const amountHad = inventoriesCopy[businessId][ingredientId] || 0
+      if (!amountHad || amountHad < amountNeeded) {
+        checkIngredients = false
+      }
+    }
+
+    if (!checkIngredients) {
+      return false
+    }
+
+    // remove ingredients from inventory
+    for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+      inventoriesCopy[businessId][ingredientId] -= amountNeeded
+    }
+
+    const currentAmount = inventoriesCopy[businessId][itemId] || 0
+    inventoriesCopy[businessId][itemId] = currentAmount + yieldAmount
+
+    console.log('hi')
+
+    return true
+
+    // set(() => ({ inventories: inventoriesCopy }))
+
+    // // Update the db
+    // try {
+    //   await updateDbInventories(inventoriesCopy)
+    //   return true
+    // } catch (error) {
+    //   console.error('could not update inventories with crafted item')
+    //   // revert state on failure
+    //   set(() => ({ inventories: currentInventories }))
+    //   return false
+    // }
+  },
   processProductCrafting: async (): Promise<boolean> => {
-    // TODO: IMPROVE TYPE SAFETY & explain the logic with comments
+    // TODO: improve type safety
+    // TODO: refactor following the other 'process' functions
+    // TODO: explain the logic with comments
+
     const inventories = get().inventories
     const productsToCraft: {
       recipeName: string
@@ -141,27 +231,30 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
-    const myPromisesArray = productsToCraft.map(
-      async ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
-        return get()
-          .craftBusinessProduct(
-            recipeName,
-            businessId,
-            businessAllowedItems,
-            requiredRole,
-          )
-          .then((result) => result)
-          .catch((error) => console.error(error))
-      },
-    )
+    
+    return true
 
-    try {
-      await Promise.allSettled(myPromisesArray)
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+    // const myPromisesArray = productsToCraft.map(
+    //   async ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
+    //     return get()
+    //       .craftBusinessProduct(
+    //         recipeName,
+    //         businessId,
+    //         businessAllowedItems,
+    //         requiredRole,
+    //       )
+    //       .then((result) => result)
+    //       .catch((error) => console.error(error))
+    //   },
+    // )
+
+    // try {
+    //   await Promise.allSettled(myPromisesArray)
+    //   return true
+    // } catch (error) {
+    //   console.error(error)
+    //   return false
+    // }
   },
   buyRecipeIngredients: async (
     recipeName: string,

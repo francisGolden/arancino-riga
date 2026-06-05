@@ -12,8 +12,8 @@ export interface GameDb {
 export type EmployeeRole = 'cook' | 'cashier' | 'barista' | 'pastry chef'
 
 export interface WorkRate {
-  crafting: number;
-  selling: number;
+  crafting: number
+  selling: number
 }
 
 export interface EmployeeConfig {
@@ -23,7 +23,7 @@ export interface EmployeeConfig {
   description: string
   baseWage: number
   preferredBusinessTypes: BusinessType[]
-  workRate: WorkRate;
+  workRate: WorkRate
 }
 
 export interface ElapsedTimeResult {
@@ -80,6 +80,12 @@ export interface InventoryState {
 export interface InventoriesState {
   inventories: Record<string, Record<string, number>>
   craftBusinessProduct: (
+    recipeItemId: string,
+    businessId: string,
+    allowedItems: string[],
+    requiredRole: EmployeeRole,
+  ) => Promise<boolean>
+  craftBusinessProductsForBulk: (
     recipeItemId: string,
     businessId: string,
     allowedItems: string[],
