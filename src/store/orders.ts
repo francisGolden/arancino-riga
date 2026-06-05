@@ -96,7 +96,9 @@ export const useOrders = create<OrdersState>((set, get) => ({
       get().pendingBusinessOrders,
     )
 
-    const oldInventories = structuredClone(useInventories.getState().inventories)
+    const oldInventories = structuredClone(
+      useInventories.getState().inventories,
+    )
 
     const inventoriesCopy = structuredClone(
       useInventories.getState().inventories,
@@ -107,12 +109,11 @@ export const useOrders = create<OrdersState>((set, get) => ({
     let totalMoneyEarned = 0
 
     for (const businessID of businessIDs) {
-      console.log(pendingBusinessOrdersCopy[businessID])
-
       // What is the combined selling workrate of the people working for this business?
       let combinedSellingWorkrate = 0
       const businessEmployees =
         useEmployees.getState().businessEmployees[businessID]
+
       for (const businessEmployee of businessEmployees) {
         combinedSellingWorkrate +=
           EMPLOYEES_CATALOG[businessEmployee].workRate.selling
@@ -131,11 +132,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
       for (const productSold of productsSold) {
         totalMoneyEarned += PRODUCTS_CATALOG[productSold].baseSellingPrice
-      }
-
-      // console.log('new pending orders for this business: ', pendingBusinessOrdersCopy[businessID])
-      // console.log('products removed: ', productsSold)
-      for (const productSold of productsSold) {
         if (inventoriesCopy[businessID][productSold]) {
           inventoriesCopy[businessID][productSold]--
         }
@@ -182,6 +178,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const MARKET_DEMAND = 10
     const ORDERS_LIMIT = 7
 
+    // Loop over the business inventories
     for (const businessID of businessIDs) {
       const products = Object.keys(inventories[businessID])
         .filter((item) => item in PRODUCTS_CATALOG)
@@ -195,17 +192,18 @@ export const useOrders = create<OrdersState>((set, get) => ({
       const oldPendingBusinessOrdersLength =
         pendingBusinessOrdersCopy[businessID].length
 
-      // TO-DO: check that we are adding to the pending list what is available in the inventory and not more
+
+      // Loop over the products available in the inventory of this business
       for (const product of products) {
+        // Push as many available as possible to the productsToPush array.
+        // The limit that should not be overtaken 
+        // taking into account the sum of products already present in the pendingBusinessOrders array and the productsToPush array
+        // is set by the ORDERS_LIMIT
         while (productsPushedCounter < MARKET_DEMAND && product.amount > 0) {
           if (
             oldPendingBusinessOrdersLength + productsToPush.length >=
             ORDERS_LIMIT
           ) {
-            console.log(
-              'cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle',
-              businessID,
-            )
             break
           }
           productsPushedCounter++
@@ -214,14 +212,19 @@ export const useOrders = create<OrdersState>((set, get) => ({
         }
       }
 
+      // The ordersToAdd's property of each business is populated with products that will be pushed into its pending orders list
       ordersToAdd[businessID] = productsToPush
 
+      // Here we are setting each business' pending business orders array
+      // as the sum of the current pending orders and the orders to add
+      // using the spread operator
       pendingBusinessOrdersCopy[businessID] = [
         ...pendingBusinessOrdersCopy[businessID],
         ...ordersToAdd[businessID],
       ]
     }
 
+    // Update the global pendingBusinessOrders state with the new values
     set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
 
     try {
