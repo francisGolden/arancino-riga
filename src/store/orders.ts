@@ -107,7 +107,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const ordersToAdd: Record<string, string[]> = {}
 
     const MARKET_DEMAND = 10
-    const ORDERS_LIMIT = 30
+    const ORDERS_LIMIT = 7
 
     for (const businessID of businessIDs) {
       const products = Object.keys(inventories[businessID])
@@ -119,16 +119,19 @@ export const useOrders = create<OrdersState>((set, get) => ({
       let productsPushedCounter = 0
       const productsToPush: string[] = []
 
+      const oldPendingBusinessOrdersLength =
+        pendingBusinessOrdersCopy[businessID].length
+
       // TO-DO: check that we are adding to the pending list what is available in the inventory and not more
       for (const product of products) {
         while (productsPushedCounter < MARKET_DEMAND && product.amount > 0) {
           if (
-            pendingBusinessOrdersCopy[businessID].length +
-              productsToPush.length >
+            oldPendingBusinessOrdersLength + productsToPush.length >=
             ORDERS_LIMIT
           ) {
             console.log(
-              'cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle', businessID
+              'cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle',
+              businessID,
             )
             break
           }
@@ -137,21 +140,14 @@ export const useOrders = create<OrdersState>((set, get) => ({
           productsToPush.push(product['productID'])
         }
       }
-      console.log('ordersToAdd check', ordersToAdd)
 
       ordersToAdd[businessID] = productsToPush
+
       pendingBusinessOrdersCopy[businessID] = [
         ...pendingBusinessOrdersCopy[businessID],
         ...ordersToAdd[businessID],
       ]
     }
-
-    // for (const businessID of businessIDs) {
-    //   pendingBusinessOrdersCopy[businessID] = [
-    //     ...pendingBusinessOrdersCopy[businessID],
-    //     ...ordersToAdd[businessID],
-    //   ]
-    // }
 
     set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
 
