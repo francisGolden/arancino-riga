@@ -98,27 +98,38 @@ export const useOrders = create<OrdersState>((set, get) => ({
     console.log('business inventories')
     const inventories = structuredClone(useInventories.getState().inventories)
     const businessIDs = Object.keys(inventories)
-    const pendingBusinessOrdersCopy = structuredClone(get().pendingBusinessOrders)
+    const oldPendingBusinessOrders = structuredClone(
+      get().pendingBusinessOrders,
+    )
+    const pendingBusinessOrdersCopy = structuredClone(
+      get().pendingBusinessOrders,
+    )
     const ordersToAdd: Record<string, string[]> = {}
 
     const MARKET_DEMAND = 10
     const ORDERS_LIMIT = 30
-    
 
     for (const businessID of businessIDs) {
-      
       const products = Object.keys(inventories[businessID])
         .filter((item) => item in PRODUCTS_CATALOG)
         .map((item) => {
           return { productID: item, amount: inventories[businessID][item] }
         })
-      console.log(products)
+
       let productsPushedCounter = 0
       const productsToPush: string[] = []
+
+      // TO-DO: check that we are adding to the pending list what is available in the inventory and not more
       for (const product of products) {
         while (productsPushedCounter < MARKET_DEMAND && product.amount > 0) {
-          if (pendingBusinessOrdersCopy[businessID].length + productsToPush.length > ORDERS_LIMIT) {
-            console.log('cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle')
+          if (
+            pendingBusinessOrdersCopy[businessID].length +
+              productsToPush.length >
+            ORDERS_LIMIT
+          ) {
+            console.log(
+              'cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle', businessID
+            )
             break
           }
           productsPushedCounter++
@@ -126,22 +137,32 @@ export const useOrders = create<OrdersState>((set, get) => ({
           productsToPush.push(product['productID'])
         }
       }
+      console.log('ordersToAdd check', ordersToAdd)
+
       ordersToAdd[businessID] = productsToPush
+      pendingBusinessOrdersCopy[businessID] = [
+        ...pendingBusinessOrdersCopy[businessID],
+        ...ordersToAdd[businessID],
+      ]
     }
 
-    for (const businessID of businessIDs) {
-      pendingBusinessOrdersCopy[businessID] = [...pendingBusinessOrdersCopy[businessID], ...ordersToAdd[businessID]]
-    }
+    // for (const businessID of businessIDs) {
+    //   pendingBusinessOrdersCopy[businessID] = [
+    //     ...pendingBusinessOrdersCopy[businessID],
+    //     ...ordersToAdd[businessID],
+    //   ]
+    // }
 
-    set(() => ({pendingBusinessOrders: pendingBusinessOrdersCopy}))
+    set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
 
     try {
       await updateDbOrders(pendingBusinessOrdersCopy)
+      return true
     } catch (error) {
       console.error(error)
+      set(() => ({ pendingBusinessOrders: oldPendingBusinessOrders }))
+      return false
     }
-
-    return true
   },
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => {
     set(() => ({ pendingBusinessOrders: savedPendingBusinessOrders }))
