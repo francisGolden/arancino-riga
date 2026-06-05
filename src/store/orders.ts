@@ -108,6 +108,7 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
     let totalMoneyEarned = 0
 
+    // Let's loop over the businessIDs of owned businesses
     for (const businessID of businessIDs) {
       // What is the combined selling workrate of the people working for this business?
       let combinedSellingWorkrate = 0
@@ -121,29 +122,39 @@ export const useOrders = create<OrdersState>((set, get) => ({
 
       let productsSoldCounter = 0
 
+      // We can only process as many products as the selling capacity of business' workers
       while (productsSoldCounter < combinedSellingWorkrate) {
         productsSoldCounter++
       }
 
+      // Let's gather the products that are going to be sold from the pending orders list of this business
       const productsSold = pendingBusinessOrdersCopy[businessID].splice(
         0,
         productsSoldCounter,
       )
 
+      // Here we are calculating the amount of money earned by selling these products
       for (const productSold of productsSold) {
         totalMoneyEarned += PRODUCTS_CATALOG[productSold].baseSellingPrice
+
+        // and decreasing the amount of this product in the inventory
         if (inventoriesCopy[businessID][productSold]) {
           inventoriesCopy[businessID][productSold]--
         }
       }
     }
 
+    // Let's set the global state with the new object,
     set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
+
+    // increase the money state
     useMoney.getState().increaseMoney(totalMoneyEarned)
+
+    // and update the inventories with the new object
     useInventories.getState().hydrateInventories(inventoriesCopy)
 
-    // TODO: remove items from inventories
-
+    // Here we are trying to update the DBs with the new data and
+    // reverting to the old state in case of error
     try {
       await Promise.all([
         updateDbOrders(pendingBusinessOrdersCopy),
