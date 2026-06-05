@@ -56,41 +56,41 @@ export const GameClock = () => {
   //   useLoop.getState().processOfflineProgress(offlineDelta)
   // }, [lastSavedAt, db.data.lastSavedAt])
 
-  useEffect(() => {
-    let timeoutId: number
+  // useEffect(() => {
+  //   let timeoutId: number
 
-    const run = async (): Promise<void> => {
-      await useInventories.getState().processProductCrafting()
-      timeoutId = window.setTimeout(run, 5000)
-    }
+  //   const run = async (): Promise<void> => {
+  //     await useInventories.getState().processProductCrafting()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
 
-    timeoutId = window.setTimeout(run, 5000)
-    return () => window.clearTimeout(timeoutId)
-  }, [])
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
 
-  useEffect(() => {
-    let timeoutId: number
+  // useEffect(() => {
+  //   let timeoutId: number
 
-    const run = async (): Promise<void> => {
-      await useOrders.getState().processAddOrders()
-      timeoutId = window.setTimeout(run, 5000)
-    }
+  //   const run = async (): Promise<void> => {
+  //     await useOrders.getState().processAddOrders()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
 
-    timeoutId = window.setTimeout(run, 5000)
-    return () => window.clearTimeout(timeoutId)
-  }, [])
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
 
-  useEffect(() => {
-    let timeoutId: number
+  // useEffect(() => {
+  //   let timeoutId: number
 
-    const run = async (): Promise<void> => {
-      await useOrders.getState().processAllOrdersBulk()
-      timeoutId = window.setTimeout(run, 5000)
-    }
+  //   const run = async (): Promise<void> => {
+  //     await useOrders.getState().processAllOrdersBulk()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
 
-    timeoutId = window.setTimeout(run, 5000)
-    return () => window.clearTimeout(timeoutId)
-  }, [])
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
 
   return (
     <span>

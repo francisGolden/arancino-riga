@@ -231,8 +231,29 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
+    productsToCraft.map(
+      async ({ recipeName, businessId, businessAllowedItems, requiredRole }) =>
+        get().craftBusinessProductsForBulk(
+          recipeName,
+          businessId,
+          businessAllowedItems,
+          requiredRole,
+        ),
+    )
+
+    console.log(productsToCraft)
+
+    // Ideally, I should call the craftBusinessProductsForBulk function and pass it the productsToCraft array.
+    // This because, when working with a lot of modifications to the DB, it makes sense to do it with a single 
+    // call than several ones for most purposes, otherwise it would be too costly and inefficient
     
+
+    
+
     return true
+
+    // The following is working code but it hits the DB for every product to craft, 
+    // which doesn't make a lot of sense in general
 
     // const myPromisesArray = productsToCraft.map(
     //   async ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
@@ -370,7 +391,10 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   ): Promise<void> => {
     const currentInventories = get().inventories
 
-    console.log("🔥 URRENT business INVENTORy 🔥", currentInventories[businessId])
+    console.log(
+      '🔥 URRENT business INVENTORy 🔥',
+      currentInventories[businessId],
+    )
     console.log('item to sell ID: ', id)
 
     if (currentInventories[businessId][id] > 0) {
