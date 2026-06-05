@@ -102,38 +102,44 @@ export const useOrders = create<OrdersState>((set, get) => ({
     const ordersToAdd: Record<string, string[]> = {}
 
     const MARKET_DEMAND = 10
+    const ORDERS_LIMIT = 30
+    
 
     for (const businessID of businessIDs) {
-      console.log('Business', businessID)
-      console.log('which of these items are products?')
+      
       const products = Object.keys(inventories[businessID])
         .filter((item) => item in PRODUCTS_CATALOG)
         .map((item) => {
           return { productID: item, amount: inventories[businessID][item] }
         })
       console.log(products)
-      console.log('I want to get ', MARKET_DEMAND, ' of these products into the pendingBusinessOrders list')
       let productsPushedCounter = 0
       const productsToPush: string[] = []
       for (const product of products) {
         while (productsPushedCounter < MARKET_DEMAND && product.amount > 0) {
+          if (pendingBusinessOrdersCopy[businessID].length + productsToPush.length > ORDERS_LIMIT) {
+            console.log('cannot add more orders to the pending orders list because we hit the ORDERS_LIMIT this business can handle')
+            break
+          }
           productsPushedCounter++
           product.amount -= 1
           productsToPush.push(product['productID'])
         }
       }
-    
       ordersToAdd[businessID] = productsToPush
-
-      console.log('---------')
     }
 
     for (const businessID of businessIDs) {
       pendingBusinessOrdersCopy[businessID] = [...pendingBusinessOrdersCopy[businessID], ...ordersToAdd[businessID]]
     }
 
-    console.log('new pending business orders', pendingBusinessOrdersCopy)
     set(() => ({pendingBusinessOrders: pendingBusinessOrdersCopy}))
+
+    try {
+      await updateDbOrders(pendingBusinessOrdersCopy)
+    } catch (error) {
+      console.error(error)
+    }
 
     return true
   },
