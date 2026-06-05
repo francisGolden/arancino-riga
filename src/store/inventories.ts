@@ -93,6 +93,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     set(() => ({ inventories: inventoriesCopy }))
 
+    // Update the db
     try {
       await updateDbInventories(inventoriesCopy)
       return true
@@ -104,7 +105,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
   },
   processProductCrafting: async (): Promise<boolean> => {
-    // TODO: IMPROVE TYPE SAFETY
+    // TODO: IMPROVE TYPE SAFETY & explain the logic with comments
     const inventories = get().inventories
     const productsToCraft: {
       recipeName: string

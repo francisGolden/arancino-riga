@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
-import { useLoop } from '#/store/offlineProgress'
+// import { useLoop } from '#/store/offlineProgress'
 import { useOrders } from '#/store/orders'
 import { db } from '#/db/initDb'
 import { useInventories } from '#/store/inventories'
@@ -13,7 +13,7 @@ export const GameClock = () => {
   const setTime = useTime((state) => state.setTime)
   const setLastSavedAt = useTime((state) => state.setLastSavedAt)
   const lastSavedAt = useTime((state) => state.time.lastSavedAt)
-  const offlineProgressStatus = useLoop((state) => state.offlineProgressStatus)
+  // const offlineProgressStatus = useLoop((state) => state.offlineProgressStatus)
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
