@@ -118,12 +118,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
           EMPLOYEES_CATALOG[businessEmployee].workRate.selling
       }
 
-      console.log(
-        'For this business I can process ',
-        combinedSellingWorkrate,
-        ' orders at a time',
-      )
-
       let productsSoldCounter = 0
 
       while (productsSoldCounter < combinedSellingWorkrate) {
@@ -172,8 +166,6 @@ export const useOrders = create<OrdersState>((set, get) => ({
     // This function pushes a certain amount of products present in all businesses inventories to the pendingBusinessOrders list,
     // where they'll be processes.
     // The amount of products that can be pushed in the list of business pending orders is set by the MARKET_DEMAND variable.
-
-    console.log('business inventories')
     const inventories = structuredClone(useInventories.getState().inventories)
 
     const oldPendingBusinessOrders = structuredClone(
