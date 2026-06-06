@@ -195,7 +195,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   },
   processProductCrafting: async (): Promise<boolean> => {
     // TODO: improve type safety
-    // TODO: refactor following the other 'process' functions
     // TODO: explain the logic with comments
 
     const inventories = get().inventories
@@ -235,49 +234,13 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
-    // productsToCraft.map(
-    //   async ({ recipeName, businessId, businessAllowedItems, requiredRole }) =>
-    //     get().craftBusinessProductsForBulk(
-    //       recipeName,
-    //       businessId,
-    //       businessAllowedItems,
-    //       requiredRole,
-    //     ),
-    // )
-
-    console.log('productsToCraft', productsToCraft)
-    get().craftBusinessProductsForBulk(productsToCraft)
-
-    // Ideally, I should call the craftBusinessProductsForBulk function and pass it the productsToCraft array.
-    // This because, when working with a lot of modifications to the DB, it makes sense to do it with a single
-    // call than several ones for most purposes, otherwise it would be too costly and inefficient
-
-    return true
-
-    // The following is working code but it hits the DB for every product to craft,
-    // which doesn't make a lot of sense in general
-
-    // const myPromisesArray = productsToCraft.map(
-    //   async ({ recipeName, businessId, businessAllowedItems, requiredRole }) => {
-    //     return get()
-    //       .craftBusinessProduct(
-    //         recipeName,
-    //         businessId,
-    //         businessAllowedItems,
-    //         requiredRole,
-    //       )
-    //       .then((result) => result)
-    //       .catch((error) => console.error(error))
-    //   },
-    // )
-
-    // try {
-    //   await Promise.allSettled(myPromisesArray)
-    //   return true
-    // } catch (error) {
-    //   console.error(error)
-    //   return false
-    // }
+    try {
+      await get().craftBusinessProductsForBulk(productsToCraft)
+      return true
+    } catch (error) {
+      console.error(error)
+      return false
+    }
   },
   buyRecipeIngredients: async (
     recipeName: string,
