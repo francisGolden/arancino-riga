@@ -120,10 +120,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     for (const {
       yieldAmount,
       productID,
-      recipeItemId,
       businessAllowedItems,
       requiredRole,
-      businessId,
+      businessID,
       ingredients,
     } of productsForBulkCrafting) {
       let checkAllowedItems = false
@@ -140,7 +139,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
       let checkRequiredEmployeeRoles = false
       const businessEmployees =
-        useEmployees.getState().businessEmployees[businessId]
+        useEmployees.getState().businessEmployees[businessID]
       for (const employee of businessEmployees) {
         if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
           if (EMPLOYEES_CATALOG[employee].roles.includes(requiredRole)) {
@@ -159,7 +158,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       // look up if the business has enough ingredients
       let checkIngredients = true
       for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
-        const amountHad = inventoriesCopy[businessId][ingredientId] || 0
+        const amountHad = inventoriesCopy[businessID][ingredientId] || 0
         if (!amountHad || amountHad < amountNeeded) {
           checkIngredients = false
         }
@@ -172,12 +171,12 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
       // remove ingredients from inventory
       for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
-        inventoriesCopy[businessId][ingredientId] -= amountNeeded
+        inventoriesCopy[businessID][ingredientId] -= amountNeeded
       }
 
       // add product to business inventory
-      const currentAmount = inventoriesCopy[businessId][productID] || 0
-      inventoriesCopy[businessId][productID] = currentAmount + yieldAmount
+      const currentAmount = inventoriesCopy[businessID][productID] || 0
+      inventoriesCopy[businessID][productID] = currentAmount + yieldAmount
     }
 
     set(() => ({ inventories: inventoriesCopy }))
@@ -194,39 +193,43 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
   },
   processProductCrafting: async (): Promise<boolean> => {
-    // TODO: improve type safety
-    // TODO: explain the logic with comments
-
     const inventories = get().inventories
     const productsToCraft: ProductsForBulkCrafting[] = []
     const craftBusinessProductsForBulk = get().craftBusinessProductsForBulk
 
-    for (const value of Object.keys(inventories)) {
+    // Let's loop over the businessIDs, which are keys in the inventories record
+    for (const businessID of Object.keys(inventories)) {
+      // What are the items that this business can buy, craft and sell?
       const businessAllowedItems = BUSINESS_CATALOG.find(
-        (business) => business.id === value,
+        (business) => business.id === businessID,
       )?.allowedItems
-      const businessId = value
+
+      // Let's loop over the allowed items
       businessAllowedItems?.forEach((allowedItem) => {
+        // Let's consider only the items that are products
         if (allowedItem in PRODUCTS_CATALOG) {
-          const recipeObj =
-            Object.entries(RECIPE_CATALOG).find(
-              ([_, obj]) => obj.productId === allowedItem,
-            ) || []
-          const requiredRole: any = recipeObj[1]?.requiredRole
-          const productID: string = recipeObj[1]?.productId || ''
-          const yieldAmount: number = recipeObj[1]?.yieldAmount || 0
-          const ingredients: Record<string, number> =
-            recipeObj[1]?.ingredients || {}
-          const recipeItemId: any = recipeObj[0]
-          productsToCraft.push({
-            yieldAmount,
-            productID,
-            recipeItemId,
-            businessId,
-            businessAllowedItems,
-            requiredRole,
-            ingredients,
-          })
+
+          // Now we need to gather some informations about the product's recipe
+
+          const recipeObj = Object.entries(RECIPE_CATALOG).find(
+            ([_, obj]) => obj.productId === allowedItem,
+          )
+
+          if (recipeObj) {
+            const recipeItemId: string = recipeObj[0]
+            const {requiredRole, productId: productID, yieldAmount, ingredients} = recipeObj[1]
+
+            // Push this data as an object inside the productsToCraft array
+            productsToCraft.push({
+              yieldAmount,
+              productID,
+              recipeItemId,
+              businessID,
+              businessAllowedItems,
+              requiredRole,
+              ingredients,
+            })
+          }
         }
       })
     }
@@ -235,6 +238,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
 
+    // Update the DB
     try {
       await craftBusinessProductsForBulk(productsToCraft)
       return true

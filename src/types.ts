@@ -81,7 +81,7 @@ export interface ProductsForBulkCrafting {
   yieldAmount: number
   productID: string
   recipeItemId: string
-  businessId: string
+  businessID: string
   businessAllowedItems: string[]
   requiredRole: EmployeeRole
   ingredients: Record<string, number>
