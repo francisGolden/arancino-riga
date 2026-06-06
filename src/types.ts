@@ -77,6 +77,16 @@ export interface InventoryState {
   hydrateInventory: (savedInventory: Record<string, number>) => void
 }
 
+export interface ProductsForBulkCrafting {
+  yieldAmount: number
+  productID: string
+  recipeItemId: string
+  businessId: string
+  businessAllowedItems: string[]
+  requiredRole: EmployeeRole
+  ingredients: Record<string, number>
+}
+
 export interface InventoriesState {
   inventories: Record<string, Record<string, number>>
   craftBusinessProduct: (
@@ -85,12 +95,7 @@ export interface InventoriesState {
     allowedItems: string[],
     requiredRole: EmployeeRole,
   ) => Promise<boolean>
-  craftBusinessProductsForBulk: (
-    recipeItemId: string,
-    businessId: string,
-    allowedItems: string[],
-    requiredRole: EmployeeRole,
-  ) => Promise<boolean>
+  craftBusinessProductsForBulk: (productsToCraft: ProductsForBulkCrafting[]) => Promise<boolean>;
   processProductCrafting: () => Promise<boolean>
   buyRecipeIngredients: (
     recipeItemId: string,
