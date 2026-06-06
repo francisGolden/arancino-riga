@@ -81,7 +81,7 @@ export interface ProductsForBulkCrafting {
   yieldAmount: number
   productID: string
   recipeItemId: string
-  businessId: string
+  businessID: string
   businessAllowedItems: string[]
   requiredRole: EmployeeRole
   ingredients: Record<string, number>
@@ -95,7 +95,7 @@ export interface InventoriesState {
     allowedItems: string[],
     requiredRole: EmployeeRole,
   ) => Promise<boolean>
-  craftBusinessProductsForBulk: (productsToCraft: ProductsForBulkCrafting[]) => Promise<boolean>;
+  craftProductsInBulk: (productsToCraft: ProductsForBulkCrafting[]) => Promise<boolean>;
   processProductCrafting: () => Promise<boolean>
   buyRecipeIngredients: (
     recipeItemId: string,
