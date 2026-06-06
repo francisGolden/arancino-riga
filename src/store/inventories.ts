@@ -132,7 +132,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
           checkAllowedItems = true
         }
       }
-      console.log(checkAllowedItems)
+
       if (!checkAllowedItems) {
         console.log('item not allowed to be crafted for this business')
         continue
