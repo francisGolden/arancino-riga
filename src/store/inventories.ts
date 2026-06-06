@@ -26,6 +26,7 @@ export const updateDbInventories = async (
 
 export const useInventories = create<InventoriesState>((set, get) => ({
   inventories: {},
+  // The following function is used to craft a single product
   craftBusinessProduct: async (
     recipeItemId: string,
     businessId: string,
@@ -109,10 +110,10 @@ export const useInventories = create<InventoriesState>((set, get) => ({
       return false
     }
   },
-  craftBusinessProductsForBulk: async (
+  // The following function is used to craft products in bulk
+  craftProductsInBulk: async (
     productsForBulkCrafting: ProductsForBulkCrafting[],
   ): Promise<boolean> => {
-    console.log(productsForBulkCrafting)
     // How many of each items do I need to craft in bulk?
     const currentInventories = get().inventories
     const inventoriesCopy = structuredClone(currentInventories)
@@ -195,7 +196,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
   processProductCrafting: async (): Promise<boolean> => {
     const inventories = get().inventories
     const productsToCraft: ProductsForBulkCrafting[] = []
-    const craftBusinessProductsForBulk = get().craftBusinessProductsForBulk
+    const craftProductsInBulk = get().craftProductsInBulk
 
     // Let's loop over the businessIDs, which are keys in the inventories record
     for (const businessID of Object.keys(inventories)) {
@@ -240,7 +241,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     // Update the DB
     try {
-      await craftBusinessProductsForBulk(productsToCraft)
+      await craftProductsInBulk(productsToCraft)
       return true
     } catch (error) {
       console.error(error)
