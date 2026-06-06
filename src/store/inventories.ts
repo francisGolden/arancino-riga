@@ -199,6 +199,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     const inventories = get().inventories
     const productsToCraft: ProductsForBulkCrafting[] = []
+    const craftBusinessProductsForBulk = get().craftBusinessProductsForBulk
 
     for (const value of Object.keys(inventories)) {
       const businessAllowedItems = BUSINESS_CATALOG.find(
@@ -235,7 +236,7 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     try {
-      await get().craftBusinessProductsForBulk(productsToCraft)
+      await craftBusinessProductsForBulk(productsToCraft)
       return true
     } catch (error) {
       console.error(error)
