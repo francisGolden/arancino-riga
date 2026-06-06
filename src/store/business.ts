@@ -4,6 +4,7 @@ import { db } from '#/db/initDb'
 import { useMoney } from './currency'
 import { useInventories } from './inventories'
 import { useEmployees } from './employees'
+import { useOrders } from './orders'
 
 const updateDbBusiness = async (newCurrentBusinesses: string[]) => {
   try {
@@ -33,9 +34,11 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
 
     set(() => ({ ownedBusinesses: ownedBusinessesCopy }))
 
-    useInventories.getState().addBusinessToInventory(id)
-    useMoney.getState().decreaseMoney(cost)
 
+    console.log({moneyBeforeBuying: useMoney.getState().money, salePrice: cost, expectedNewMoney: useMoney.getState().money - cost})
+    useInventories.getState().addBusinessToInventory(id)
+    useOrders.getState().addBusinessToPendingBusinessOrders(id)
+    useMoney.getState().decreaseMoney(cost)
 
     try {
       await updateDbBusiness(ownedBusinessesCopy)
@@ -63,10 +66,15 @@ export const useBusiness = create<BusinessListState>((set, get) => ({
     )
 
     set(() => ({ ownedBusinesses: newOwnedBusinesses }))
+    console.log({moneyBeforeSelling: useMoney.getState().money, salePrice: cost, expectedNewMoney: useMoney.getState().money + cost})
     useMoney.getState().increaseMoney(cost)
+    useOrders.getState().removeBusinessFromOrders(id)
+    useInventories.getState().removeBusinessFromInventory(id)
+    
 
     try {
       await updateDbBusiness(newOwnedBusinesses)
+
       return true
     } catch (error) {
       set(() => ({ ownedBusinesses: currentOwnedBusinesses }))

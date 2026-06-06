@@ -13,7 +13,7 @@ export const useLoop = create<LoopState>((set, get) => ({
   processOfflineProgress: async (offlineDelta: number): Promise<boolean> => {
     const offlineProgressStatus = get().offlineProgressStatus
     if (offlineProgressStatus === 'processing') {
-      console.log('still processing...')
+      console.log('still processing  with offline delta date ...', offlineDelta)
       return false
     }
     if (offlineProgressStatus === 'done') {
@@ -22,7 +22,7 @@ export const useLoop = create<LoopState>((set, get) => ({
     }
 
     set(() => ({ offlineProgressStatus: 'processing' }))
-    console.log('start processing')
+    console.log('start processing with offline delta date ', offlineDelta)
 
     // offline processing simulation with promises
     const promises = [

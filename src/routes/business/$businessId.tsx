@@ -1,12 +1,14 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useInventories } from '#/store/inventories'
-import { INVENTORY_CATALOG } from '#/db/inventoryList'
+import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
+import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { useMoney } from '#/store/currency'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import type { EmployeeConfig, RecipeConfig } from '#/types'
 import { useBusiness } from '#/store/business'
 import { useEmployees } from '#/store/employees'
+import { useOrders } from '#/store/orders'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 export const Route = createFileRoute('/business/$businessId')({
@@ -53,18 +55,132 @@ function RouteComponent() {
     })
   }
 
+  const pendingBusinessOrders = useOrders(
+    (state) => state.pendingBusinessOrders[businessId],
+  )
+
   return (
     <div>
       <h1>{businessId}</h1>
       <h4>{businessCatalogObject?.type}</h4>
       <span>{money} money</span>
       <div>
+        <span>Actions</span>
+        <ul>
+          <li><button onClick={useInventories.getState().processProductCrafting}>processProductCrafting</button></li>
+          <li><button onClick={useOrders.getState().processAddOrders}>processAddOrders</button></li>
+          <li><button onClick={useOrders.getState().processAllOrdersBulk}>processAllOrdersBulk</button></li>
+        </ul>
+      </div>
+      <div>
         <h4>Business Inventory</h4>
         <ul>
+          <span>Ingredients</span>
           {objectInventoryIterable.map(([item, amount], index) => {
+            if (Object.keys(INGREDIENTS_CATALOG).includes(item))
+              return (
+                <li key={index}>
+                  <span>
+                    {item}: {amount}
+                  </span>
+                </li>
+              )
+          })}
+        </ul>
+        <ul>
+          <span>Products to sell</span>
+          {objectInventoryIterable.map(([item, amount], index) => {
+            
+            if (Object.keys(PRODUCTS_CATALOG).includes(item) && amount > 0)
+              return (
+                <li key={index}>
+                  <span>
+                    {item}:{' '}
+                    {amount}
+                  </span>
+                  <button
+                    onClick={() =>
+                      useOrders.getState().addOrder(businessId, item)
+                    }
+                  >
+                    Add 1 to pending Business Orders
+                  </button>
+                </li>
+              )
+          })}
+        </ul>
+      </div>
+      <div>
+        <h4>Orders</h4>
+        <ul>
+          <span>Pending orders:</span>
+          {pendingBusinessOrders.map((order, index) => {
             return (
               <li key={index}>
-                {item}: {amount}
+                <span>{order}</span>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div>
+        <h4>Buy from market</h4>
+        <ul>
+          {allowedItems?.map((allowedItem, index) => {
+            // user can only buy ingredients from the market
+            return (
+              <li key={index}>
+                <span>{allowedItem}</span>
+                <button
+                  onClick={() =>
+                    buyItemForBusiness(
+                      allowedItem,
+                      INGREDIENTS_CATALOG[allowedItem].baseCost || 0,
+                      businessId,
+                      allowedItems,
+                    )
+                  }
+                >
+                  buy
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div>
+        <h4>Craft</h4>
+        <ul>
+          {allowedRecipes.map((allowedRecipe: RecipeConfig, index: number) => {
+            return (
+              <li key={index}>
+                <span>{allowedRecipe.productId}</span>
+                <button
+                  onClick={() =>
+                    craftBusinessProduct(
+                      allowedRecipe.recipeName || '',
+                      businessId,
+                      allowedItems || [],
+                      RECIPE_CATALOG[allowedRecipe.recipeName || '']
+                        .requiredRole,
+                    )
+                  }
+                >
+                  craft {allowedRecipe.yieldAmount}
+                </button>
+                <button
+                  onClick={() =>
+                    useInventories
+                      .getState()
+                      .buyRecipeIngredients(
+                        allowedRecipe.recipeName || '',
+                        allowedItems || [],
+                        businessId,
+                      )
+                  }
+                >
+                  Buy required ingredients
+                </button>
               </li>
             )
           })}
@@ -123,66 +239,7 @@ function RouteComponent() {
           </ul>
         </div>
       </div>
-      <div>
-        <h4>Buy from supplier</h4>
-        <ul>
-          {allowedItems?.map((allowedItem, index) => {
-            return (
-              <li key={index}>
-                <span>{allowedItem}</span>
-                <button
-                  onClick={() =>
-                    buyItemForBusiness(
-                      allowedItem,
-                      INVENTORY_CATALOG[allowedItem].baseCost,
-                      businessId,
-                      allowedItems
-                    )
-                  }
-                >
-                  buy
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
-      <div>
-        <h4>Craft</h4>
-        <ul>
-          {allowedRecipes.map((allowedRecipe: RecipeConfig, index: number) => {
-            return (
-              <li key={index}>
-                <span>{allowedRecipe.productId}</span>
-                <button
-                  onClick={() =>
-                    craftBusinessProduct(
-                      allowedRecipe.recipeName || '',
-                      businessId,
-                      allowedItems || [],
-                      RECIPE_CATALOG[allowedRecipe.recipeName || '']
-                        .requiredRole,
-                    )
-                  }
-                >
-                  craft {allowedRecipe.yieldAmount}
-                </button>
-                <button
-                  onClick={() =>
-                    useInventories
-                      .getState()
-                      .buyRecipeIngredients(
-                        allowedRecipe.recipeName || '',
-                        allowedItems || [],
-                        businessId,
-                      )
-                  }
-                >Buy required ingredients</button>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
+
       <div>
         <button
           onClick={() =>

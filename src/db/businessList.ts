@@ -5,6 +5,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'penguin_saldejums_uzvaras',
     baseCost: 750,
     baseIncome: 5,
+    baseOrderRate: 1,
     name: 'Penguin Saldējums',
     description:
       'A colorful ice cream truck strategically parked in Uzvaras Parks. Perfect for refreshing families and kids after a skateboarding session.',
@@ -25,6 +26,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'arancino_riga_agenskalns',
     baseCost: 2500,
     baseIncome: 15,
+    baseOrderRate: 2,
     name: 'Arančino Rīga',
     description:
       'Artisan arancini shop located inside the beautiful, renovated Āgenskalns indoor market (Āgenskalna tirgus). Blends Sicilian street food with the Latvian spirit.',
@@ -48,6 +50,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'kiosk_vermanes_darzs',
     baseCost: 6000,
     baseIncome: 32,
+    baseOrderRate: 4,
     name: 'Vērmanes Kafija Kiosk',
     description:
       'A small but bustling coffee and cereal bar kiosk in the historic Vērmanes dārzs park. The favorite pit stop for downtown commuters.',
@@ -70,6 +73,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'pizza_tallinas_kvartals',
     baseCost: 14000,
     baseIncome: 70,
+    baseOrderRate: 5,
     name: 'Tallinas Kvartāls Maiznīca', // (Mantenuto nome originale dalla tua lista, anche se ID è pizza_...)
     description:
       'Artisan pizza shop in the heart of the Tallinas creative district. Attracts hipsters, artists, and lovers of organic baked goods.',
@@ -82,6 +86,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'pancake_kalnciema',
     baseCost: 28000,
     baseIncome: 125,
+    baseOrderRate: 8,
     name: 'Kalnciema Pankūkas',
     description:
       'A cozy spot specializing in sweet and savory pancakes, nestled among the characteristic wooden houses of the Kalnciema kvartāls Saturday market.',
@@ -103,6 +108,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'cafe_miera_iela',
     baseCost: 55000,
     baseIncome: 220,
+    baseOrderRate: 12,
     name: 'Miera Iela Hipster Cafē',
     description:
       "Literary cafe and independent roastery on Riga's most alternative street. Great atmosphere for students and matcha tea lovers.",
@@ -125,6 +131,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'tech_bistro_teika',
     baseCost: 120000,
     baseIncome: 450,
+    baseOrderRate: 18,
     name: 'Teika Tech Bistro',
     description:
       'A modern fast-casual bistro located in the Jaunā Teika technology hub. Feeds hundreds of hungry programmers and startup founders every lunch break.',
@@ -144,6 +151,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'sunset_grill_andrejosta',
     baseCost: 260000,
     baseIncome: 900,
+    baseOrderRate: 24,
     name: 'Andrejosta Sunset Grill',
     description:
       'Elegant restaurant with a terrace overlooking the Daugava river in the marina area. Generates massive profits during summer evenings thanks to the sunset view.',
@@ -163,6 +171,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'fine_dining_vecriga',
     baseCost: 580000,
     baseIncome: 1800,
+    baseOrderRate: 30,
     name: 'Vecrīga Luxury Dining',
     description:
       'Haute cuisine restaurant located in a historic building in the Old Town. An exclusive destination for wealthy tourists, gala dinners, and diplomatic delegations.',
@@ -190,6 +199,7 @@ export const BUSINESS_CATALOG: BusinessConfig[] = [
     id: 'airport_food_court',
     baseCost: 1350000,
     baseIncome: 3800,
+    baseOrderRate: 50,
     name: 'Lidosta Rīga Food Empire',
     description:
       'The pinnacle of your commercial empire: an entire block in the food court of Riga International Airport. Guaranteed customer traffic 24/7.',
