@@ -1,21 +1,24 @@
 import { create } from 'zustand'
-import type { EmployeeRole, InventoriesState, RecipeConfig } from '#/types'
+import type {
+  EmployeeRole,
+  InventoriesState,
+  RecipeConfig,
+  ProductsForBulkCrafting,
+} from '#/types'
 import { db } from '#/db/initDb'
 import { useMoney } from './currency'
 import { useEmployees } from './employees'
 import { RECIPE_CATALOG } from '#/db/recipeList'
 import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 import { INGREDIENTS_CATALOG } from '#/db/ingredientsCatalog'
-import { useBusiness } from './business'
 import { BUSINESS_CATALOG } from '#/db/businessList'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
 
-const updateDbInventories = async (
+export const updateDbInventories = async (
   newInventories: Record<string, Record<string, number>>,
 ) => {
   try {
     await db.update((data) => (data.inventories = newInventories))
-    console.log('inventory updated on db')
   } catch (error) {
     console.error('could not update inventory', error)
   }
@@ -82,7 +85,6 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
 
     if (!checkIngredients) {
-      console.log('not enough ingredients')
       return false
     }
 
@@ -96,6 +98,91 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     set(() => ({ inventories: inventoriesCopy }))
 
+    // Update the db
+    try {
+      await updateDbInventories(inventoriesCopy)
+      return true
+    } catch (error) {
+      console.error('could not update inventories with crafted item')
+      // revert state on failure
+      set(() => ({ inventories: currentInventories }))
+      return false
+    }
+  },
+  craftBusinessProductsForBulk: async (
+    productsForBulkCrafting: ProductsForBulkCrafting[],
+  ): Promise<boolean> => {
+    console.log(productsForBulkCrafting)
+    // How many of each items do I need to craft in bulk?
+    const currentInventories = get().inventories
+    const inventoriesCopy = structuredClone(currentInventories)
+
+    for (const {
+      yieldAmount,
+      productID,
+      recipeItemId,
+      businessAllowedItems,
+      requiredRole,
+      businessId,
+      ingredients,
+    } of productsForBulkCrafting) {
+      let checkAllowedItems = false
+      for (const item of businessAllowedItems) {
+        if (item === productID) {
+          checkAllowedItems = true
+        }
+      }
+
+      if (!checkAllowedItems) {
+        console.log('item not allowed to be crafted for this business')
+        continue
+      }
+
+      let checkRequiredEmployeeRoles = false
+      const businessEmployees =
+        useEmployees.getState().businessEmployees[businessId]
+      for (const employee of businessEmployees) {
+        if (Object.keys(EMPLOYEES_CATALOG).includes(employee)) {
+          if (EMPLOYEES_CATALOG[employee].roles.includes(requiredRole)) {
+            checkRequiredEmployeeRoles = true
+          }
+        }
+      }
+
+      if (!checkRequiredEmployeeRoles) {
+        console.log('we cannot make this recipe with the current workforce')
+        continue
+      }
+
+      const iterableRecipeIngredients = Object.entries(ingredients)
+
+      // look up if the business has enough ingredients
+      let checkIngredients = true
+      for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+        const amountHad = inventoriesCopy[businessId][ingredientId] || 0
+        if (!amountHad || amountHad < amountNeeded) {
+          checkIngredients = false
+        }
+      }
+
+      if (!checkIngredients) {
+        console.log('we do not have enough ingredients to make', productID)
+        continue
+      }
+
+      // remove ingredients from inventory
+      for (const [ingredientId, amountNeeded] of iterableRecipeIngredients) {
+        inventoriesCopy[businessId][ingredientId] -= amountNeeded
+      }
+
+      // add product to business inventory
+      const currentAmount = inventoriesCopy[businessId][productID] || 0
+      inventoriesCopy[businessId][productID] = currentAmount + yieldAmount
+    }
+
+    set(() => ({ inventories: inventoriesCopy }))
+
+    // Update the db
     try {
       await updateDbInventories(inventoriesCopy)
       return true
@@ -107,10 +194,13 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     }
   },
   processProductCrafting: async (): Promise<boolean> => {
-    // TODO: IMPROVE TYPE SAFETY
+    // TODO: improve type safety
+    // TODO: explain the logic with comments
+
     const inventories = get().inventories
-    const craftingPromises: Promise<any>[] = []
-    const promisesArguments: any = []
+    const productsToCraft: ProductsForBulkCrafting[] = []
+    const craftBusinessProductsForBulk = get().craftBusinessProductsForBulk
+
     for (const value of Object.keys(inventories)) {
       const businessAllowedItems = BUSINESS_CATALOG.find(
         (business) => business.id === value,
@@ -120,39 +210,33 @@ export const useInventories = create<InventoriesState>((set, get) => ({
         if (allowedItem in PRODUCTS_CATALOG) {
           const recipeObj =
             Object.entries(RECIPE_CATALOG).find(
-              ([key, obj]) => obj.productId === allowedItem,
+              ([_, obj]) => obj.productId === allowedItem,
             ) || []
           const requiredRole: any = recipeObj[1]?.requiredRole
-          const recipeName: any = recipeObj[0]
-          const promise = get()
-            .craftBusinessProduct(
-              recipeName,
-              businessId,
-              businessAllowedItems,
-              requiredRole,
-            )
-            .then((result) => result)
-            .catch((error) => {
-              console.error('error in running the promise', error)
-              return false
-            })
-          craftingPromises.push(promise)
-          promisesArguments.push({
-            recipeName,
+          const productID: string = recipeObj[1]?.productId || ''
+          const yieldAmount: number = recipeObj[1]?.yieldAmount || 0
+          const ingredients: Record<string, number> =
+            recipeObj[1]?.ingredients || {}
+          const recipeItemId: any = recipeObj[0]
+          productsToCraft.push({
+            yieldAmount,
+            productID,
+            recipeItemId,
             businessId,
             businessAllowedItems,
             requiredRole,
+            ingredients,
           })
         }
       })
     }
 
-    if (craftingPromises.length === 0) {
+    if (productsToCraft.length === 0) {
       return false
     }
 
     try {
-      await Promise.allSettled(craftingPromises)
+      await craftBusinessProductsForBulk(productsToCraft)
       return true
     } catch (error) {
       console.error(error)
@@ -271,10 +355,15 @@ export const useInventories = create<InventoriesState>((set, get) => ({
     cost: number,
     businessId: string,
   ): Promise<void> => {
-
     const currentInventories = get().inventories
 
-    if (id in currentInventories[businessId]) {
+    console.log(
+      '🔥 URRENT business INVENTORy 🔥',
+      currentInventories[businessId],
+    )
+    console.log('item to sell ID: ', id)
+
+    if (currentInventories[businessId][id] > 0) {
     } else {
       console.log('item. not in business inventory. cannot sell')
       return
@@ -287,9 +376,9 @@ export const useInventories = create<InventoriesState>((set, get) => ({
 
     inventoriesCopy[businessId][id] -= 1
 
-    if (inventoriesCopy[businessId][id] <= 0) {
-      delete inventoriesCopy[businessId][id]
-    }
+    // if (inventoriesCopy[businessId][id] <= 0) {
+    //   delete inventoriesCopy[businessId][id]
+    // }
 
     set(() => ({ inventories: inventoriesCopy }))
     useMoney.getState().increaseMoney(cost)

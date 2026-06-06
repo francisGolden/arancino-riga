@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import type { ElapsedTimeResult } from '#/types'
 import { getElapsedGameTime } from '#/engine/world/time'
 import { useTime } from '#/store/time'
-import { useLoop } from '#/store/offlineProgress'
+// import { useLoop } from '#/store/offlineProgress'
 import { useOrders } from '#/store/orders'
 import { db } from '#/db/initDb'
 import { useInventories } from '#/store/inventories'
@@ -13,7 +13,7 @@ export const GameClock = () => {
   const setTime = useTime((state) => state.setTime)
   const setLastSavedAt = useTime((state) => state.setLastSavedAt)
   const lastSavedAt = useTime((state) => state.time.lastSavedAt)
-  const offlineProgressStatus = useLoop((state) => state.offlineProgressStatus)
+  // const offlineProgressStatus = useLoop((state) => state.offlineProgressStatus)
 
   useEffect(() => {
     // This useEffect gathers the elapsedGameTime
@@ -49,26 +49,56 @@ export const GameClock = () => {
   }, [])
 
   // offline progress useEffect
-  useEffect(() => {
-    const savedAt = lastSavedAt || db.data.lastSavedAt
-    if (!savedAt || offlineProgressStatus === 'done') return // not hydrated yet
-    const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
-    useLoop.getState().processOfflineProgress(offlineDelta)
-  }, [lastSavedAt, db.data.lastSavedAt])
+  // useEffect(() => {
+  //   const savedAt = lastSavedAt || db.data.lastSavedAt
+  //   if (!savedAt || offlineProgressStatus === 'done') return // not hydrated yet
+  //   const offlineDelta = useLoop.getState().setOfflineDelta(savedAt, Date.now())
+  //   useLoop.getState().processOfflineProgress(offlineDelta)
+  // }, [lastSavedAt, db.data.lastSavedAt])
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   let timeoutId: number
 
-    const intervalId: number = window.setInterval(async (): Promise<void> => {
-      await useInventories.getState().processProductCrafting()
-      await useOrders.getState().processPendingOrders()
-    }, 5000)
+  //   const run = async (): Promise<void> => {
+  //     await useInventories.getState().processProductCrafting()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
 
-    return () => window.clearInterval(intervalId)
-  }, [])
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
+
+  // useEffect(() => {
+  //   let timeoutId: number
+
+  //   const run = async (): Promise<void> => {
+  //     await useOrders.getState().processAddOrders()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
+
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
+
+  // useEffect(() => {
+  //   let timeoutId: number
+
+  //   const run = async (): Promise<void> => {
+  //     await useOrders.getState().processAllOrdersBulk()
+  //     timeoutId = window.setTimeout(run, 5000)
+  //   }
+
+  //   timeoutId = window.setTimeout(run, 5000)
+  //   return () => window.clearTimeout(timeoutId)
+  // }, [])
 
   return (
-    <span> Last saved
-    at: {lastSavedAt ? new Date(lastSavedAt).toLocaleString() : new Date(db.data.lastSavedAt).toLocaleString()}
+    <span>
+      {' '}
+      Last saved at:{' '}
+      {lastSavedAt
+        ? new Date(lastSavedAt).toLocaleString()
+        : new Date(db.data.lastSavedAt).toLocaleString()}
     </span>
   )
 }

@@ -2,8 +2,10 @@ import type { OrdersState } from '#/types'
 import { create } from 'zustand'
 import { db } from '#/db/initDb'
 import { PRODUCTS_CATALOG } from '#/db/productsCatalog'
-import { useInventories } from './inventories'
-import { BUSINESS_CATALOG } from '#/db/businessList'
+import { useInventories, updateDbInventories } from './inventories'
+import { useMoney, updateDbMoney } from './currency'
+import { useEmployees } from './employees'
+import { EMPLOYEES_CATALOG } from '#/db/employeesCatalog'
 
 const updateDbOrders = async (
   newPendingBusinessOrders: Record<string, string[]>,
@@ -66,6 +68,12 @@ export const useOrders = create<OrdersState>((set, get) => ({
     }
     set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
 
+    console.log(
+      'newPendingBusinessOrders:',
+      newPendingBusinessOrders,
+      newPendingBusinessOrders[businessId].length,
+    )
+
     try {
       await updateDbOrders(newPendingBusinessOrders)
       return true
@@ -75,89 +83,167 @@ export const useOrders = create<OrdersState>((set, get) => ({
       return false
     }
   },
-  fulfillOrder: async (
-    businessId: string,
-    productId: string,
-  ): Promise<boolean> => {
-    const businessOrders = get().getPendingBusinessOrders(businessId)
-    const newBusinessOrders = [...businessOrders]
-    let toRemoveIndex = 0
+  processAllOrdersBulk: async (): Promise<boolean> => {
+    // This function processes a certain amount of orders present in the pendingBusinessOrders list
+    // The amount of orders is defined by the capacity of the workforce, namely the combined selling workrate
+    // of employees working for the business
 
-    for (let i = 0; i < newBusinessOrders.length; i++) {
-      if (newBusinessOrders[i] === productId) {
-        toRemoveIndex = i
-        break
+    // What are the orders that are present in the pending orders list of each business?
+    const oldPendingBusinessOrders = structuredClone(
+      get().pendingBusinessOrders,
+    )
+    const pendingBusinessOrdersCopy = structuredClone(
+      get().pendingBusinessOrders,
+    )
+
+    const oldInventories = structuredClone(
+      useInventories.getState().inventories,
+    )
+
+    const inventoriesCopy = structuredClone(
+      useInventories.getState().inventories,
+    )
+
+    const businessIDs = Object.keys(pendingBusinessOrdersCopy)
+
+    let totalMoneyEarned = 0
+
+    // Let's loop over the businessIDs of owned businesses
+    for (const businessID of businessIDs) {
+      // What is the combined selling workrate of the people working for this business?
+      let combinedSellingWorkrate = 0
+      const businessEmployees =
+        useEmployees.getState().businessEmployees[businessID]
+
+      for (const businessEmployee of businessEmployees) {
+        combinedSellingWorkrate +=
+          EMPLOYEES_CATALOG[businessEmployee].workRate.selling
+      }
+
+      let productsSoldCounter = 0
+
+      // We can only process as many products as the selling capacity of business' workers
+      while (productsSoldCounter < combinedSellingWorkrate) {
+        productsSoldCounter++
+      }
+
+      // Let's gather the products that are going to be sold from the pending orders list of this business
+      const productsSold = pendingBusinessOrdersCopy[businessID].splice(
+        0,
+        productsSoldCounter,
+      )
+
+      // Here we are calculating the amount of money earned by selling these products
+      for (const productSold of productsSold) {
+        totalMoneyEarned += PRODUCTS_CATALOG[productSold].baseSellingPrice
+
+        // and decreasing the amount of this product in the inventory
+        if (inventoriesCopy[businessID][productSold]) {
+          inventoriesCopy[businessID][productSold]--
+        }
       }
     }
 
-    newBusinessOrders.splice(toRemoveIndex, 1)
+    // Let's set the global state with the new object,
+    set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
 
-    const pendingBusinessOrders = get().pendingBusinessOrders
-    const newPendingBusinessOrders = {
-      ...pendingBusinessOrders,
-      [businessId]: newBusinessOrders,
-    }
-    set(() => ({ pendingBusinessOrders: newPendingBusinessOrders }))
+    // increase the money state
+    useMoney.getState().increaseMoney(totalMoneyEarned)
 
+    // and update the inventories with the new object
+    useInventories.getState().hydrateInventories(inventoriesCopy)
+
+    // Here we are trying to update the DBs with the new data and
+    // reverting to the old state in case of error
     try {
-      await updateDbOrders(newPendingBusinessOrders)
-      useInventories
-        .getState()
-        .sellBusinessItem(
-          productId,
-          PRODUCTS_CATALOG[productId].baseSellingPrice,
-          businessId,
-        )
+      await Promise.all([
+        updateDbOrders(pendingBusinessOrdersCopy),
+        updateDbMoney(useMoney.getState().money),
+        updateDbInventories(inventoriesCopy),
+      ])
       return true
     } catch (error) {
-      set(() => ({ pendingBusinessOrders }))
-      console.error('could not fulfill order', error)
+      set(() => ({ pendingBusinessOrders: oldPendingBusinessOrders }))
+      useMoney.getState().decreaseMoney(totalMoneyEarned)
+      useInventories.getState().hydrateInventories(oldInventories)
       return false
     }
   },
-  processPendingOrders: async (): Promise<boolean> => {
-    const pendingBusinessOrders = get().pendingBusinessOrders
+  processAddOrders: async (): Promise<boolean> => {
+    // This function pushes a certain amount of products present in all businesses inventories to the pendingBusinessOrders list,
+    // where they'll be processes.
+    // The amount of products that can be pushed in the list of business pending orders is set by the MARKET_DEMAND variable.
+    const inventories = structuredClone(useInventories.getState().inventories)
 
-    let pendingOrdersNumber = 0
-    Object.entries(pendingBusinessOrders).forEach(
-      ([businessId, orders]) => {
-        orders.forEach(() => {
-          pendingOrdersNumber += 1
-        })
-      },
+    const oldPendingBusinessOrders = structuredClone(
+      get().pendingBusinessOrders,
+    )
+    const pendingBusinessOrdersCopy = structuredClone(
+      get().pendingBusinessOrders,
     )
 
-    if (pendingOrdersNumber === 0) {
-      return false
+    const businessIDs = Object.keys(oldPendingBusinessOrders)
+
+    const ordersToAdd: Record<string, string[]> = {}
+
+    const MARKET_DEMAND = 10
+    const ORDERS_LIMIT = 7
+
+    // Loop over the business inventories
+    for (const businessID of businessIDs) {
+      const products = Object.keys(inventories[businessID])
+        .filter((item) => item in PRODUCTS_CATALOG)
+        .map((item) => {
+          return { productID: item, amount: inventories[businessID][item] }
+        })
+
+      let productsPushedCounter = 0
+      const productsToPush: string[] = []
+
+      const oldPendingBusinessOrdersLength =
+        pendingBusinessOrdersCopy[businessID].length
+
+
+      // Loop over the products available in the inventory of this business
+      for (const product of products) {
+        // Push as many available as possible to the productsToPush array.
+        // The limit that should not be overtaken 
+        // taking into account the sum of products already present in the pendingBusinessOrders array and the productsToPush array
+        // is set by the ORDERS_LIMIT
+        while (productsPushedCounter < MARKET_DEMAND && product.amount > 0) {
+          if (
+            oldPendingBusinessOrdersLength + productsToPush.length >=
+            ORDERS_LIMIT
+          ) {
+            break
+          }
+          productsPushedCounter++
+          product.amount -= 1
+          productsToPush.push(product['productID'])
+        }
+      }
+
+      // The ordersToAdd's property of each business is populated with products that will be pushed into its pending orders list
+      ordersToAdd[businessID] = productsToPush
+
+      // Here we are setting each business' pending business orders array
+      // as the sum of the current pending orders and the orders to add
+      // using the spread operator
+      pendingBusinessOrdersCopy[businessID] = [
+        ...pendingBusinessOrdersCopy[businessID],
+        ...ordersToAdd[businessID],
+      ]
     }
 
-    const ordersPromises: Promise<any>[] = []
-    Object.entries(pendingBusinessOrders).forEach(
-      ([businessId, orders]) => {
-        const businessOrderRate =
-          BUSINESS_CATALOG.find((business) => business.id === businessId)
-            ?.baseOrderRate || 1
-        const ordersToProcess = orders.slice(0, businessOrderRate)
-        ordersToProcess.forEach((order) => {
-          const promise = get()
-            .fulfillOrder(businessId, order)
-            .then((fulfilledOrder) => {
-              return fulfilledOrder
-            })
-            .catch((error) => {
-              console.error(`Errore nell'ordine per ${businessId}:`, error)
-              return false
-            })
-          ordersPromises.push(promise)
-        })
-      },
-    )
+    // Update the global pendingBusinessOrders state with the new values
+    set(() => ({ pendingBusinessOrders: pendingBusinessOrdersCopy }))
 
     try {
-      await Promise.allSettled(ordersPromises)
+      await updateDbOrders(pendingBusinessOrdersCopy)
       return true
     } catch (error) {
-      console.error('could not settle all order promises')
+      console.error(error)
+      set(() => ({ pendingBusinessOrders: oldPendingBusinessOrders }))
       return false
     }
   },

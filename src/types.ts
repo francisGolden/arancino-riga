@@ -12,8 +12,8 @@ export interface GameDb {
 export type EmployeeRole = 'cook' | 'cashier' | 'barista' | 'pastry chef'
 
 export interface WorkRate {
-  crafting: number;
-  selling: number;
+  crafting: number
+  selling: number
 }
 
 export interface EmployeeConfig {
@@ -23,7 +23,7 @@ export interface EmployeeConfig {
   description: string
   baseWage: number
   preferredBusinessTypes: BusinessType[]
-  workRate: WorkRate;
+  workRate: WorkRate
 }
 
 export interface ElapsedTimeResult {
@@ -34,7 +34,9 @@ export interface ElapsedTimeResult {
 export interface MoneyState {
   money: number
   increaseMoney: (amount: number) => Promise<boolean>
+  increaseMoneyMemory: (amount: number) => void
   decreaseMoney: (amount: number) => Promise<boolean>
+  decreaseMoneyMemory: (amount: number) => void
   setMoney: (amount: number) => void
   hydrateMoney: (savedAmount: number) => void
 }
@@ -75,6 +77,16 @@ export interface InventoryState {
   hydrateInventory: (savedInventory: Record<string, number>) => void
 }
 
+export interface ProductsForBulkCrafting {
+  yieldAmount: number
+  productID: string
+  recipeItemId: string
+  businessId: string
+  businessAllowedItems: string[]
+  requiredRole: EmployeeRole
+  ingredients: Record<string, number>
+}
+
 export interface InventoriesState {
   inventories: Record<string, Record<string, number>>
   craftBusinessProduct: (
@@ -83,6 +95,7 @@ export interface InventoriesState {
     allowedItems: string[],
     requiredRole: EmployeeRole,
   ) => Promise<boolean>
+  craftBusinessProductsForBulk: (productsToCraft: ProductsForBulkCrafting[]) => Promise<boolean>;
   processProductCrafting: () => Promise<boolean>
   buyRecipeIngredients: (
     recipeItemId: string,
@@ -135,8 +148,8 @@ export interface OrdersState {
   getPendingBusinessOrders: (businessId: string) => string[]
   addBusinessToPendingBusinessOrders: (businessId: string) => Promise<void>
   removeBusinessFromOrders: (businessId: string) => Promise<void>
+  processAllOrdersBulk: () => Promise<boolean>
   addOrder: (businessId: string, productId: string) => Promise<boolean>
-  fulfillOrder: (businessId: string, productId: string) => Promise<boolean>
-  processPendingOrders: () => Promise<boolean>
+  processAddOrders: () => Promise<boolean>
   hydrateOrders: (savedPendingBusinessOrders: Record<string, string[]>) => void
 }

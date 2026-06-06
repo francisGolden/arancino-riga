@@ -65,6 +65,14 @@ function RouteComponent() {
       <h4>{businessCatalogObject?.type}</h4>
       <span>{money} money</span>
       <div>
+        <span>Actions</span>
+        <ul>
+          <li><button onClick={useInventories.getState().processProductCrafting}>processProductCrafting</button></li>
+          <li><button onClick={useOrders.getState().processAddOrders}>processAddOrders</button></li>
+          <li><button onClick={useOrders.getState().processAllOrdersBulk}>processAllOrdersBulk</button></li>
+        </ul>
+      </div>
+      <div>
         <h4>Business Inventory</h4>
         <ul>
           <span>Ingredients</span>
@@ -82,18 +90,13 @@ function RouteComponent() {
         <ul>
           <span>Products to sell</span>
           {objectInventoryIterable.map(([item, amount], index) => {
-            const amountConsideringPendingOrders = amount -
-                      useOrders
-                        .getState()
-                        .getPendingBusinessOrders(businessId)
-                        .filter((orderProductId) => orderProductId === item)
-                        .length
-            if (Object.keys(PRODUCTS_CATALOG).includes(item) && amountConsideringPendingOrders > 0)
+            
+            if (Object.keys(PRODUCTS_CATALOG).includes(item) && amount > 0)
               return (
                 <li key={index}>
                   <span>
                     {item}:{' '}
-                    {amountConsideringPendingOrders}
+                    {amount}
                   </span>
                   <button
                     onClick={() =>
@@ -115,13 +118,6 @@ function RouteComponent() {
             return (
               <li key={index}>
                 <span>{order}</span>
-                <button
-                  onClick={() =>
-                    useOrders.getState().fulfillOrder(businessId, order)
-                  }
-                >
-                  Fulfill order
-                </button>
               </li>
             )
           })}
